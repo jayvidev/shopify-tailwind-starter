@@ -49,13 +49,14 @@ jobs:
 
       # If your script already runs "shopify theme push", you don't need a separate push step.
       - name: Upload theme to Shopify
+        env:
+          SHOPIFY_CLI_TOKEN: ${{ secrets.SHOPIFY_CLI_TOKEN }}
         run: |
           pnpm dlx @shopify/cli@latest theme push \
             --allow-live \
             --json \
             --theme ${{ secrets.SHOPIFY_THEME_ID }} \
-            --store ${{ secrets.SHOPIFY_STORE_URL }} \
-            --password ${{ secrets.SHOPIFY_API_PASSWORD }}
+            --store ${{ secrets.SHOPIFY_STORE_URL }}
 
       # If your npm script does NOT push, uncomment this step and remove push logic from npm script.
       # - name: Push theme to LIVE
