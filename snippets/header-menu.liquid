@@ -1,0 +1,12 @@
+<ul class="header-menu flex items-center p-4 max-[576px]:hidden">
+  {% for link in linklists.main-menu.links %}
+    <li>
+      <a href="{{ link.url }}" class="mr-4 cursor-pointer text-base text-white no-underline{% if link.active %} underline{% endif %}">
+        {{ link.title | escape }}
+      </a>
+    </li>
+  {% endfor %}
+  <button type="button" x-data @click="$store.global.isMinicartVisible = true" class="mr-4 cursor-pointer border-0 bg-transparent text-base text-white appearance-none">
+    Minicart
+  </button>
+</ul>

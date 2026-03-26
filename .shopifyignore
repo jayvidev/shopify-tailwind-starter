@@ -1,0 +1,9 @@
+package.json
+pnpm-lock.yaml
+vite.config.ts
+README.md
+jsconfig.json
+tsconfig.json
+postcss.config.cjs
+assets/.vite
+plugins/*

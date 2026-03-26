@@ -1,0 +1,26 @@
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1 {
+    font-size: var(--text-5xl);
+    font-weight: var(--font-weight-bold);
+  }
+
+  h2 {
+    font-size: var(--text-4xl);
+    font-weight: var(--font-weight-bold);
+  }
+
+  h3 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-bold);
+  
+  }
+
+  a {
+    font-weight: var(--font-weight-bold);
+    color: var(--color-cloud-burst-500);
+  }
+}

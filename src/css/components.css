@@ -1,0 +1,58 @@
+@layer components {
+  .btn {
+    padding-block: --spacing(3);
+    padding-inline: --spacing(12);
+    background-color: var(--color-indigo-900);
+    color: var(--color-white);
+    cursor: pointer;
+    border-radius: calc(infinity * 1px);
+    transition: background-color 150ms ease;
+  }
+
+  .btn:hover {
+    background-color: var(--color-cloud-burst-600);
+  }
+
+  #dialog-modal-example::backdrop {
+    background-color: --alpha(var(--color-black) / 50%);
+  }
+
+  .input-select {
+    display: block;
+    margin-block: --spacing(4);
+    padding-block: --spacing(2);
+    padding-inline: --spacing(4);
+    width: 100%;
+    border-width: 1px;
+    border-color: var(--color-gray-500);
+    appearance: none;
+    border-radius: var(--radius-lg);
+  }
+
+  .select-arrow {
+    position: absolute;
+    border: solid black;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    pointer-events: none;
+  }
+
+  .pill-button {
+    background-color: var(--color-indigo-900);
+    color: var(--color-white);
+    padding-inline: --spacing(4);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+  }
+
+  .starter-input {
+    padding-block: --spacing(2);
+    padding-inline: --spacing(4);
+    border-radius: var(--radius-lg);
+    border-color: var(--color-gray-500);
+    border-width: 1px;
+  }
+}

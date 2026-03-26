@@ -1,0 +1,13 @@
+[environments.development]
+store = "your-store.myshopify.com"
+theme = "your-theme-id"
+
+[environments.staging]
+store = "your-store.myshopify.com"
+theme = "your-theme-id"
+ignore = ["templates/*", "config/*"]
+
+[environments.production]
+store = "your-store.myshopify.com"
+theme = "your-theme-id"
+ignore = ["templates/*", "config/*"]

@@ -1,0 +1,29 @@
+{% schema %}
+  {
+    "name": "footer",
+    "class": "footer",
+    "tag": "footer",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "t:sections.footer.settings.paragraph"
+      }
+    ]
+  }
+{% endschema %}
+
+<div class="px-6 md:px-8 py-12">
+  <div class="container">
+    <div>
+      {% for link in linklists.footer.links %}
+        <a href="{{ link.url }}">
+          {{ link.title }}
+        </a>
+      {% endfor %}
+    </div>
+  
+    <small>
+      &copy; {{ "now" | date: "%Y" }} Shopify Tailwind Starter Theme
+    </small>
+  </div>
+</div>

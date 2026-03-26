@@ -1,0 +1,128 @@
+{% schema %}
+  {
+    "name": "Cart Section",
+    "class": "section-main-collection",
+    "tag": "section",
+    "settings": [
+      {
+        "type": "text",
+        "id": "summary-message",
+        "label": "Cart Summary Message",
+        "default": "Taxes and shipping calculated at checkout"
+      }
+    ]
+  }
+{% endschema %}
+
+<div class="cart px-6 py-12 md:px-8 [&_.error-notif]:block [&_.error-notif]:text-xs [&_.error-notif]:text-red-500 [&_a]:no-underline" data-ajax-cart-section>
+  <form
+    action="{{ routes.cart_url }}"
+    method="post"
+    id="cart">
+    <div class="cart-inner container">
+      {% if cart.item_count > 0 %}
+        <table class="w-full [&_tr>td]:pb-4 [&_tr>th]:pb-4">
+          <tr class="text-left">
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th></th>
+            <th>Total</th>
+          </tr>
+          {% for line_item in cart.items %}
+            <tr>
+              <td>
+                {{ line_item.title }}
+                <div data-ajax-cart-errors="{{ line_item.key }}" class="text-xs text-red-500">
+                  <!-- Error messages appear here -->
+                </div>
+              </td>
+              <td>
+                {{ line_item.price | money }}
+              </td>
+              <td>
+                <ajax-cart-quantity class="flex">
+                  <a href="{{ routes.cart_change_url }}?id={{ line_item.key }}&quantity={{ line_item.quantity | minus: 1 | at_least: 1 }}" data-ajax-cart-quantity-minus>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      class="w-6 h-6">
+                      <path
+                        fill-rule="evenodd"
+                        d="M5.25 12a.75.75 0 01.75-.75h12a.75.75 0 010 1.5H6a.75.75 0 01-.75-.75z"
+                        clip-rule="evenodd" />
+                    </svg>
+
+                  </a>
+                  <input
+                    type="number"
+                    value="{{ line_item.quantity }}"
+                    name="updates[]"
+                    data-ajax-cart-quantity-input="{{ line_item.key }}"
+                    class="noscroll w-10 appearance-none text-center [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    readonly>
+                  <img
+                    class="loading-indicator hidden h-4 w-4"
+                    src="{{ 'loading.gif' | asset_url }}"
+                    alt="Loading Indicator"
+                    role="alert"
+                    aria-busy="false">
+                  <a href="{{ routes.cart_change_url }}?id={{ line_item.key }}&quantity={{ line_item.quantity | plus: 1 }}" data-ajax-cart-quantity-plus>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      class="w-6 h-6">
+                      <path
+                        fill-rule="evenodd"
+                        d="M12 5.25a.75.75 0 01.75.75v5.25H18a.75.75 0 010 1.5h-5.25V18a.75.75 0 01-1.5 0v-5.25H6a.75.75 0 010-1.5h5.25V6a.75.75 0 01.75-.75z"
+                        clip-rule="evenodd" />
+                    </svg>
+                  </a>
+                </ajax-cart-quantity>
+              </td>
+              <td>
+                <a href="{{ line_item.url_to_remove }}" @click.prevent="window.location.replace($el.href)">Remove</a>
+              </td>
+              <td>
+                {{ line_item.final_line_price | money }}
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+
+        <div class="cart-summary-row flex flex-col py-7.5">
+          <div class="totals mb-2.5 flex items-center">
+            <h3 class="mr-8">Subtotal</h3>
+            <p>{{ cart.original_total_price | money }}</p>
+          </div>
+          <small class="mb-2.5">
+            {{ section.settings['summary-message'] }}
+          </small>
+          <button
+            class="btn mt-4 max-w-87.5"
+            type="submit"
+            name="checkout"
+            form="cart">
+            {{ 'sections.cart.checkout' | t }}
+          </button>
+        </div>
+      {% else %}
+        <h2>You have no items in your cart.</h2>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+{% comment %} Remove to allow user to key in quantity {% endcomment %}
+{% comment %} <script>
+  document.addEventListener("wheel", function(event){
+    if (document.activeElement.type === "number" &&
+       document.activeElement.classList.contains("noscroll"))
+    {
+        event.preventDefault();
+        document.activeElement.blur();
+    }
+  });
+</script> {% endcomment %}

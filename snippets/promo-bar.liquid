@@ -1,0 +1,16 @@
+<div id="site-promo-bar-wrapper" 
+  {% if settings.collapse_promo_bar %}
+    x-data
+    x-show="$store.global.isPromoBarVisible"
+    x-collapse
+  {% endif %}
+>
+  <div
+    id="site-promo-bar"
+    class="flex px-4 py-1 top-0 w-full items-center justify-center bg-woodland-500 text-white"
+  >
+    <div class="text-white [&_a]:text-white font-bold text-base tracking-wide text-center">
+      {{ settings.promo_bar_content }}
+    </div>
+  </div>
+</div>

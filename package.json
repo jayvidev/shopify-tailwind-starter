@@ -1,0 +1,41 @@
+{
+  "name": "shopify-tailwind-starter",
+  "description": "Shopify starter theme using Vite with AlpineJS, TailwindCSS, Liquid AJAX Cart, and the Shopify Vite plugin.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "run-p shopify:dev vite:watch",
+    "build": "run-s vite:build",
+    "deploy": "run-s vite:build && shopify theme push -e production",
+    "deploy:dev": "run-s vite:build && shopify theme push -e development",
+    "deploy:staging": "run-s vite:build && shopify theme push --path shopify -e staging",
+    "deploy:new": "run-s vite:build && shopify theme push --unpublished",
+    "vite:watch": "cross-env NODE_ENV=development vite",
+    "vite:build": "cross-env NODE_ENV=production vite build",
+    "shopify:dev": "shopify theme dev --poll --live-reload=\"hot-reload\" --notify=/tmp/theme.update --theme-editor-sync -e development",
+    "shopify:pull": "shopify theme pull",
+    "shopify:pull-dev": "shopify theme pull -d"
+  },
+  "devDependencies": {
+    "@alpinejs/collapse": "^3.15.3",
+    "@alpinejs/focus": "^3.15.3",
+    "@alpinejs/morph": "^3.15.3",
+    "@shopify/cli": "^3.90.1",
+    "@tailwindcss/typography": "^0.5.19",
+    "@tailwindcss/vite": "^4.1.18",
+    "@vitejs/plugin-basic-ssl": "^2.1.4",
+    "alpinejs": "^3.15.3",
+    "autoprefixer": "^10.4.20",
+    "chokidar": "^4.0.1",
+    "cross-env": "^7.0.3",
+    "fs-extra": "^11.2.0",
+    "liquid-ajax-cart": "^2.2.0",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.4.47",
+    "postcss-import": "^16.1.0",
+    "tailwindcss": "^4.1.18",
+    "vite": "^7.3.1",
+    "vite-plugin-page-reload": "^0.2.2",
+    "vite-plugin-shopify": "^4.1.1"
+  }
+}
