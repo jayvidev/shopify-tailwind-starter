@@ -16,13 +16,11 @@
           "type": "collapsable_row",
           "settings": {
             "heading": "Some Heading",
-            "content": "<p>Model Name: {{ product.metafields.custom.model_info.value.name.value }}</p><p>Model Bust: {{ product.metafields.custom.model_info.value.bust | metafield_tag }}</p>"
+            "content": "<p>Model info unavailable</p>"
           }
         }
       },
-      "block_order": [
-        "collapsable_row_7EjzKy"
-      ],
+      "block_order": ["collapsable_row_7EjzKy"],
       "settings": {
         "picker_type": "radio"
       }
@@ -32,8 +30,5 @@
       "settings": {}
     }
   },
-  "order": [
-    "main",
-    "product-recommendations"
-  ]
+  "order": ["main", "product-recommendations"]
 }
