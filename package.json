@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "run-p shopify:dev vite:watch",
+    "format": "pnpm prettier --write .",
     "build": "run-s vite:build",
     "deploy": "run-s vite:build && shopify theme push -e production",
     "deploy:dev": "run-s vite:build && shopify theme push -e development",
@@ -21,6 +22,7 @@
     "@alpinejs/focus": "^3.15.3",
     "@alpinejs/morph": "^3.15.3",
     "@shopify/cli": "^3.90.1",
+    "@shopify/prettier-plugin-liquid": "^1.10.2",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.18",
     "@vitejs/plugin-basic-ssl": "^2.1.4",
@@ -33,6 +35,7 @@
     "npm-run-all": "^4.1.5",
     "postcss": "^8.4.47",
     "postcss-import": "^16.1.0",
+    "prettier": "^3.8.1",
     "tailwindcss": "^4.1.18",
     "vite": "^7.3.1",
     "vite-plugin-page-reload": "^0.2.2",

@@ -20,6 +20,9 @@ importers:
       '@shopify/cli':
         specifier: ^3.90.1
         version: 3.92.1
+      '@shopify/prettier-plugin-liquid':
+        specifier: ^1.10.2
+        version: 1.10.2(prettier@3.8.1)
       '@tailwindcss/typography':
         specifier: ^0.5.19
         version: 0.5.19(tailwindcss@4.2.2)
@@ -56,6 +59,9 @@ importers:
       postcss-import:
         specifier: ^16.1.0
         version: 16.1.1(postcss@8.5.8)
+      prettier:
+        specifier: ^3.8.1
+        version: 3.8.1
       tailwindcss:
         specifier: ^4.1.18
         version: 4.2.2
@@ -780,10 +786,18 @@ packages:
     os: [darwin, linux, win32]
     hasBin: true
 
+  '@shopify/liquid-html-parser@2.9.2':
+    resolution: {integrity: sha512-2XJYqHaZxEBwuufGhzIZ0M6m9YA4HS7YlVOiZtYanFgkmoQeJm1c0JhKcuCXU5C1pc2M0rt1XzBX8SgWv7l8Ww==}
+
   '@shopify/plugin-cloudflare@3.92.1':
     resolution: {integrity: sha512-Hqsk5RlxlsHP/QrmE8r+CzmjJ4qrGNWmBSx84HoaQiKvaf/Tda81ZGG8cQUHyzBjpyKWmfvbEIsx7TuHk8LeJA==}
     engines: {node: '>=20.10.0'}
     os: [darwin, linux, win32]
+
+  '@shopify/prettier-plugin-liquid@1.10.2':
+    resolution: {integrity: sha512-yzC+6bJemVnrEgddztLuX5I7zSoRrxXgS5j7BVS6HzVs9sMf8Fx+bdIEDkKu4bBBBKSzuen1SLVfq9u3z9L1wQ==}
+    peerDependencies:
+      prettier: ^2.0.0 || ^3.0.0
 
   '@sindresorhus/is@5.6.0':
     resolution: {integrity: sha512-TV7t8GKYaJWsn00tFDqBw8+Uqmr8A0fRU1tvTQhyZzGv0sJCGRQL3JGMI3ucuKo3XIZdUP+Lx7/gh2t3lewy7g==}
@@ -1663,6 +1677,9 @@ packages:
   hosted-git-info@2.8.9:
     resolution: {integrity: sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==}
 
+  html-styles@1.0.0:
+    resolution: {integrity: sha512-cDl5dcj73oI4Hy0DSUNh54CAwslNLJRCCoO+RNkVo+sBrjA/0+7E/xzvj3zH/GxbbBLGJhE0hBe1eg+0FINC6w==}
+
   http-cache-semantics@4.2.0:
     resolution: {integrity: sha512-dTxcvPXqPvXBQpq5dUr6mEMJX4oIEFv6bwom3FDwKRDsuIjjJGANqhBuoAn9c1RQJIdAKav33ED65E2ys+87QQ==}
 
@@ -1903,6 +1920,10 @@ packages:
     resolution: {integrity: sha512-6B3tLtFqtQS4ekarvLVMZ+X+VlvQekbe4taUkf/rhVO3d/h0M2rfARm/pXLcPEsjjMsFgrFgSrhQIxcSVrBz8w==}
     engines: {node: '>=18'}
 
+  isobject@2.1.0:
+    resolution: {integrity: sha512-+OUdGJlgjOBZDfxnDjYYG6zp487z0JGNQq3cYQYg5f5hKR+syHMsaztzGeml/4kGG55CSpKSpWTY+jYGgsHLgA==}
+    engines: {node: '>=0.10.0'}
+
   jake@10.9.4:
     resolution: {integrity: sha512-wpHYzhxiVQL+IV05BLE2Xn34zW1S223hvjtqk0+gsPrwd/8JNLXJgZZM/iPFsYc1xyphF+6M6EvdE5E9MBGkDA==}
     engines: {node: '>=10'}
@@ -2028,6 +2049,9 @@ packages:
   lilconfig@3.1.3:
     resolution: {integrity: sha512-/vlFKAoH5Cgt3Ie+JLhRbwOsCQePABiU3tJ1egGvyQ+33R/vcwM2Zl2QR/LzjsBeItPt3oSVXapn+m4nQDvpzw==}
     engines: {node: '>=14'}
+
+  line-column@1.0.2:
+    resolution: {integrity: sha512-Ktrjk5noGYlHsVnYWh62FLVs4hTb8A3e+vucNZMgPeAOITdshMSgv4cCZQeRDjm7+goqmo6+liZwTXo+U3sVww==}
 
   liquid-ajax-cart@2.2.0:
     resolution: {integrity: sha512-j4NzKvejE0p2Dz49TreIWkCh4vAI5fBoZbtlsTiAWG9Led65YqofK9AxQAS1tU+KkOSW3ilH+RejN9ZYv13czg==}
@@ -2221,6 +2245,10 @@ packages:
     resolution: {integrity: sha512-nK28WOo+QIjBkDduTINE4JkF/UJJKyf2EJxvJKfblDpyg0Q+pkOHNTL0Qwy6NP6FhE/EnzV73BxxqcJaXY9anw==}
     engines: {node: '>= 0.4'}
 
+  ohm-js@17.5.0:
+    resolution: {integrity: sha512-l4Sa7026+6jsvYbt0PXKmL+f+ML32fD++IznLgxDhx2t9Cx6NC7zwRqblCujPHGGmkQerHoeBzRutdxaw/S72g==}
+    engines: {node: '>=0.12.1'}
+
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
@@ -2355,6 +2383,11 @@ packages:
   postcss@8.5.8:
     resolution: {integrity: sha512-OW/rX8O/jXnm82Ey1k44pObPtdblfiuWnrd8X7GJ7emImCOstunGbXUpp7HdBrFQX6rJzn3sPT397Wp5aCwCHg==}
     engines: {node: ^10 || ^12 || >=14}
+
+  prettier@3.8.1:
+    resolution: {integrity: sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==}
+    engines: {node: '>=14'}
+    hasBin: true
 
   printable-characters@1.0.42:
     resolution: {integrity: sha512-dKp+C4iXWK4vVYZmYSd0KBH5F/h1HoZRsbJ82AVKRO3PEo8L4lBS/vLwhVtpwwuYcoIsVY+1JYKR268yn480uQ==}
@@ -3537,6 +3570,11 @@ snapshots:
       esbuild: 0.27.2
       global-agent: 3.0.0
 
+  '@shopify/liquid-html-parser@2.9.2':
+    dependencies:
+      line-column: 1.0.2
+      ohm-js: 17.5.0
+
   '@shopify/plugin-cloudflare@3.92.1':
     dependencies:
       '@oclif/core': 4.5.3
@@ -3548,6 +3586,12 @@ snapshots:
       - react-devtools-core
       - supports-color
       - utf-8-validate
+
+  '@shopify/prettier-plugin-liquid@1.10.2(prettier@3.8.1)':
+    dependencies:
+      '@shopify/liquid-html-parser': 2.9.2
+      html-styles: 1.0.0
+      prettier: 3.8.1
 
   '@sindresorhus/is@5.6.0': {}
 
@@ -4567,6 +4611,8 @@ snapshots:
 
   hosted-git-info@2.8.9: {}
 
+  html-styles@1.0.0: {}
+
   http-cache-semantics@4.2.0: {}
 
   http2-wrapper@2.2.1:
@@ -4790,6 +4836,10 @@ snapshots:
 
   isexe@3.1.5: {}
 
+  isobject@2.1.0:
+    dependencies:
+      isarray: 1.0.0
+
   jake@10.9.4:
     dependencies:
       async: 3.2.6
@@ -4884,6 +4934,11 @@ snapshots:
       lightningcss-win32-x64-msvc: 1.32.0
 
   lilconfig@3.1.3: {}
+
+  line-column@1.0.2:
+    dependencies:
+      isarray: 1.0.0
+      isobject: 2.1.0
 
   liquid-ajax-cart@2.2.0: {}
 
@@ -5048,6 +5103,8 @@ snapshots:
       has-symbols: 1.1.0
       object-keys: 1.1.1
 
+  ohm-js@17.5.0: {}
+
   once@1.4.0:
     dependencies:
       wrappy: 1.0.2
@@ -5168,6 +5225,8 @@ snapshots:
       nanoid: 3.3.11
       picocolors: 1.1.1
       source-map-js: 1.2.1
+
+  prettier@3.8.1: {}
 
   printable-characters@1.0.42: {}
 
