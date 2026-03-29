@@ -39,15 +39,12 @@ jobs:
             pnpm install
           fi
 
-      - name: Install Shopify CLI
-        run: pnpm add -g @shopify/cli@latest
-
       - name: Run build script
         run: pnpm build
 
       - name: Upload theme to Shopify
         run: |
-          shopify theme push \
+          pnpm exec shopify theme push \
             --allow-live \
             --json \
             --theme ${{ secrets.SHOPIFY_THEME_ID }} \
