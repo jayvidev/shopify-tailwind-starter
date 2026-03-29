@@ -1,6 +1,24 @@
 {
   "files.exclude": {
     "node_modules": true,
-    "assets": true,
-  }
+    "pnpm-lock.yaml": true,
+    "assets": true
+  },
+  "files.associations": {
+    "*.liquid": "liquid"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[liquid]": {
+    "editor.defaultFormatter": "Shopify.theme-check-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "prettier.requireConfig": true,
+  "shopifyLiquid.formattingEnabled": true,
+  "shopifyLiquid.themeCheckEnabled": true
 }

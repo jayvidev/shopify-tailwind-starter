@@ -1,9 +1,25 @@
 package.json
 pnpm-lock.yaml
-vite.config.ts
+vite.config.js
 README.md
 jsconfig.json
 tsconfig.json
 postcss.config.cjs
 assets/.vite
 plugins/*
+
+# Dev source files (not part of theme)
+node_modules/
+src/
+
+# Config files
+.prettierrc
+.prettierignore
+.theme-check.yml
+.mcp.json
+.github/
+.vscode/
+
+# System files
+*.log
+.DS_Store
