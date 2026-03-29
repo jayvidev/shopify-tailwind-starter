@@ -28,6 +28,6 @@ jobs:
         uses: shopify/theme-check-action@v2
         with:
           # Change this if your theme is in a subfolder like "theme/"
-          theme_root: "."
+          theme_root: '.'
           token: ${{ github.token }}
           base: main

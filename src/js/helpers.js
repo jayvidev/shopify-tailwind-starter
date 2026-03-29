@@ -41,38 +41,41 @@ export default {
       })
   },
   debounce(func, wait) {
-    let timeout;
+    let timeout
     return function (...args) {
-      const context = this;
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(context, args), wait);
-    };
+      const context = this
+      clearTimeout(timeout)
+      timeout = setTimeout(() => func.apply(context, args), wait)
+    }
   },
   throttle(func, limit) {
-    let lastFunc;
-    let lastRan;
+    let lastFunc
+    let lastRan
     return function (...args) {
-      const context = this;
+      const context = this
       if (!lastRan) {
-        func.apply(context, args);
-        lastRan = Date.now();
+        func.apply(context, args)
+        lastRan = Date.now()
       } else {
-        clearTimeout(lastFunc);
-        lastFunc = setTimeout(function () {
-          if ((Date.now() - lastRan) >= limit) {
-            func.apply(context, args);
-            lastRan = Date.now();
-          }
-        }, limit - (Date.now() - lastRan));
+        clearTimeout(lastFunc)
+        lastFunc = setTimeout(
+          function () {
+            if (Date.now() - lastRan >= limit) {
+              func.apply(context, args)
+              lastRan = Date.now()
+            }
+          },
+          limit - (Date.now() - lastRan)
+        )
       }
-    };
+    }
   },
   debounce(func, wait) {
-    let timeout;
+    let timeout
     return function (...args) {
-      const context = this;
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(context, args), wait);
-    };
-  }
+      const context = this
+      clearTimeout(timeout)
+      timeout = setTimeout(() => func.apply(context, args), wait)
+    }
+  },
 }

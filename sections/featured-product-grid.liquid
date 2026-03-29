@@ -18,20 +18,22 @@
 }
 {% endschema %}
 
-<div class="px-6 md:px-8 py-12">
+<div class='px-6 md:px-8 py-12'>
   {% if section.settings.featured_collection != blank %}
-    <div class="featured-product-grid-inner container">
-      <h2 class="mb-12">Featured Product Grid</h2>
-      <div class="grid-wrapper">
+    <div class='featured-product-grid-inner container'>
+      <h2 class='mb-12'>Featured Product Grid</h2>
+      <div class='grid-wrapper'>
         {% assign featured_collection = section.settings.featured_collection %}
-        <div class="product-grid grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
+        <div class='product-grid grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4'>
           {% for product in featured_collection.products %}
             {% render 'product-grid-item', prod: product %}
           {% endfor %}
         </div>
       </div>
 
-      <div class="mt-10 [&_.pagination]:mx-auto [&_.pagination]:flex [&_.pagination]:max-w-max [&_.pagination]:gap-2.5"></div>
+      <div
+        class='mt-10 [&_.pagination]:mx-auto [&_.pagination]:flex [&_.pagination]:max-w-max [&_.pagination]:gap-2.5'
+      ></div>
     </div>
   {% endif %}
 </div>

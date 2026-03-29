@@ -3,10 +3,7 @@ import { rmSync, readdirSync } from 'fs'
 import { resolve } from 'path'
 
 export function cleanShopifyAssets(options = {}) {
-  const {
-    dir = 'assets',
-    extensions = ['.js', '.css', '.map']
-  } = options
+  const { dir = 'assets', extensions = ['.js', '.css', '.map'] } = options
 
   return {
     name: 'clean-shopify-assets',
@@ -17,8 +14,8 @@ export function cleanShopifyAssets(options = {}) {
         const files = readdirSync(assetsDir)
 
         files
-          .filter(file => /\-[a-zA-Z0-9]{8}\.(js|css|map)$/.test(file))
-          .forEach(file => {
+          .filter((file) => /\-[a-zA-Z0-9]{8}\.(js|css|map)$/.test(file))
+          .forEach((file) => {
             rmSync(resolve(assetsDir, file), { force: true })
           })
 
@@ -26,6 +23,6 @@ export function cleanShopifyAssets(options = {}) {
       } catch {
         // Directory doesn't exist yet, nothing to clean
       }
-    }
+    },
   }
 }

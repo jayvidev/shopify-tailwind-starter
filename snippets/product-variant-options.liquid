@@ -22,9 +22,11 @@
   assign product_form_id = 'product-form-' | append: section.id
 -%}
 
-{% comment %} <script>
-  console.log({{ product.variants | json }})
-</script> {% endcomment %}
+{% comment %}
+  <script>
+    console.log({{ product.variants | json }})
+  </script>
+{% endcomment %}
 
 {%- for value in option.values -%}
   {%- liquid
@@ -62,41 +64,45 @@
   -%}
 
   {%- if picker_type == 'radio' -%}
-      <input
-        type="radio"
-        id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
-        name="{{ option.name }}"
-      value="{{ value | escape }}"
-      form="{{ product_form_id }}"
+    <input
+      type='radio'
+      id='{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}'
+      name='{{ option.name }}'
+      value='{{ value | escape }}'
+      form='{{ product_form_id }}'
       data-prodify-shopify-section-main-product-inner
       {% if option.selected_value == value %}
         checked
       {% endif %}
       {% if option_disabled %}
-        class="peer disabled hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white [&:disabled+label]:bg-slate-100 [&:disabled+label]:text-gray-300 focus-visible:[&+label]:outline focus-visible:[&+label]:outline-2 focus-visible:[&+label]:outline-[#08f]"
+        class='peer disabled hidden [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white [&:disabled+label]:bg-slate-100 [&:disabled+label]:text-gray-300 focus-visible:[&+label]:outline focus-visible:[&+label]:outline-2 focus-visible:[&+label]:outline-[#08f]'
       {% else %}
-        class="peer hidden [&.disabled+label]:line-through [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white [&:disabled+label]:bg-slate-100 [&:disabled+label]:text-gray-300 focus-visible:[&+label]:outline focus-visible:[&+label]:outline-2 focus-visible:[&+label]:outline-[#08f]"
+        class='peer hidden [&.disabled+label]:line-through [&:checked+label]:bg-indigo-900 [&:checked+label]:text-white [&:disabled+label]:bg-slate-100 [&:disabled+label]:text-gray-300 focus-visible:[&+label]:outline focus-visible:[&+label]:outline-2 focus-visible:[&+label]:outline-[#08f]'
       {% endif %}
     >
-    <label 
-      for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}" 
-      data-unavailable="{{ option_unavailable }}"
-      @keyup.enter="$el.click()"
-      tabindex="0"
-      class="inline-block cursor-pointer rounded-full bg-slate-100 px-5 py-2.5 text-sm tracking-[1px] text-black data-[unavailable=true]:bg-slate-100 data-[unavailable=true]:text-gray-300"
-      >
+    <label
+      for='{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}'
+      data-unavailable='{{ option_unavailable }}'
+      @keyup.enter='$el.click()'
+      tabindex='0'
+      class='inline-block cursor-pointer rounded-full bg-slate-100 px-5 py-2.5 text-sm tracking-[1px] text-black data-[unavailable=true]:bg-slate-100 data-[unavailable=true]:text-gray-300'
+    >
       {{ value -}}
-      <span class="visually-hidden sr-only">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span>
+      <span class='visually-hidden sr-only'>
+        {{- 'products.product.variant_sold_out_or_unavailable' | t -}}
+      </span>
     </label>
   {%- else -%}
     <option
-      value="{{ value | escape }}"
-      data-option-position="option{{ option.position }}"
-      data-option-value="{{ value | escape }}"
-      data-selected-value="{{ option.selected_value | escape }}"
+      value='{{ value | escape }}'
+      data-option-position='option{{ option.position }}'
+      data-option-value='{{ value | escape }}'
+      data-selected-value='{{ option.selected_value | escape }}'
       {% assign value = value | strip %}
       {% assign selected_value = option.selected_value | strip %}
-      {% if value == selected_value %}selected{% endif %}
+      {% if value == selected_value %}
+        selected
+      {% endif %}
     >
       {% if option_unavailable -%}
         {% if option_not_exist %}

@@ -1,7 +1,7 @@
 import shopify from 'vite-plugin-shopify'
 import pageReload from 'vite-plugin-page-reload'
 import basicSsl from '@vitejs/plugin-basic-ssl'
-import tailwindcss from "@tailwindcss/vite";
+import tailwindcss from '@tailwindcss/vite'
 import { copyPublicToAssetsPlugin } from './plugins/vite-plugin-copy-public-to-assets.js'
 import { cleanShopifyAssets } from './plugins/vite-plugin-clean-assets.js'
 
@@ -16,9 +16,9 @@ export default {
       origin: [
         /^https?:\/\/(?:(?:[^:]+\.)?localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/,
         'https://starter.myshopify.com',
-        'https:/starter.com'
-      ]
-    }
+        'https:/starter.com',
+      ],
+    },
   },
   publicDir: 'public',
   build: {
@@ -30,7 +30,7 @@ export default {
         chunkFileNames: '[name].[hash].min.js',
         assetFileNames: '[name].[hash].min[extname]',
       },
-    }
+    },
   },
   plugins: [
     tailwindcss(),
@@ -38,23 +38,21 @@ export default {
     copyPublicToAssetsPlugin(),
     cleanShopifyAssets(),
     shopify({
-      sourceCodeDir: "src",
+      sourceCodeDir: 'src',
       entrypointsDir: 'src/entrypoints',
-      additionalEntrypoints: [
-        'src/js/prodify/index.ts'
-      ],
+      additionalEntrypoints: ['src/js/prodify/index.ts'],
     }),
     pageReload('/tmp/theme.update', {
-      delay: 2000
+      delay: 2000,
     }),
     {
       name: 'vite-plugin-liquid-tailwind-refresh',
       handleHotUpdate(ctx) {
         if (ctx.file.endsWith('.liquid')) {
           // Filter out the liquid module to prevent a full refresh
-          return [...ctx.modules[0]?.importers ?? [], ...ctx.modules.slice(1)]
+          return [...(ctx.modules[0]?.importers ?? []), ...ctx.modules.slice(1)]
         }
-      }
-    }
+      },
+    },
   ],
 }

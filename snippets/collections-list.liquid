@@ -1,9 +1,13 @@
-<ul class="collections-list flex justify-center">
+<ul class='collections-list flex justify-center'>
   {% for collection in collections %}
-  <li{% unless forloop.first %} class="mb-10 ml-4"{% endunless %}>
-    <a href="{{ collection.url }}">
-      {{ collection.title }}
-    </a>
-  </li>
+    <li
+      {% unless forloop.first %}
+        class='mb-10 ml-4'
+      {% endunless %}
+    >
+      <a href='{{ collection.url }}'>
+        {{ collection.title }}
+      </a>
+    </li>
   {% endfor %}
 </ul>

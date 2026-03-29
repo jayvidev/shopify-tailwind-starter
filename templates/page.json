@@ -18,22 +18,15 @@
           }
         }
       },
-      "block_order": [
-        "item_qmT3Hm",
-        "item_EBEdYH"
-      ],
+      "block_order": ["item_qmT3Hm", "item_EBEdYH"],
       "settings": {
         "heading": "FAQ Demo Section"
       }
     },
     "main": {
       "type": "main-page",
-      "settings": {
-      }
+      "settings": {}
     }
   },
-  "order": [
-    "faq_BzizYk",
-    "main"
-  ]
+  "order": ["faq_BzizYk", "main"]
 }

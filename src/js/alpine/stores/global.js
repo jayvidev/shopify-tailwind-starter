@@ -1,5 +1,5 @@
 export default {
-  name: "global",
+  name: 'global',
   store() {
     return {
       isMobileMenuVisible: false,
@@ -9,65 +9,65 @@ export default {
       isWindowScrolled: false,
       cart: null,
       init() {
-        console.log("Starter Global Store Initialized.");
+        console.log('Starter Global Store Initialized.')
 
         window.addEventListener(
-          "scroll",
+          'scroll',
           window[window.starterNamespace].helpers.throttle(
             this.onWindowScrollHandler.bind(this),
-            200,
-          ),
-        );
+            200
+          )
+        )
 
-        this.initLiquidAJaxCart();
+        this.initLiquidAJaxCart()
       },
       get bodyClasses() {
-        let classes = [];
+        let classes = []
 
         if (this.isMobileMenuVisible) {
-          classes.push("mobile-menu-visible");
+          classes.push('mobile-menu-visible')
         }
 
-        return classes || "";
+        return classes || ''
       },
       openMobileMenu() {
-        this.isMobileMenuVisible = true;
+        this.isMobileMenuVisible = true
       },
       closeMobileMenu() {
-        this.isMobileMenuVisible = false;
+        this.isMobileMenuVisible = false
       },
       toggleMobileMenu() {
-        this.isMobileMenuVisible = !this.isMobileMenuVisible;
+        this.isMobileMenuVisible = !this.isMobileMenuVisible
       },
       initLiquidAJaxCart() {
-        document.addEventListener("liquid-ajax-cart:request-end", (event) => {
-          const { requestState, cart, previousCart, sections } = event.detail;
+        document.addEventListener('liquid-ajax-cart:request-end', (event) => {
+          const { requestState, cart, previousCart, sections } = event.detail
 
-          if (requestState.requestType === "add") {
+          if (requestState.requestType === 'add') {
             if (requestState.responseData?.ok) {
-              this.isMinicartVisible = true;
+              this.isMinicartVisible = true
             }
           }
 
-          this.cart = cart;
-        });
+          this.cart = cart
+        })
       },
       onWindowScrollHandler() {
-        const isScrolled = window.scrollY > 0;
+        const isScrolled = window.scrollY > 0
 
         // Hide promo bar when scrolling down more than 100px
         if (window.scrollY > 100) {
-          this.isPromoBarVisible = false;
+          this.isPromoBarVisible = false
         } else if (window.scrollY < 60) {
-          this.isPromoBarVisible = true;
+          this.isPromoBarVisible = true
         }
 
-        this.isWindowScrolled = isScrolled;
-        document.body.classList[isScrolled ? "add" : "remove"]("scrolled");
+        this.isWindowScrolled = isScrolled
+        document.body.classList[isScrolled ? 'add' : 'remove']('scrolled')
       },
       openModal() {
-        document.dispatchEvent(new CustomEvent("show-modal"));
+        document.dispatchEvent(new CustomEvent('show-modal'))
       },
-    };
+    }
   },
-};
+}

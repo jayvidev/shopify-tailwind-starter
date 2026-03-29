@@ -1,25 +1,23 @@
 {% schema %}
-  {
-    "name": "Modal",
-    "class": "section-modal",
-    "settings": []
-  }
+{
+  "name": "Modal",
+  "class": "section-modal",
+  "settings": []
+}
 {% endschema %}
 
 <dialog
-  id="dialog-modal-example"
-  x-data="modal"
-  x-init="init($el)"
-  class="max-w-md rounded-md mx-auto top-1/2 -translate-y-1/2"
-  @click="close($event)"
-  >
-  <form action="" class="p-12">
-    <div class="prose">
+  id='dialog-modal-example'
+  x-data='modal'
+  x-init='init($el)'
+  class='max-w-md rounded-md mx-auto top-1/2 -translate-y-1/2'
+  @click='close($event)'
+>
+  <form action='' class='p-12'>
+    <div class='prose'>
       <h1>{{ settings.modal_title }}</h1>
       <p>{{ settings.modal_description }}</p>
-      <button type="button" @click="open = false" class="btn rounded-none">
-        Close
-      </button>
+      <button type='button' @click='open = false' class='btn rounded-none'>Close</button>
     </div>
   </form>
 </dialog>
@@ -69,7 +67,7 @@
             this.open = false
           }
         }
-      }
+      },
     }))
   })
 </script>

@@ -1,93 +1,101 @@
 {% schema %}
-  {
-    "name": "Product Section",
-    "class": "section-main-product",
-    "tag": "section",
-    "settings": [
-      {
-        "type": "radio",
-        "id": "picker_type",
-        "label": "Variant Picker Type",
-        "options": [
-          {
-            "value": "radio",
-            "label": "Radio Buttons"
-          }, {
-            "value": "select",
-            "label": "Select Dropdowns"
-          }
-        ],
-        "default": "radio"
-      }
-    ],
-    "blocks": [
-      {
-        "type": "collapsable_row",
-        "name": "Collapsable Row",
-        "settings": [
-          {
-            "type": "text",
-            "id": "heading",
-            "label": "Heading"
-          }, {
-            "type": "richtext",
-            "id": "content",
-            "label": "Content"
-          }
-        ]
-      }
-    ]
-  }
+{
+  "name": "Product Section",
+  "class": "section-main-product",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "radio",
+      "id": "picker_type",
+      "label": "Variant Picker Type",
+      "options": [
+        {
+          "value": "radio",
+          "label": "Radio Buttons"
+        },
+        {
+          "value": "select",
+          "label": "Select Dropdowns"
+        }
+      ],
+      "default": "radio"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collapsable_row",
+      "name": "Collapsable Row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Content"
+        }
+      ]
+    }
+  ]
+}
 {% endschema %}
 
-<div class="px-6 md:px-8 py-12">
+<div class='px-6 md:px-8 py-12'>
   <div
-    class="shopify-section-main-product-inner container mx-auto"
-    data-handle="{{ product.handle }}"
-    data-id="{{ product.id }}"
-    data-url="{{ product.url }}"
-    data-section="{{ section.id }}"
-    data-prodify="{{ section.settings.picker_type }}">
-
-    <script type="application/json" data-prodify-variants-json>
+    class='shopify-section-main-product-inner container mx-auto'
+    data-handle='{{ product.handle }}'
+    data-id='{{ product.id }}'
+    data-url='{{ product.url }}'
+    data-section='{{ section.id }}'
+    data-prodify='{{ section.settings.picker_type }}'
+  >
+    <script type='application/json' data-prodify-variants-json>
       {{ product.variants | json }}
     </script>
 
-    <a class="absolute z-50 px-4 py-2 text-white bg-cloud-burst rounded-lg shadow-lg not-focus:sr-only" href="#product-info-{{ section.id }}">
+    <a
+      class='absolute z-50 px-4 py-2 text-white bg-cloud-burst rounded-lg shadow-lg not-focus:sr-only'
+      href='#product-info-{{ section.id }}'
+    >
       Skip to product info
     </a>
-    <div class="md:flex md:gap-12 pdp-main relative">
-      <div class="media flex-1 mb-8 md:mb-0" data-prodify-media-container>
-        <div class="image-wrapper relative overflow-hidden pt-[137%]">
+    <div class='md:flex md:gap-12 pdp-main relative'>
+      <div class='media flex-1 mb-8 md:mb-0' data-prodify-media-container>
+        <div class='image-wrapper relative overflow-hidden pt-[137%]'>
           {% if product.selected_variant and product.selected_variant.image %}
             {% assign media = product.selected_variant.image %}
           {% else %}
             {% assign media = product.featured_image %}
           {% endif %}
           <img
-            src="{{ media | image_url }}"
-            alt="{{ media.alt }}"
-            srcset="{{ media | image_url: width: 800 }} 800w, {{ media | image_url: width: 1000 }} 1000w, {{ media | image_url: width: 1426 }} 1426w"
-            sizes="(min-width: 768px) 55vw, 100vw"
-            height="{{ media.height }}"
-            width="{{ media.width }}"
-            class="absolute h-full w-full object-cover inset-0"
-            loading="eager">
-          <h1 class="text-4xl z-50 relative">
+            src='{{ media | image_url }}'
+            alt='{{ media.alt }}'
+            srcset='{{ media | image_url: width: 800 }} 800w, {{ media | image_url: width: 1000 }} 1000w, {{ media | image_url: width: 1426 }} 1426w'
+            sizes='(min-width: 768px) 55vw, 100vw'
+            height='{{ media.height }}'
+            width='{{ media.width }}'
+            class='absolute h-full w-full object-cover inset-0'
+            loading='eager'
+          >
+          <h1 class='text-4xl z-50 relative'>
             {{ product.selected_or_first_available_variant.options }}
           </h1>
         </div>
-        <span class="absolute top-0 left-0 z-100 text-[10px]">
+        <span class='absolute top-0 left-0 z-100 text-[10px]'>
           {{ product.selected_or_first_available_variant.id }}
         </span>
       </div>
-      <div class="info flex-1" id="product-info-{{ section.id }}">
-        <p class="caption tracking-wide text-[10px] leading-3 text-gray-500">{{ product.type | upcase }}</p>
-        <h1 class="text-4xl leading-normal font-medium">{{ product.title }}</h1>
-        <div class="flex items-center py-2" data-prodify-price-container>
-          <span class="sr-only">Regular Price</span>
+      <div class='info flex-1' id='product-info-{{ section.id }}'>
+        <p class='caption tracking-wide text-[10px] leading-3 text-gray-500'>
+          {{ product.type | upcase }}
+        </p>
+        <h1 class='text-4xl leading-normal font-medium'>{{ product.title }}</h1>
+        <div class='flex items-center py-2' data-prodify-price-container>
+          <span class='sr-only'>Regular Price</span>
           {% if product.selected_or_first_available_variant.compare_at_price %}
-            <span class="line-through">
+            <span class='line-through'>
               {{ product.selected_or_first_available_variant.compare_at_price | money }}
             </span>
           {% endif %}
@@ -95,24 +103,26 @@
             {{ product.selected_or_first_available_variant.price | money }}
           </span>
         </div>
-        {% render 'product-variant-picker'
-          , product: product
-          , product_form_id: 'product-form-id'
-          , picker_type: section.settings.picker_type %}
-        <div class="quantity-row">
-          <label for="quantity-control-input">Quantity</label>
-          <div class="quantity-control-container">
-            <button type="button" data-prodify-quantity-decrement>
+        {% render 'product-variant-picker',
+          product: product,
+          product_form_id: 'product-form-id',
+          picker_type: section.settings.picker_type
+        %}
+        <div class='quantity-row'>
+          <label for='quantity-control-input'>Quantity</label>
+          <div class='quantity-control-container'>
+            <button type='button' data-prodify-quantity-decrement>
               {% render 'icon-minus' %}
             </button>
             <input
-              tabindex="-1"
-              type="number"
-              id="quantity-control-input"
-              value="1"
-              disabled=""
-              data-prodify-quantity-presentation>
-            <button type="button" data-prodify-quantity-increment>
+              tabindex='-1'
+              type='number'
+              id='quantity-control-input'
+              value='1'
+              disabled=''
+              data-prodify-quantity-presentation
+            >
+            <button type='button' data-prodify-quantity-increment>
               {% render 'icon-plus' %}
             </button>
           </div>
@@ -120,54 +130,59 @@
 
         <ajax-cart-product-form>
           <form
-            action="{{ routes.cart_add_url }}"
-            id="product_form_id"
-            class="product-form"
-            novalidate="novalidate"
-            data-prodify-product-form>
+            action='{{ routes.cart_add_url }}'
+            id='product_form_id'
+            class='product-form'
+            novalidate='novalidate'
+            data-prodify-product-form
+          >
             <input
-              type="hidden"
-              name="id"
-              value="{{ product.selected_or_first_available_variant.id }}">
+              type='hidden'
+              name='id'
+              value='{{ product.selected_or_first_available_variant.id }}'
+            >
             <input
-              type="hidden"
-              name="quantity"
-              value="1"
-              data-prodify-quantity-hidden-input>
-            <div class="mb-2.5">
+              type='hidden'
+              name='quantity'
+              value='1'
+              data-prodify-quantity-hidden-input
+            >
+            <div class='mb-2.5'>
               <button
-                type="submit"
-                name="add"
-                class="px-6 hover:bg-cloud-burst-400 bg-indigo-900 text-white w-full h-12 cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-black"
+                type='submit'
+                name='add'
+                class='px-6 hover:bg-cloud-burst-400 bg-indigo-900 text-white w-full h-12 cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-black'
                 {% if product.selected_or_first_available_variant.available == false %}
-                disabled
-                {% endif %}>
-                <span class="in-[[processing]]:hidden">
+                  disabled
+                {% endif %}
+              >
+                <span class='in-[[processing]]:hidden'>
                   {%- if product.selected_or_first_available_variant.available -%}
                     Add to cart
                   {%- else -%}
                     Sold out
                   {%- endif -%}
                 </span>
-                <span class="hidden in-[[processing]]:block in-[[processing]]:cursor-not-allowed">
+                <span class='hidden in-[[processing]]:block in-[[processing]]:cursor-not-allowed'>
                   Adding to cart...
                 </span>
               </button>
             </div>
-            <div data-ajax-cart-errors="form" class="text-red-500">
+            <div data-ajax-cart-errors='form' class='text-red-500'>
               <!-- Error messages appear here -->
             </div>
 
             {%- if product.selected_or_first_available_variant.available -%}
               <button
-                type="button"
-                class="w-full h-12 px-6 text-white bg-indigo-900 flex items-center justify-center hover:after:border-offset-1"
-                onclick="onBuyNowClicked()">
+                type='button'
+                class='w-full h-12 px-6 text-white bg-indigo-900 flex items-center justify-center hover:after:border-offset-1'
+                onclick='onBuyNowClicked()'
+              >
                 Buy it now
               </button>
               <script>
                 const onBuyNowClicked = () => {
-                  window.location.href = `/cart/${window?.prodify?.currentVariant?.id}:1`;
+                  window.location.href = `/cart/${window?.prodify?.currentVariant?.id}:1`
                 }
               </script>
             {%- endif -%}
@@ -176,11 +191,11 @@
           </form>
         </ajax-cart-product-form>
 
-        <div class="description prose">
+        <div class='description prose'>
           {{ product.description }}
         </div>
         {% for block in section.blocks %}
-          <div class="collapsable-row border border-gray-500 my-4 p-4">
+          <div class='collapsable-row border border-gray-500 my-4 p-4'>
             <h2>{{ block.settings.heading }}</h2>
             <div>{{ block.settings.content }}</div>
           </div>
@@ -188,7 +203,6 @@
       </div>
     </div>
   </div>
-
 </div>
 
 <style>
@@ -201,11 +215,21 @@
     cursor: pointer;
   }
 
-  body:not(.using-mouse) .section-main-product .shopify-section-main-product-inner .info fieldset input:focus + label {
+  body:not(.using-mouse)
+    .section-main-product
+    .shopify-section-main-product-inner
+    .info
+    fieldset
+    input:focus
+    + label {
     outline: #08f auto 2px;
   }
 
-  .section-main-product .shopify-section-main-product-inner .info fieldset label[data-unavailable='true'],
+  .section-main-product
+    .shopify-section-main-product-inner
+    .info
+    fieldset
+    label[data-unavailable='true'],
   .section-main-product .shopify-section-main-product-inner .info fieldset input[disabled] + label {
     background-color: rgb(241 245 249);
     color: lightgray;
@@ -220,7 +244,11 @@
     margin-bottom: 4px;
   }
 
-  .section-main-product .shopify-section-main-product-inner .info .quantity-row .quantity-control-container {
+  .section-main-product
+    .shopify-section-main-product-inner
+    .info
+    .quantity-row
+    .quantity-control-container {
     display: flex;
     align-items: center;
     border: 1px solid rgba(26, 27, 24, 0.55);
@@ -230,7 +258,12 @@
     font-size: 14px;
   }
 
-  .section-main-product .shopify-section-main-product-inner .info .quantity-row .quantity-control-container button {
+  .section-main-product
+    .shopify-section-main-product-inner
+    .info
+    .quantity-row
+    .quantity-control-container
+    button {
     width: 45px;
     height: 45px;
     appearance: none;
@@ -244,11 +277,22 @@
     cursor: pointer;
   }
 
-  .section-main-product .shopify-section-main-product-inner .info .quantity-row .quantity-control-container button svg {
+  .section-main-product
+    .shopify-section-main-product-inner
+    .info
+    .quantity-row
+    .quantity-control-container
+    button
+    svg {
     width: 10px;
   }
 
-  .section-main-product .shopify-section-main-product-inner .info .quantity-row .quantity-control-container input {
+  .section-main-product
+    .shopify-section-main-product-inner
+    .info
+    .quantity-row
+    .quantity-control-container
+    input {
     appearance: none;
     -webkit-appearance: none;
     border: none;
@@ -258,8 +302,18 @@
     padding: 0;
   }
 
-  .section-main-product .shopify-section-main-product-inner .info .quantity-row .quantity-control-container input[type='number']::-webkit-inner-spin-button,
-  .section-main-product .shopify-section-main-product-inner .info .quantity-row .quantity-control-container input[type='number']::-webkit-outer-spin-button {
+  .section-main-product
+    .shopify-section-main-product-inner
+    .info
+    .quantity-row
+    .quantity-control-container
+    input[type='number']::-webkit-inner-spin-button,
+  .section-main-product
+    .shopify-section-main-product-inner
+    .info
+    .quantity-row
+    .quantity-control-container
+    input[type='number']::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }

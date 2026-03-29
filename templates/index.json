@@ -2,8 +2,7 @@
   "sections": {
     "main": {
       "type": "main-index",
-      "settings": {
-      }
+      "settings": {}
     },
     "featured-product-grid": {
       "type": "featured-product-grid",
@@ -12,8 +11,5 @@
       }
     }
   },
-  "order": [ 
-    "main",
-    "featured-product-grid"
-  ]
+  "order": ["main", "featured-product-grid"]
 }

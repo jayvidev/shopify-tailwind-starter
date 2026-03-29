@@ -10,35 +10,44 @@
 {% endcomment %}
 {%- unless product.has_only_default_variant -%}
   {% if picker_type == 'radio' %}
-    <div class="variant-radios">
+    <div class='variant-radios'>
       {% for option in product.options_with_values %}
         <fieldset
-          class="mb-5 flex flex-wrap gap-3"
-        data-prodify-option-container>
-          <legend class="text-sm tracking-tighter leading-5 text-gray-500 mb-4">
+          class='mb-5 flex flex-wrap gap-3'
+          data-prodify-option-container
+        >
+          <legend class='text-sm tracking-tighter leading-5 text-gray-500 mb-4'>
             {{ option.name }}
           </legend>
-          {% render 'product-variant-options', product: product, option: option, picker_type: picker_type %}
+          {% render 'product-variant-options',
+            product: product,
+            option: option,
+            picker_type: picker_type
+          %}
         </fieldset>
       {% endfor %}
     </div>
   {% else %}
-    <div class="variant-selects">
+    <div class='variant-selects'>
       {% for option in product.options_with_values %}
         <div data-prodify-option-container>
-          <label for="Option-{{ section.id }}-{{ forloop.index0 }}">
+          <label for='Option-{{ section.id }}-{{ forloop.index0 }}'>
             {{ option.name }}
           </label>
-          <div class="select-wrapper relative flex items-center justify-end">
-            <span class="select-arrow mr-6"></span>
+          <div class='select-wrapper relative flex items-center justify-end'>
+            <span class='select-arrow mr-6'></span>
             <select
-              id="Option-{{ section.id }}-{{ forloop.index0 }}"
-              class="input-select"
-              name="options[{{ option.name | escape }}]"
-              form="{{ product_form_id }}"
-              data-option-position="{{ forloop.index }}"
+              id='Option-{{ section.id }}-{{ forloop.index0 }}'
+              class='input-select'
+              name='options[{{ option.name | escape }}]'
+              form='{{ product_form_id }}'
+              data-option-position='{{ forloop.index }}'
             >
-              {% render 'product-variant-options', product: product, option: option, picker_type: picker_type %}
+              {% render 'product-variant-options',
+                product: product,
+                option: option,
+                picker_type: picker_type
+              %}
             </select>
           </div>
         </div>
@@ -47,27 +56,27 @@
   {% endif %}
 {% endunless %}
 
-<noscript class="product-form__noscript-wrapper-{{ section.id }}">
-  <div class="product-form__input{% if product.has_only_default_variant %} hidden{% endif %}">
-    <label class="form__label" for="Variants-{{ section.id }}">
+<noscript class='product-form__noscript-wrapper-{{ section.id }}'>
+  <div class='product-form__input{% if product.has_only_default_variant %} hidden{% endif %}'>
+    <label class='form__label' for='Variants-{{ section.id }}'>
       {{- 'products.product.product_variants' | t -}}
     </label>
-    <div class="select">
+    <div class='select'>
       <select
-        name="id"
-        id="Variants-{{ section.id }}"
-        class="input-select"
-        form="{{ product_form_id }}"
+        name='id'
+        id='Variants-{{ section.id }}'
+        class='input-select'
+        form='{{ product_form_id }}'
       >
         {%- for variant in product.variants -%}
           <option
             {% if variant == product.selected_or_first_available_variant %}
-              selected="selected"
+              selected='selected'
             {% endif %}
             {% if variant.available == false %}
               disabled
             {% endif %}
-            value="{{ variant.id }}"
+            value='{{ variant.id }}'
           >
             {%- liquid
               echo variant.title

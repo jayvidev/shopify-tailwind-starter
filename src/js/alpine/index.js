@@ -12,7 +12,10 @@ export default {
     }
 
     // Alpine components
-    const alpineComponents = import.meta.glob('./components/*.js', { eager: true, import: 'default' })
+    const alpineComponents = import.meta.glob('./components/*.js', {
+      eager: true,
+      import: 'default',
+    })
 
     for (const path in alpineComponents) {
       const component = alpineComponents[path]
