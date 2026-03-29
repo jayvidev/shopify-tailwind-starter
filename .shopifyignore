@@ -7,19 +7,13 @@ tsconfig.json
 postcss.config.cjs
 assets/.vite
 plugins/*
-
-# Dev source files (not part of theme)
-node_modules/
-src/
-
-# Config files
+node_modules/*
+src/*
 .prettierrc
 .prettierignore
 .theme-check.yml
 .mcp.json
-.github/
-.vscode/
-
-# System files
+.github/*
+.vscode/*
 *.log
 .DS_Store
