@@ -18,7 +18,10 @@
     "shopify:pull-dev": "shopify theme pull -d"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild", "protobufjs"]
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "protobufjs"
+    ]
   },
   "devDependencies": {
     "@alpinejs/collapse": "^3.15.3",

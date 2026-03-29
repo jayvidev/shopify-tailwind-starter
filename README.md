@@ -10,6 +10,7 @@ Copy this example into `shopify.theme.toml` and replace the placeholders:
 [environments.development]
 store = "your-store.myshopify.com"
 theme = "your-theme-id"
+store-password = "your-store-password" # only if store has password protection
 
 [environments.staging]
 store = "your-store.myshopify.com"

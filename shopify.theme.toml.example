@@ -1,6 +1,7 @@
 [environments.development]
 store = "your-store.myshopify.com"
 theme = "your-theme-id"
+store-password = "your-store-password"
 
 [environments.staging]
 store = "your-store.myshopify.com"
