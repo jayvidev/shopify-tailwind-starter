@@ -1,11 +1,9 @@
-{{ 'accounts.css' | asset_url | stylesheet_tag }}
-
 <div class='account-register'>
   <div class='account-register-inner shell'>
     <h1>Orders</h1>
 
-    <a href='/account/logout' class='mb-5 block'>Logout</a>
-    <a href='/account/addresses' class='mb-5 block'>Manage Addresses</a>
+    <a href='{{ routes.account_logout_url }}' class='mb-5 block'>Logout</a>
+    <a href='{{ routes.account_addresses_url }}' class='mb-5 block'>Manage Addresses</a>
     {% paginate customer.orders by 20 %}
       {%- if customer.orders.size > 0 -%}
         <table

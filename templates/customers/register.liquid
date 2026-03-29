@@ -1,5 +1,3 @@
-{{ 'accounts.css' | asset_url | stylesheet_tag }}
-
 <div class='account-register'>
   <div class='account-register-inner shell'>
     <h1>Sign Up</h1>
@@ -44,6 +42,6 @@
       </div>
     {% endform %}
 
-    <div>Already signed up? <a href='/account/login'>Login</a></div>
+    <div>Already signed up? <a href='{{ routes.account_login_url }}'>Login</a></div>
   </div>
 </div>

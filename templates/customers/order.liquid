@@ -1,10 +1,8 @@
-{{ 'accounts.css' | asset_url | stylesheet_tag }}
-
 <div class='account-register'>
   <div class='account-register-inner shell'>
     <h1 class='mt-4 text-[2rem]'>Order</h1>
 
-    <a href='/account/orders/'>Back to orders</a>
+    <a href='{{ routes.account_url }}/orders/'>Back to orders</a>
 
     <div class='w-full overflow-x-auto'>
       <h2 class='mt-[0.8rem] text-2xl'>{{ 'customer.order.title' | t: name: order.name }}</h2>
