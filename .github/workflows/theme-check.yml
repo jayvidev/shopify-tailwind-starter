@@ -12,6 +12,9 @@ permissions:
   pull-requests: read
   checks: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   theme-check:
     name: Shopify Theme Check
