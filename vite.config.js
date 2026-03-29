@@ -15,8 +15,7 @@ export default {
     cors: {
       origin: [
         /^https?:\/\/(?:(?:[^:]+\.)?localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/,
-        'https://starter.myshopify.com',
-        'https:/starter.com',
+        'https://tailwind-css-starter.myshopify.com',
       ],
     },
   },
