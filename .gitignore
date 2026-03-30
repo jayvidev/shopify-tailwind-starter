@@ -2,10 +2,13 @@ node_modules/
 .DS_Store
 *.log
 
-# ignore all files inside shopify/assets/ except files with 'static' keyword in their filename
-/assets
-/snippets/vite.liquid
-/snippets/vite-tag.liquid
+# Archivos compilados (generados por el build, no se versionan)
+/assets/theme.css
+/assets/theme.css.map
+/assets/theme.js
+/assets/theme.js.map
+/assets/prodify.js
+/assets/prodify.js.map
 
 # Shopify CLI
 shopify.theme.toml

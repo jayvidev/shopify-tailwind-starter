@@ -1,12 +1,8 @@
 package.json
 pnpm-lock.yaml
-vite.config.js
 README.md
 jsconfig.json
 tsconfig.json
-postcss.config.cjs
-assets/.vite
-plugins/*
 node_modules/*
 src/*
 .prettierrc

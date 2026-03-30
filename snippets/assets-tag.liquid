@@ -1,0 +1,7 @@
+{%- assign file_extension = file | split: '.' | last -%}
+{%- assign css_extensions = 'css,less,sass,scss' | split: ',' -%}
+{%- if css_extensions contains file_extension -%}
+  <link rel="stylesheet" href="{{ file | asset_url }}" crossorigin="anonymous">
+{%- else -%}
+  <script src="{{ file | asset_url }}" type="module" defer></script>
+{%- endif -%}

@@ -30,11 +30,10 @@
     {% render 'head-css' %}
     {% render 'head-scripts' %}
 
-    {% liquid
-      render 'vite-tag', entry: 'theme.css'
-      render 'vite-tag', entry: 'theme.js'
-      render 'vite-tag', entry: '@/js/prodify/index.ts'
-    %}
+    {% render 'font-face' %}
+    {% render 'assets-tag', file: 'theme.css' %}
+    {% render 'assets-tag', file: 'theme.js' %}
+    {% render 'assets-tag', file: 'prodify.js' %}
   </head>
 
   {% liquid

@@ -1,21 +1,20 @@
 {
   "name": "shopify-tailwind-starter",
-  "description": "Shopify starter theme using Vite with AlpineJS, TailwindCSS, Liquid AJAX Cart, and the Shopify Vite plugin.",
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "run-p shopify:dev vite:watch",
+    "dev": "run-p shopify:dev css:dev js:dev",
+    "build": "run-p css:build js:build",
+    "deploy": "run-s build shopify:push",
     "format": "pnpm prettier --write .",
-    "build": "run-s vite:build",
-    "deploy": "run-s vite:build && shopify theme push -e production",
-    "deploy:dev": "run-s vite:build && shopify theme push -e development",
-    "deploy:staging": "run-s vite:build && shopify theme push --path shopify -e staging",
-    "deploy:new": "run-s vite:build && shopify theme push --unpublished",
-    "vite:watch": "cross-env NODE_ENV=development vite",
-    "vite:build": "cross-env NODE_ENV=production vite build",
-    "shopify:dev": "shopify theme dev --poll --live-reload=\"hot-reload\" --notify=/tmp/theme.update --theme-editor-sync -e development --allow-live",
+    "shopify:dev": "shopify theme dev --poll --live-reload=hot-reload --notify=/tmp/theme.update --theme-editor-sync -e development --allow-live",
+    "shopify:push": "shopify theme push -e production",
     "shopify:pull": "shopify theme pull",
-    "shopify:pull-dev": "shopify theme pull -d"
+    "shopify:pull-dev": "shopify theme pull -d",
+    "css:dev": "tailwindcss -i src/entrypoints/theme.css -o assets/theme.css --watch",
+    "css:build": "tailwindcss -i src/entrypoints/theme.css -o assets/theme.css --minify",
+    "js:dev": "concurrently \"esbuild src/entrypoints/theme.js --bundle --outfile=assets/theme.js --sourcemap --watch\" \"esbuild src/js/prodify/index.ts --bundle --outfile=assets/prodify.js --sourcemap --watch\"",
+    "js:build": "concurrently \"esbuild src/entrypoints/theme.js --bundle --minify --outfile=assets/theme.js --define:process.env.NODE_ENV='\\\"production\\\"'\" \"esbuild src/js/prodify/index.ts --bundle --minify --outfile=assets/prodify.js --define:process.env.NODE_ENV='\\\"production\\\"'\""
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -29,22 +28,14 @@
     "@alpinejs/morph": "^3.15.3",
     "@shopify/cli": "^3.90.1",
     "@shopify/prettier-plugin-liquid": "^1.10.2",
+    "@tailwindcss/cli": "^4.1.18",
     "@tailwindcss/typography": "^0.5.19",
-    "@tailwindcss/vite": "^4.1.18",
-    "@vitejs/plugin-basic-ssl": "^2.1.4",
     "alpinejs": "^3.15.3",
-    "autoprefixer": "^10.4.20",
-    "chokidar": "^4.0.1",
-    "cross-env": "^7.0.3",
-    "fs-extra": "^11.2.0",
+    "concurrently": "^9.2.0",
+    "esbuild": "^0.25.0",
     "liquid-ajax-cart": "^2.2.0",
     "npm-run-all": "^4.1.5",
-    "postcss": "^8.4.47",
-    "postcss-import": "^16.1.0",
     "prettier": "^3.8.1",
-    "tailwindcss": "^4.1.18",
-    "vite": "^7.3.1",
-    "vite-plugin-page-reload": "^0.2.2",
-    "vite-plugin-shopify": "^4.1.1"
+    "tailwindcss": "^4.1.18"
   }
 }
