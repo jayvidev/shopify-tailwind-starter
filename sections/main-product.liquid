@@ -112,7 +112,7 @@
           <label for='quantity-control-input'>Quantity</label>
           <div class='quantity-control-container'>
             <button type='button' data-prodify-quantity-decrement>
-              {% render 'icon-minus' %}
+              {% render 'icon', icon: 'minus' %}
             </button>
             <input
               tabindex='-1'
@@ -123,7 +123,7 @@
               data-prodify-quantity-presentation
             >
             <button type='button' data-prodify-quantity-increment>
-              {% render 'icon-plus' %}
+              {% render 'icon', icon: 'plus' %}
             </button>
           </div>
         </div>

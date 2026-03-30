@@ -48,7 +48,7 @@
           {%- elsif form.errors -%}
             <div class='flex items-center'>
               <div class='mr-2'>
-                {%- render 'icon-error' -%}
+                {% render 'icon', icon: 'error' %}
               </div>
               <p
                 class=''
@@ -111,7 +111,7 @@
                 </span>
                 <span class='flex items-center'>
                   <div class='mr-2'>
-                    {%- render 'icon-error' -%}
+                    {% render 'icon', icon: 'error' %}
                   </div>
                   <span>
                     {{ form.errors.translated_fields.email | capitalize }}

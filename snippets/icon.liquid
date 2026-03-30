@@ -1,0 +1,130 @@
+{%- case icon -%}
+  {%- when 'bubble-bottom' -%}
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 24 24'
+      stroke-width='1.5'
+      stroke='currentColor'
+      {% if class != blank %}class='{{ class }}'{% endif %}
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+    </svg>
+
+  {%- when 'cart' -%}
+    <div {% if class != blank %}class='{{ class }}'{% endif %}>
+      <svg
+        class='bi bi-bag bi-bag-empty hidden in-[.js-ajax-cart-empty]:block'
+        fill='currentColor'
+        height='22'
+        viewbox='0 0 16 16'
+        width='22'
+        xmlns='http://www.w3.org/2000/svg'
+      >
+        <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z" />
+      </svg>
+      <svg
+        class='bi bi-bag-fill block in-[.js-ajax-cart-empty]:hidden'
+        fill='currentColor'
+        height='22'
+        viewbox='0 0 16 16'
+        width='22'
+        xmlns='http://www.w3.org/2000/svg'
+      >
+        <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5z" />
+      </svg>
+    </div>
+
+  {%- when 'close' or 'close-x' -%}
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      width='24'
+      height='24'
+      viewBox='0 0 24 24'
+      fill='currentColor'
+      {% if class != blank %}class='{{ class }}'{% endif %}
+    >
+      <path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"/>
+    </svg>
+
+  {%- when 'error' -%}
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 24 24'
+      stroke-width='1.5'
+      stroke='currentColor'
+      {% if class != blank %}class='{{ class }}'{% endif %}
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+    </svg>
+
+  {%- when 'hamburger' or 'menu' -%}
+    <svg
+      viewbox='0 0 100 80'
+      width='40'
+      height='40'
+      fill='currentColor'
+      {% if class != blank %}class='{{ class }}'{% endif %}
+    >
+      <rect height="20" width="100"></rect>
+      <rect
+        height="20"
+        width="100"
+        y="30"></rect>
+      <rect
+        height="20"
+        width="100"
+        y="60"></rect>
+    </svg>
+
+  {%- when 'minus' -%}
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      aria-hidden='true'
+      focusable='false'
+      role='presentation'
+      fill='none'
+      viewBox='0 0 10 2'
+      {% if class != blank %}class='{{ class }}'{% endif %}
+    >
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M.5 1C.5.7.7.5 1 .5h8a.5.5 0 110 1H1A.5.5 0 01.5 1z" fill="currentColor">
+    </svg>
+
+  {%- when 'plus' -%}
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      aria-hidden='true'
+      focusable='false'
+      role='presentation'
+      fill='none'
+      viewBox='0 0 10 10'
+      {% if class != blank %}class='{{ class }}'{% endif %}
+    >
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M1 4.51a.5.5 0 000 1h3.5l.01 3.5a.5.5 0 001-.01V5.5l3.5-.01a.5.5 0 00-.01-1H5.5L5.49.99a.5.5 0 00-1 .01v3.5l-3.5.01H1z" fill="currentColor">
+    </svg>
+
+  {%- when 'search' -%}
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      viewBox='0 0 101 101'
+      width='28'
+      height='22'
+      fill='currentColor'
+      {% if class != blank %}class='{{ class }}'{% endif %}
+    >
+      <path d="M63.3 59.9c3.8-4.6 6.2-10.5 6.2-17 0-14.6-11.9-26.5-26.5-26.5S16.5 28.3 16.5 42.9 28.4 69.4 43 69.4c6.4 0 12.4-2.3 17-6.2l20.6 20.6c.5.5 1.1.7 1.7.7.6 0 1.2-.2 1.7-.7.9-.9.9-2.5 0-3.4L63.3 59.9zm-20.4 4.7c-12 0-21.7-9.7-21.7-21.7s9.7-21.7 21.7-21.7 21.7 9.7 21.7 21.7-9.7 21.7-21.7 21.7z"></path>
+    </svg>
+
+  {%- when 'user' -%}
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 24 24'
+      stroke-width='1.5'
+      stroke='currentColor'
+      {% if class != blank %}class='{{ class }}'{% endif %}
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+    </svg>
+{%- endcase -%}

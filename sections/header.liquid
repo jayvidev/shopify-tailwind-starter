@@ -40,10 +40,10 @@
       >
         <span class='sr-only'>Menu</span>
         <span aria-hidden='true' x-show='!$store.global.isMobileMenuVisible' class='text-white'>
-          {% render 'icon-hamburger' %}
+          {% render 'icon', icon: 'hamburger' %}
         </span>
         <span aria-hidden='true' x-show='$store.global.isMobileMenuVisible' class='text-white'>
-          {% render 'icon-close-x' %}
+          {% render 'icon', icon: 'close-x' %}
         </span>
       </button>
       {% render 'mobile-menu' %}
@@ -68,7 +68,7 @@
           @click='$store.global.openModal()'
           aria-label='Open Modal'
         >
-          {% render 'icon-bubble-bottom' %}
+          {% render 'icon', icon: 'bubble-bottom' %}
         </button>
       {% endif %}
 
@@ -77,7 +77,7 @@
           href='{{ routes.search_url }}'
           class='block fill-white p-2 text-white md:hidden [&>svg]:h-7'
         >
-          {% render 'icon-search' %}
+          {% render 'icon', icon: 'search' %}
         </a>
         <button
           type='button'
@@ -87,17 +87,17 @@
           aria-label='Search'
           aria-controls='predictive-search'
         >
-          {% render 'icon-search' %}
+          {% render 'icon', icon: 'search' %}
         </button>
       {% else %}
         <a href='{{ routes.search_url }}' class='fill-white p-2 text-white [&>svg]:h-7'>
-          {% render 'icon-search' %}
+          {% render 'icon', icon: 'search' %}
         </a>
       {% endif %}
 
       {% if shop.customer_accounts_enabled %}
         <a href='{{ routes.account_url }}' class='fill-white p-2 text-white [&>svg]:h-7'>
-          {% render 'icon-user' %}
+          {% render 'icon', icon: 'user' %}
         </a>
       {% endif %}
 
@@ -106,7 +106,7 @@
         class='relative p-2 text-white [&>svg]:h-5.5 [&>svg]:w-auto'
         x-cloak
       >
-        {% render 'icon-cart' %}
+        {% render 'icon', icon: 'cart' %}
         <span
           data-ajax-cart-bind='item_count'
           class='absolute top-[58%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-xs text-cloud-burst-500'
@@ -115,23 +115,5 @@
         </span>
       </a>
     </div>
-
-    {% comment %}
-      // Output customer login links
-
-      <ul>
-      {% if shop.customer_accounts_enabled %}
-      {% if customer %}
-      <a href="{{ routes.account_url }}">
-      {{ 'action.account' | t }}
-      </a>
-      {{ 'action.log_out' | t | customer_logout_link }}
-      {% else %}
-      {{ 'action.log_in' | t | customer_login_link }}
-      {{ 'action.register' | t | customer_register_link }}
-      {% endif %}
-      {% endif %}
-      </ul>
-    {% endcomment %}
   </div>
 </div>
