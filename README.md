@@ -9,7 +9,7 @@ Copy this example into `shopify.theme.toml` and replace the placeholders:
 ```toml
 [environments.development]
 store = "your-store.myshopify.com"
-theme = "your-theme-id"
+theme = "" # Leave empty to use a safe, automatic development theme
 store-password = "your-store-password" # only if store has password protection
 
 [environments.staging]
@@ -25,12 +25,12 @@ ignore = ["templates/*", "config/*"]
 
 ### Commands
 
-| Command       |                         Purpose                          |                                         Notes                                          |
-| ------------- | :------------------------------------------------------: | :------------------------------------------------------------------------------------: |
-| `pnpm dev`    |   Develop with Shopify CLI dev server + CSS/JS watch     | See [Development Themes](https://shopify.dev/docs/themes/tools/cli#development-themes) |
-| `pnpm build`  |          Build CSS and JS for production                 |             Generates `assets/theme.css`, `theme.js`, `prodify.js`                     |
-| `pnpm deploy` |  Build and push to production environment (via toml)     |              Uses `production` environment from **shopify.theme.toml**                 |
-| `pnpm format` |              Format all files with Prettier              |                                                                                        |
+| Command           |                         Purpose                          |                                          Notes                                          |
+| ----------------- | :------------------------------------------------------: | :-------------------------------------------------------------------------------------: |
+| `pnpm dev`        |   Develop with Shopify CLI dev server + CSS/JS watch     | See [Development Themes](https://shopify.dev/docs/themes/tools/cli#development-themes)  |
+| `pnpm build`      |          Build CSS and JS for production                 |                    Generates `assets/theme.css`, `theme.js`, `prodify.js`               |
+| `pnpm deploy`     |  Build and push to production environment (via toml)     |               Uses `production` environment from **shopify.theme.toml**                 |
+| `pnpm format`     |              Format all files with Prettier              |                                                                                         |
 
 For all other Shopify CLI theme commands see [Shopify CLI commands for themes](https://shopify.dev/docs/themes/tools/cli/commands).
 
@@ -75,7 +75,3 @@ The Shopify provided predictive search is included and can be enabled in the the
 ### Prodify
 
 Prodify is a rework of the Shopify Dawn theme's custom element logic for handling variant pickers on the PDP. See **src/js/prodify**.
-
-### Dynamic Import
-
-Dynamically import scripts. See demo in **src/entrypoints/theme.js**.

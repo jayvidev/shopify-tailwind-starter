@@ -7,7 +7,7 @@
     "build": "run-p css:build js:build",
     "deploy": "run-s build shopify:push",
     "format": "pnpm prettier --write .",
-    "shopify:dev": "shopify theme dev --poll --live-reload=hot-reload --notify=/tmp/theme.update --theme-editor-sync -e development --allow-live",
+    "shopify:dev": "shopify theme dev --poll --live-reload=hot-reload --notify=/tmp/theme.update --theme-editor-sync -e development",
     "shopify:push": "shopify theme push -e production",
     "shopify:pull": "shopify theme pull",
     "shopify:pull-dev": "shopify theme pull -d",

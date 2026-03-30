@@ -1,6 +1,6 @@
 [environments.development]
 store = "your-store.myshopify.com"
-theme = "your-theme-id"
+theme = "" # Leave empty to use a safe, automatic development theme
 store-password = "your-store-password"
 
 [environments.staging]
