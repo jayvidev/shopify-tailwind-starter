@@ -1,5 +1,3 @@
-@source "../../**/*.liquid";
-
 @import 'tailwindcss';
 @import '../css/base.css';
 @import '../css/components.css';
