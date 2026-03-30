@@ -12,10 +12,6 @@
 }
 {% endschema %}
 
-{% if settings.show_promo_bar %}
-  {% render 'promo-bar' %}
-{% endif %}
-
 <div class='px-6 md:px-8 bg-indigo-900'>
   <div class='container flex items-center text-white relative mx-auto'>
     <nav
@@ -40,10 +36,10 @@
       >
         <span class='sr-only'>Menu</span>
         <span aria-hidden='true' x-show='!$store.global.isMobileMenuVisible' class='text-white'>
-          {% render 'icon', icon: 'hamburger' %}
+          {% render 'icon', icon: 'menu' %}
         </span>
         <span aria-hidden='true' x-show='$store.global.isMobileMenuVisible' class='text-white'>
-          {% render 'icon', icon: 'close-x' %}
+          {% render 'icon', icon: 'close' %}
         </span>
       </button>
       {% render 'mobile-menu' %}
