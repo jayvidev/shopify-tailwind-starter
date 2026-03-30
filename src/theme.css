@@ -1,7 +1,4 @@
 @import 'tailwindcss';
-@import '../css/base.css';
-@import '../css/components.css';
-@import '../css/utilities.css';
 
 @plugin '@tailwindcss/typography';
 
@@ -36,24 +33,23 @@
   --color-woodland: #595425;
 
   --font-open-sans: 'Open Sans', sans-serif;
-
-  --breakpoint-sm: 640px;
-  --breakpoint-md: 768px;
-  --breakpoint-lg: 1024px;
-  --breakpoint-xl: 1280px;
-  --breakpoint-2xl: 1536px;
 }
 
-@custom-variant scrolled {
-  :where(.scrolled) & {
-    @slot;
+@utility prose {
+  max-width: none;
+  :where(:not(.not-prose, .not-prose *)) {
+    --tw-prose-body: var(--color-cloud-burst-400);
+    --tw-prose-headings: var(--color-cloud-burst-50);
+    --tw-prose-links: var(--color-woodland-500);
+
+    &:where(a:hover) {
+      --tw-prose-links: var(--color-woodland-200);
+    }
+
+    &:where(iframe) {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 16 / 9;
+    }
   }
 }
-
-@custom-variant mobile-menu-visible {
-  :where(.mobile-menu-visible) & {
-    @slot;
-  }
-}
-
-@import '../css/global.css';

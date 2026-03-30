@@ -11,10 +11,10 @@
     "shopify:push": "shopify theme push -e production",
     "shopify:pull": "shopify theme pull",
     "shopify:pull-dev": "shopify theme pull -d",
-    "css:dev": "tailwindcss -i src/entrypoints/theme.css -o assets/theme.css --watch",
-    "css:build": "tailwindcss -i src/entrypoints/theme.css -o assets/theme.css --minify",
-    "js:dev": "concurrently \"esbuild src/entrypoints/theme.js --bundle --outfile=assets/theme.js --sourcemap --watch\" \"esbuild src/js/prodify/index.ts --bundle --outfile=assets/prodify.js --sourcemap --watch\"",
-    "js:build": "concurrently \"esbuild src/entrypoints/theme.js --bundle --minify --outfile=assets/theme.js --define:process.env.NODE_ENV='\\\"production\\\"'\" \"esbuild src/js/prodify/index.ts --bundle --minify --outfile=assets/prodify.js --define:process.env.NODE_ENV='\\\"production\\\"'\""
+    "css:dev": "tailwindcss -i src/theme.css -o assets/theme.css --watch",
+    "css:build": "tailwindcss -i src/theme.css -o assets/theme.css --minify",
+    "js:dev": "concurrently \"esbuild src/theme.js --bundle --outfile=assets/theme.js --sourcemap --watch\" \"esbuild src/prodify/index.ts --bundle --outfile=assets/prodify.js --sourcemap --watch\"",
+    "js:build": "concurrently \"esbuild src/theme.js --bundle --minify --outfile=assets/theme.js --define:process.env.NODE_ENV='\\\"production\\\"'\" \"esbuild src/prodify/index.ts --bundle --minify --outfile=assets/prodify.js --define:process.env.NODE_ENV='\\\"production\\\"'\""
   },
   "pnpm": {
     "onlyBuiltDependencies": [
