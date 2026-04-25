@@ -30,3 +30,7 @@ config/settings_schema.json
 # Auto-generated snippets
 snippets/vite.liquid
 snippets/vite-tag.liquid
+
+# Shopify templates JSON
+templates/*.json
+
