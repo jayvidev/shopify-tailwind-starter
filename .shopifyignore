@@ -11,5 +11,12 @@ src/*
 .mcp.json
 .github/*
 .vscode/*
+.git/*
+.gitignore
+.shopify/*
+.shopifyignore
 *.log
 .DS_Store
+assets/*.map
+LICENSE
+shopify.theme.toml.example

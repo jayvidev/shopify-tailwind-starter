@@ -17,20 +17,26 @@ coverage/
 .tmp/
 temp/
 
-# Shopify auto-generated assets (vite build output)
 assets/*.min.js
 assets/*.min.css
 assets/*.min.woff
 assets/*.min.woff2
 
-# Shopify config/data files
 config/settings_data.json
 config/settings_schema.json
 
-# Auto-generated snippets
 snippets/vite.liquid
 snippets/vite-tag.liquid
 
-# Shopify templates JSON
 templates/*.json
+templates/**/*.json
+sections/*.json
+sections/**/*.json
+locales/*.json
+locales/**/*.json
 
+assets/theme.css
+assets/theme.js
+assets/theme.js.map
+assets/prodify.js
+assets/prodify.js.map

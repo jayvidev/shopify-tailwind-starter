@@ -2,13 +2,10 @@ node_modules/
 .DS_Store
 *.log
 
-# Archivos compilados (generados por el build, no se versionan)
-/assets/theme.css
-/assets/theme.css.map
-/assets/theme.js
-/assets/theme.js.map
-/assets/prodify.js
-/assets/prodify.js.map
-
-# Shopify CLI
 shopify.theme.toml
+
+assets/theme.css
+assets/theme.js
+assets/theme.js.map
+assets/prodify.js
+assets/prodify.js.map

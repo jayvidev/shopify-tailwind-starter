@@ -6,14 +6,16 @@
     "assets/theme.js": true,
     "assets/theme.js.map": true,
     "assets/prodify.js": true,
-    "assets/prodify.js.map": true
+    "assets/prodify.js.map": true,
+    ".shopify": true
   },
   "search.exclude": {
     "node_modules": true,
     "pnpm-lock.yaml": true,
     "assets/theme.css": true,
     "assets/theme.js": true,
-    "assets/prodify.js": true
+    "assets/prodify.js": true,
+    ".shopify": true
   },
   "files.associations": {
     "*.liquid": "liquid"

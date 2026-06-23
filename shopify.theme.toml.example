@@ -2,13 +2,3 @@
 store = "your-store.myshopify.com"
 theme = "" # Leave empty to use a safe, automatic development theme
 store-password = "your-store-password"
-
-[environments.staging]
-store = "your-store.myshopify.com"
-theme = "your-theme-id"
-ignore = ["templates/*", "config/*"]
-
-[environments.production]
-store = "your-store.myshopify.com"
-theme = "your-theme-id"
-ignore = ["templates/*", "config/*"]
