@@ -12,7 +12,7 @@ export default {
       close() {
         this.open = false
       },
-      open() {
+      show() {
         this.open = true
       },
     }
