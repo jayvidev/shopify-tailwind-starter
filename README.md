@@ -1,5 +1,7 @@
 <div align="center">
-  <img src="./assets/using-mobile-phone.jpg" alt="Preview" width="600">
+  <a href="https://tailwind-css-starter.myshopify.com">
+    <img src="./assets/readme.jpg" alt="Preview">
+  </a>
   <p></p>
 </div>
 
