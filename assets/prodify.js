@@ -1,1 +1,151 @@
-(()=>{var E="data-prodify",u=t=>`[${E}-${t}]`,r={root:`[${E}]`,form:u("product-form"),price:u("price-container"),media:u("media-container"),variants:u("variants-json"),option:u("option-container"),qtyInc:u("quantity-increment"),qtyDec:u("quantity-decrement"),qtyDisplay:u("quantity-presentation"),qtyHidden:u("quantity-hidden-input")},a=(t,e=document)=>e.querySelector(t),m=(t,e=document)=>Array.from(e.querySelectorAll(t)),q=t=>fetch(t).then(e=>e.text()).then(e=>new DOMParser().parseFromString(e,"text/html")),s=()=>window.prodify;function b(){let t=s();return t.variantData??=JSON.parse(a(r.variants,t.el)?.textContent??"[]"),t.variantData}function T(){let t=s();t.pickerType==="select"?t.options=m("select",t.el).map(e=>e.value):t.options=m(r.option,t.el).map(e=>a("input:checked",e).value)}function w(){let t=b();s().currentVariant=t.length===1?t[0]:t.find(e=>e.options.every((n,i)=>s().options?.[i]===n))}function y(t,e,n=!0){let i=a(r.form);if(!i)return;let c=a('[name="add"]',i),o=a('[name="add"] > span',i);c&&(t?(c.setAttribute("disabled","disabled"),e&&o&&(o.textContent=e)):(c.removeAttribute("disabled"),o&&(o.textContent=window.variantStrings.addToCart)),n&&c.classList.toggle("disabled",t))}function S(){m(r.form).forEach(t=>{let e=a('input[name="id"]',t);e&&(e.value=String(s().currentVariant.id))})}function H(t,e,n){let i=s().pickerType==="select",{soldout_with_option:c,unavailable_with_option:o}=window.variantStrings;for(let l of t){let p=l.getAttribute("value");if(e.includes(p))i?l.innerText=p:l.classList.remove("disabled");else if(i){let v=n.includes(p)?c:o;l.innerText=v.replace("[value]",p)}else l.classList.add("disabled")}}function L(){let{variantData:t,el:e}=s();if(!t||t.length<=1)return;let n=a(":checked",e);if(!n)return;let i=t.filter(o=>o.options[0]===n.value),c=m(r.option,e);c.forEach((o,l)=>{if(l===0)return;let p=m('input[type="radio"], option',o),v=a(":checked",c[l-1])?.value,g=i.filter(d=>d.options[l-1]===v);H(p,g.filter(d=>d.available).map(d=>d.options[l]),g.map(d=>d.options[l]))})}function I(){let{currentVariant:t,el:e}=s();!t||e.dataset.updateUrl==="false"||history.replaceState({},"",`${e.dataset.url}?variant=${t.id}`)}function M(){let{currentVariant:t,el:e}=s();t&&q(`${e.dataset.url}?variant=${t.id}&section_id=${e.dataset.section}`).then(n=>{for(let i of[r.price,r.media,`${r.form} [name="add"]`]){let c=a(i,n),o=a(i,e);c&&o&&o.replaceWith(c)}}).catch(console.error)}function h(t){let e=a(r.qtyDisplay,s().el),n=a(r.qtyHidden,s().el);if(!e||!n)return;let i=parseInt(e.value);e.value=n.value=String(t==="up"?i+1:Math.max(1,i-1))}function D(t){if(T(),w(),y(!0,"",!1),L(),t.target instanceof HTMLSelectElement){let e=t.target;m("option",e).forEach(n=>n.toggleAttribute("selected",n.value===e.value))}s().currentVariant?(I(),S(),M()):y(!0,window.variantStrings.unavailable,!0)}var f=a(r.root);if(f&&!window.prodify){window.prodify={el:f,pickerType:f.dataset.prodify||"radio"},T(),w(),L(),s().currentVariant||y(!0,window.variantStrings.unavailable,!0),f.addEventListener("change",D);let t=a(r.qtyInc,f),e=a(r.qtyDec,f);t&&e&&(t.addEventListener("click",()=>h("up")),e.addEventListener("click",()=>h("down")))}})();
+(() => {
+  // src/prodify/index.ts
+  var A = "data-prodify";
+  var attr = (s) => `[${A}-${s}]`;
+  var SEL = {
+    root: `[${A}]`,
+    form: attr("product-form"),
+    price: attr("price-container"),
+    media: attr("media-container"),
+    variants: attr("variants-json"),
+    option: attr("option-container"),
+    qtyInc: attr("quantity-increment"),
+    qtyDec: attr("quantity-decrement"),
+    qtyDisplay: attr("quantity-presentation"),
+    qtyHidden: attr("quantity-hidden-input")
+  };
+  var $ = (s, r = document) => r.querySelector(s);
+  var $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  var fetchDoc = (url) => fetch(url).then((r) => r.text()).then((t) => new DOMParser().parseFromString(t, "text/html"));
+  var state = () => window.prodify;
+  function getVariantData() {
+    const s = state();
+    s.variantData ??= JSON.parse($(SEL.variants, s.el)?.textContent ?? "[]");
+    return s.variantData;
+  }
+  function readOptions() {
+    const s = state();
+    if (s.pickerType === "select") {
+      s.options = $$("select", s.el).map((x) => x.value);
+    } else {
+      s.options = $$(SEL.option, s.el).map((c) => $("input:checked", c).value);
+    }
+  }
+  function matchVariant() {
+    const variants = getVariantData();
+    state().currentVariant = variants.length === 1 ? variants[0] : variants.find((v) => v.options.every((o, i) => state().options?.[i] === o));
+  }
+  function setAddButton(disable, text, modifyClass = true) {
+    const form = $(SEL.form);
+    if (!form) return;
+    const btn = $('[name="add"]', form);
+    const span = $('[name="add"] > span', form);
+    if (!btn) return;
+    if (disable) {
+      btn.setAttribute("disabled", "disabled");
+      if (text && span) span.textContent = text;
+    } else {
+      btn.removeAttribute("disabled");
+      if (span) span.textContent = window.variantStrings.addToCart;
+    }
+    if (modifyClass) btn.classList.toggle("disabled", disable);
+  }
+  function syncVariantInputs() {
+    $$(SEL.form).forEach((form) => {
+      const input = $('input[name="id"]', form);
+      if (input) input.value = String(state().currentVariant.id);
+    });
+  }
+  function setInputAvailability(inputs, available, existing) {
+    const isSelect = state().pickerType === "select";
+    const { soldout_with_option, unavailable_with_option } = window.variantStrings;
+    for (const input of inputs) {
+      const val = input.getAttribute("value");
+      if (available.includes(val)) {
+        isSelect ? input.innerText = val : input.classList.remove("disabled");
+      } else {
+        if (isSelect) {
+          const tmpl = existing.includes(val) ? soldout_with_option : unavailable_with_option;
+          input.innerText = tmpl.replace("[value]", val);
+        } else {
+          input.classList.add("disabled");
+        }
+      }
+    }
+  }
+  function compareInputValues() {
+    const { variantData, el: el2 } = state();
+    if (!variantData || variantData.length <= 1) return;
+    const first = $(":checked", el2);
+    if (!first) return;
+    const matching = variantData.filter((v) => v.options[0] === first.value);
+    const containers = $$(SEL.option, el2);
+    containers.forEach((container, i) => {
+      if (i === 0) return;
+      const inputs = $$('input[type="radio"], option', container);
+      const prevVal = $(":checked", containers[i - 1])?.value;
+      const forPrev = matching.filter((v) => v.options[i - 1] === prevVal);
+      setInputAvailability(
+        inputs,
+        forPrev.filter((v) => v.available).map((v) => v.options[i]),
+        forPrev.map((v) => v.options[i])
+      );
+    });
+  }
+  function updateURL() {
+    const { currentVariant, el: el2 } = state();
+    if (!currentVariant || el2.dataset.updateUrl === "false") return;
+    history.replaceState({}, "", `${el2.dataset.url}?variant=${currentVariant.id}`);
+  }
+  function swapProductInfo() {
+    const { currentVariant, el: el2 } = state();
+    if (!currentVariant) return;
+    fetchDoc(`${el2.dataset.url}?variant=${currentVariant.id}&section_id=${el2.dataset.section}`).then((doc) => {
+      for (const q of [SEL.price, SEL.media, `${SEL.form} [name="add"]`]) {
+        const src = $(q, doc), tgt = $(q, el2);
+        if (src && tgt) tgt.replaceWith(src);
+      }
+    }).catch(console.error);
+  }
+  function updateQuantity(dir) {
+    const display = $(SEL.qtyDisplay, state().el);
+    const hidden = $(SEL.qtyHidden, state().el);
+    if (!display || !hidden) return;
+    const n = parseInt(display.value);
+    display.value = hidden.value = String(dir === "up" ? n + 1 : Math.max(1, n - 1));
+  }
+  function onVariantChange(e) {
+    readOptions();
+    matchVariant();
+    setAddButton(true, "", false);
+    compareInputValues();
+    if (e.target instanceof HTMLSelectElement) {
+      const select = e.target;
+      $$("option", select).forEach(
+        (o) => o.toggleAttribute("selected", o.value === select.value)
+      );
+    }
+    if (!state().currentVariant) {
+      setAddButton(true, window.variantStrings.unavailable, true);
+    } else {
+      updateURL();
+      syncVariantInputs();
+      swapProductInfo();
+    }
+  }
+  var el = $(SEL.root);
+  if (el && !window.prodify) {
+    window.prodify = { el, pickerType: el.dataset.prodify || "radio" };
+    readOptions();
+    matchVariant();
+    compareInputValues();
+    if (!state().currentVariant) setAddButton(true, window.variantStrings.unavailable, true);
+    el.addEventListener("change", onVariantChange);
+    const qtyInc = $(SEL.qtyInc, el), qtyDec = $(SEL.qtyDec, el);
+    if (qtyInc && qtyDec) {
+      qtyInc.addEventListener("click", () => updateQuantity("up"));
+      qtyDec.addEventListener("click", () => updateQuantity("down"));
+    }
+  }
+})();
+//# sourceMappingURL=prodify.js.map

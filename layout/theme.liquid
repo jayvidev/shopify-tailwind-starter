@@ -3,7 +3,6 @@
   <head>
     {% render 'head-meta' %}
 
-    <link rel='icon' href='{{ 'favicon.ico' | asset_url }}'>
     <link rel='canonical' href='{{ canonical_url }}'>
     <link
       rel='preconnect'
@@ -37,16 +36,16 @@
   </head>
 
   {% liquid
-    assign bodyClasses = template | handleize | append: '-template'
-    assign bodyClasses = bodyClasses | append: ' antialiased using-mouse'
+    assign body_classes = template | handleize | append: '-template'
+    assign body_classes = body_classes | append: ' antialiased using-mouse'
 
     if settings.show_promo_bar
-      assign bodyClasses = bodyClasses | append: ' promo-bar-visible'
+      assign body_classes = body_classes | append: ' promo-bar-visible'
     endif
   %}
 
   <body
-    class='{{ bodyClasses }}'
+    class='{{ body_classes }}'
     :class='$store.global.bodyClasses'
     x-data
     x-scrolled
