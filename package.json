@@ -26,14 +26,14 @@
     "@alpinejs/morph": "^3.15.3",
     "@shopify/cli": "^3.93.2",
     "@shopify/prettier-plugin-liquid": "^1.10.2",
-    "@tailwindcss/cli": "^4.1.18",
-    "@tailwindcss/typography": "^0.5.19",
+    "@tailwindcss/cli": "^4.3.3",
+    "@tailwindcss/typography": "^0.5.20",
     "alpinejs": "^3.15.3",
     "concurrently": "^9.2.0",
     "esbuild": "^0.25.0",
     "liquid-ajax-cart": "^2.2.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.8.1",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.3.3"
   }
 }
