@@ -1,8 +1,14 @@
 <!doctype html>
-<html lang='{{ request.locale.iso_code }}' class='no-js font-open-sans'>
+<html
+  lang='{{ request.locale.iso_code }}'
+  class='no-js{% if request.design_mode %} shopify-design-mode design-mode{% endif %}'
+>
   <head>
     {% render 'head-meta' %}
 
+    {%- if settings.favicon != blank -%}
+      <link rel='icon' href='{{ settings.favicon | image_url: width: 32, height: 32 }}'>
+    {%- endif -%}
     <link rel='canonical' href='{{ canonical_url }}'>
     <link
       rel='preconnect'
@@ -13,90 +19,116 @@
     <title>
       {{ page_title }}
       {%- if current_tags %}
-        &ndash; tagged "{{ current_tags | join: ', ' }}"
+        &ndash; {{ current_tags | join: ', ' }}
       {%- endif -%}
       {%- if current_page != 1 %}
-        &ndash; Page {{ current_page -}}
+        &ndash; {{ 'general.pagination.page' | t: number: current_page }}
       {%- endif -%}
       {%- unless page_title contains shop.name %}
         &ndash; {{ shop.name -}}
       {%- endunless -%}
     </title>
 
-    <!-- header hook for Shopify plugins -->
     {{ content_for_header }}
 
     {% render 'head-css' %}
     {% render 'head-scripts' %}
-
     {% render 'font-face' %}
+
     {% render 'assets-tag', file: 'theme.css' %}
     {% render 'assets-tag', file: 'theme.js' %}
     {% render 'assets-tag', file: 'prodify.js' %}
+
+    {%- if request.page_type == 'product' -%}
+      {%- assign has_model = false -%}
+      {%- for media in product.media -%}
+        {%- if media.media_type == 'model' -%}
+          {%- assign has_model = true -%}
+          {%- break -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if has_model -%}
+        <script
+          type='module'
+          src='{{ "model-viewer.min.js" | asset_url }}'
+        ></script>
+      {%- endif -%}
+    {%- endif -%}
   </head>
 
-  {% liquid
+  {%- liquid
     assign body_classes = template | handleize | append: '-template'
     assign body_classes = body_classes | append: ' antialiased using-mouse'
 
     if settings.show_promo_bar
       assign body_classes = body_classes | append: ' promo-bar-visible'
     endif
-  %}
+  -%}
 
   <body
     class='{{ body_classes }}'
-    :class='$store.global.bodyClasses'
+    :class='$store.ui.bodyClasses'
     x-data
-    x-scrolled
   >
-    <a
-      class='absolute z-50 px-4 py-2 text-white bg-cloud-burst rounded-lg shadow-lg not-focus:sr-only'
-      href='#main-content'
-    >
-      Skip to content
-    </a>
+    {%- assign skip_to_content = 'accessibility.skip_to_text' | t -%}
+    {% render 'button',
+      href: '#main-content',
+      label: skip_to_content,
+      size: 'sm',
+      class: 'absolute top-3 left-3 z-9999 w-max no-underline not-focus:sr-only'
+    %}
 
-    {% section 'header' %}
+    {% section 'promo-bar' %}
+    {% sections 'header-group' %}
 
     <main
       id='main-content'
       role='main'
       class='site-main relative'
+      tabindex='-1'
     >
       {{ content_for_layout }}
     </main>
 
-    {% section 'footer' %}
+    {% sections 'footer-group' %}
 
-    {% comment %} Styles for minicart wrapper in sections/minicart.liquid {% endcomment %}
-    <div
-      class='minicart-wrapper fixed top-12.5 right-12.5 z-100 max-[576px]:right-5'
-      x-data
-      x-show='$store.global.isMinicartVisible'
-      x-on:click.outside='$store.global.isMinicartVisible = false'
-      x-transition:enter='transition duration-300 ease-out'
-      x-transition:enter-start='translate-x-[120%]'
-      x-transition:enter-end='translate-x-0'
-      x-transition:leave='transition duration-300 ease-in'
-      x-transition:leave-start='translate-x-0'
-      x-transition:leave-end='translate-x-[120%]'
-      x-cloak
-      :aria-hidden="$store.global.isMinicartVisible ? 'false' : 'true'"
-      aria-modal='true'
-      role='dialog'
-    >
-      {% section 'minicart' %}
-    </div>
-
-    {% if settings.enable_predictive_search %}
-      {% section 'predictive-search-main' %}
-    {% endif %}
-
-    {% if settings.enable_modal %}
-      {% section 'modal' %}
-    {% endif %}
+    {% render 'backdrop',
+      show_condition: '$store.ui.isMinicartVisible || $store.ui.isMegaMenuVisible || $store.ui.isMobileMenuVisible || $store.ui.isPredictiveSearchVisible',
+      click_action: '$store.ui.isMinicartVisible = false; $store.ui.isMobileMenuVisible = false; $store.ui.isPredictiveSearchVisible = false; $dispatch("close-mega-menu")',
+      mouseenter_action: '$dispatch("close-mega-menu")'
+    %}
 
     {% render 'liquid-ajax-cart' %}
+
+    {% comment %}
+      Everything the JS reads from settings and locales. Keep in sync with
+      `src/strings.ts` and `ThemeConfig` in `src/types/globals.d.ts`.
+    {% endcomment %}
+    <script>
+      window.theme = window.theme || {}
+      window.theme.moneyLocale = {{ request.locale.iso_code | json }}
+      window.theme.strings = {
+        discountInvalid: {{ 'javascript.discount_invalid' | t | json }},
+        discountFailed: {{ 'javascript.discount_failed' | t | json }},
+        maxInCart: {{ 'javascript.max_in_cart' | t | json }}
+      }
+      window.theme.discountTiers = {
+        count: {{ settings.discount_tiers_count | default: 0 }},
+        tiers: [
+          {
+            threshold: {{ settings.discount_tier1_threshold | default: 0 }},
+            amount: {{ settings.discount_tier1_amount | default: 0 }}
+          },
+          {
+            threshold: {{ settings.discount_tier2_threshold | default: 0 }},
+            amount: {{ settings.discount_tier2_amount | default: 0 }}
+          },
+          {
+            threshold: {{ settings.discount_tier3_threshold | default: 0 }},
+            amount: {{ settings.discount_tier3_amount | default: 0 }}
+          }
+        ]
+      }
+    </script>
   </body>
 </html>

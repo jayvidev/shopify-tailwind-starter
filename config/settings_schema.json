@@ -1,64 +1,266 @@
 [
   {
     "name": "theme_info",
-    "theme_name": "Shopify Theme Lab",
-    "theme_version": "1.0.0",
-    "theme_author": "THEME_AUTHOR",
-    "theme_documentation_url": "https://THEME_DOCUMENTATION_URL.com",
-    "theme_support_url": "https://THEME_SUPPORT_URL.com"
+    "theme_name": "Shopify Tailwind Starter",
+    "theme_version": "2.0.0",
+    "theme_author": "jayvidev",
+    "theme_documentation_url": "https://github.com/jayvidev/shopify-tailwind-starter",
+    "theme_support_url": "https://github.com/jayvidev/shopify-tailwind-starter/issues"
   },
   {
-    "name": "Theme Settings",
+    "name": "Branding",
     "settings": [
       {
-        "type": "header",
-        "content": "Promo Bar"
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo"
       },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "min": 50,
+        "max": 300,
+        "step": 10,
+        "unit": "px",
+        "default": 100,
+        "label": "Logo width"
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon"
+      }
+    ]
+  },
+  {
+    "name": "Promo bar",
+    "settings": [
       {
         "type": "checkbox",
         "id": "show_promo_bar",
-        "label": "Show Promo Bar"
+        "default": true,
+        "label": "Show promo bar"
       },
       {
         "type": "checkbox",
         "id": "collapse_promo_bar",
-        "label": "Collapse Promo Bar on Scroll",
-        "default": true
+        "default": true,
+        "label": "Hide on scroll",
+        "info": "Collapses the bar once the page scrolls past it."
       },
       {
         "type": "richtext",
         "id": "promo_bar_content",
-        "label": "Promo Bar Content"
-      },
+        "label": "Content"
+      }
+    ]
+  },
+  {
+    "name": "Cart",
+    "settings": [
       {
-        "type": "header",
-        "content": "Predictive Search"
+        "type": "checkbox",
+        "id": "show_cart_note",
+        "default": false,
+        "label": "Enable cart note"
       },
       {
         "type": "checkbox",
-        "id": "enable_predictive_search",
-        "label": "Enable Predictive Search"
+        "id": "show_cart_discount_field",
+        "default": true,
+        "label": "Enable discount code field"
       },
       {
         "type": "header",
-        "content": "Modal"
+        "content": "Discount tiers"
+      },
+      {
+        "type": "paragraph",
+        "content": "Spend-more-save-more thresholds, shown as a progress bar in the cart. Create the matching automatic discounts under Discounts — these settings only drive the display."
+      },
+      {
+        "type": "range",
+        "id": "discount_tiers_count",
+        "min": 0,
+        "max": 3,
+        "step": 1,
+        "default": 0,
+        "label": "Active tiers",
+        "info": "Set to 0 to hide the progress bar."
+      },
+      {
+        "type": "header",
+        "content": "Tier 1"
+      },
+      {
+        "type": "number",
+        "id": "discount_tier1_threshold",
+        "default": 100,
+        "label": "Cart total from"
+      },
+      {
+        "type": "number",
+        "id": "discount_tier1_amount",
+        "default": 10,
+        "label": "Discount amount"
+      },
+      {
+        "type": "header",
+        "content": "Tier 2"
+      },
+      {
+        "type": "number",
+        "id": "discount_tier2_threshold",
+        "default": 200,
+        "label": "Cart total from"
+      },
+      {
+        "type": "number",
+        "id": "discount_tier2_amount",
+        "default": 25,
+        "label": "Discount amount"
+      },
+      {
+        "type": "header",
+        "content": "Tier 3"
+      },
+      {
+        "type": "number",
+        "id": "discount_tier3_threshold",
+        "default": 300,
+        "label": "Cart total from"
+      },
+      {
+        "type": "number",
+        "id": "discount_tier3_amount",
+        "default": 45,
+        "label": "Discount amount"
+      }
+    ]
+  },
+  {
+    "name": "Search",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "predictive_search_enabled",
+        "default": true,
+        "label": "Enable predictive search"
       },
       {
         "type": "checkbox",
-        "id": "enable_modal",
-        "label": "Enable Modal"
+        "id": "predictive_search_show_price",
+        "default": true,
+        "label": "Show product price"
+      },
+      {
+        "type": "checkbox",
+        "id": "predictive_search_show_vendor",
+        "default": false,
+        "label": "Show product vendor"
+      }
+    ]
+  },
+  {
+    "name": "Product cards",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_vendor",
+        "default": false,
+        "label": "Show vendor"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_secondary_image",
+        "default": true,
+        "label": "Swap to second image on hover"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_quick_add",
+        "default": true,
+        "label": "Show quick add button"
+      },
+      {
+        "type": "select",
+        "id": "badge_position",
+        "default": "bottom left",
+        "options": [
+          {
+            "value": "bottom left",
+            "label": "Bottom left"
+          },
+          {
+            "value": "bottom right",
+            "label": "Bottom right"
+          },
+          {
+            "value": "top left",
+            "label": "Top left"
+          },
+          {
+            "value": "top right",
+            "label": "Top right"
+          }
+        ],
+        "label": "Badge position"
+      }
+    ]
+  },
+  {
+    "name": "Currency format",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Prices are formatted by the currency settings in your Shopify admin."
+      },
+      {
+        "type": "checkbox",
+        "id": "currency_code_enabled",
+        "default": false,
+        "label": "Show currency code"
+      }
+    ]
+  },
+  {
+    "name": "Social media",
+    "settings": [
+      {
+        "type": "text",
+        "id": "social_instagram_link",
+        "label": "Instagram",
+        "info": "https://instagram.com/shopify"
       },
       {
         "type": "text",
-        "id": "modal_title",
-        "label": "Title",
-        "default": "Modal Title"
+        "id": "social_facebook_link",
+        "label": "Facebook",
+        "info": "https://facebook.com/shopify"
       },
       {
         "type": "text",
-        "id": "modal_description",
-        "label": "Description",
-        "default": "Modal Description. Lorem ipsum dolor sit amet consectetur adipisicing elit. Itaque totam cum cupiditate officia et quaerat blanditiis culpa? Hic, nesciunt id."
+        "id": "social_tiktok_link",
+        "label": "TikTok",
+        "info": "https://tiktok.com/@shopify"
+      },
+      {
+        "type": "text",
+        "id": "social_youtube_link",
+        "label": "YouTube",
+        "info": "https://youtube.com/shopify"
+      },
+      {
+        "type": "text",
+        "id": "social_pinterest_link",
+        "label": "Pinterest",
+        "info": "https://pinterest.com/shopify"
+      },
+      {
+        "type": "text",
+        "id": "social_twitter_link",
+        "label": "X",
+        "info": "https://x.com/shopify"
       }
     ]
   }

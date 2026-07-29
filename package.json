@@ -9,8 +9,9 @@
     "shopify:dev": "shopify theme dev --poll --live-reload=hot-reload --notify=/tmp/theme.update --theme-editor-sync -e development",
     "css:dev": "tailwindcss -i src/theme.css -o assets/theme.css --watch",
     "css:build": "tailwindcss -i src/theme.css -o assets/theme.css --minify",
-    "js:dev": "concurrently \"esbuild src/theme.js --bundle --outfile=assets/theme.js --sourcemap --watch\" \"esbuild src/prodify/index.ts --bundle --outfile=assets/prodify.js --sourcemap --watch\"",
-    "js:build": "concurrently \"esbuild src/theme.js --bundle --minify --outfile=assets/theme.js --define:process.env.NODE_ENV='\\\"production\\\"'\" \"esbuild src/prodify/index.ts --bundle --minify --outfile=assets/prodify.js --define:process.env.NODE_ENV='\\\"production\\\"'\"",
+    "js:dev": "concurrently \"esbuild src/theme.ts --bundle --alias:@=./src --outfile=assets/theme.js --sourcemap --watch\" \"esbuild src/prodify/index.ts --bundle --alias:@=./src --outfile=assets/prodify.js --sourcemap --watch\" \"esbuild src/elements/*.ts --bundle --alias:@=./src --outdir=assets --sourcemap --watch\"",
+    "js:build": "concurrently \"esbuild src/theme.ts --bundle --minify --alias:@=./src --outfile=assets/theme.js --define:process.env.NODE_ENV='\\\"production\\\"'\" \"esbuild src/prodify/index.ts --bundle --minify --alias:@=./src --outfile=assets/prodify.js --define:process.env.NODE_ENV='\\\"production\\\"'\" \"esbuild src/elements/*.ts --bundle --minify --alias:@=./src --outdir=assets --define:process.env.NODE_ENV='\\\"production\\\"'\"",
+    "typecheck": "tsc --noEmit",
     "zip": "zip -r theme.zip assets config layout locales sections snippets templates shopify.theme.toml -x \"*.DS_Store*\"",
     "package": "pnpm build && pnpm zip"
   },
@@ -27,13 +28,15 @@
     "@shopify/cli": "^3.93.2",
     "@shopify/prettier-plugin-liquid": "^1.10.2",
     "@tailwindcss/cli": "^4.3.3",
-    "@tailwindcss/typography": "^0.5.20",
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/alpinejs": "^3.13.11",
     "alpinejs": "^3.15.3",
     "concurrently": "^9.2.0",
     "esbuild": "^0.25.0",
     "liquid-ajax-cart": "^2.2.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.8.1",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2"
   }
 }

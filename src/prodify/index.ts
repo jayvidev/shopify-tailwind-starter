@@ -1,4 +1,5 @@
-import './types'
+import '@/prodify/types'
+import type { Variant } from '@/prodify/types'
 
 const A = 'data-prodify'
 const attr = (s: string) => `[${A}-${s}]`
@@ -6,8 +7,10 @@ const SEL = {
   root: `[${A}]`,
   form: attr('product-form'),
   price: attr('price-container'),
-  media: attr('media-container'),
-  variants: attr('variants-json'),
+  stockInfo: attr('stock-info'),
+  selectedVariant: attr('selected-variant'),
+  currentVariant: attr('current-variant'),
+  variantStock: attr('variant-stock'),
   option: attr('option-container'),
   qtyInc: attr('quantity-increment'),
   qtyDec: attr('quantity-decrement'),
@@ -18,120 +21,87 @@ const SEL = {
 const $ = <T extends Element>(s: string, r: Element | Document = document) => r.querySelector<T>(s)
 const $$ = <T extends Element>(s: string, r: Element | Document = document) =>
   Array.from(r.querySelectorAll<T>(s))
-const fetchDoc = (url: string) =>
-  fetch(url)
-    .then((r) => r.text())
-    .then((t) => new DOMParser().parseFromString(t, 'text/html'))
 const state = () => window.prodify
 
-function getVariantData() {
-  const s = state()
-  s.variantData ??= JSON.parse($(SEL.variants, s.el)?.textContent ?? '[]')
-  return s.variantData!
-}
-
-function readOptions() {
-  const s = state()
-  if (s.pickerType === 'select') {
-    s.options = $$<HTMLSelectElement>('select', s.el).map((x) => x.value)
-  } else {
-    s.options = $$(SEL.option, s.el).map((c) => $<HTMLInputElement>('input:checked', c)!.value)
+function parseJson<T>(sel: string, root: Element | Document): T | null {
+  const raw = $(sel, root)?.textContent?.trim()
+  if (!raw) return null
+  try {
+    return JSON.parse(raw) as T
+  } catch {
+    return null
   }
 }
 
-function matchVariant() {
-  const variants = getVariantData()
-  state().currentVariant =
-    variants.length === 1
-      ? variants[0]
-      : variants.find((v) => v.options.every((o, i) => state().options?.[i] === o))
-}
-
-function setAddButton(disable: boolean, text?: string, modifyClass = true) {
-  const form = $(SEL.form)
-  if (!form) return
-  const btn = $('[name="add"]', form)
-  const span = $('[name="add"] > span', form)
-  if (!btn) return
-
-  if (disable) {
-    btn.setAttribute('disabled', 'disabled')
-    if (text && span) span.textContent = text
-  } else {
-    btn.removeAttribute('disabled')
-    if (span) span.textContent = window.variantStrings.addToCart
+function selectedOptionValueIds(): string[] {
+  const ids: string[] = []
+  for (const container of $$(SEL.option, state().el)) {
+    const select = $<HTMLSelectElement>('select', container)
+    const selected = select
+      ? select.selectedOptions[0]
+      : $<HTMLInputElement>('input:checked', container)
+    const id = selected?.dataset.optionValueId
+    if (id) ids.push(id)
   }
-  if (modifyClass) btn.classList.toggle('disabled', disable)
+  return ids
 }
 
-function syncVariantInputs() {
-  $$(SEL.form).forEach((form) => {
-    const input = $<HTMLInputElement>('input[name="id"]', form)
-    if (input) input.value = String(state().currentVariant!.id)
-  })
+function emit(name: string, detail: unknown) {
+  state().el.dispatchEvent(new CustomEvent(name, { detail, bubbles: true }))
 }
 
-function setInputAvailability(inputs: Element[], available: string[], existing: string[]) {
-  const isSelect = state().pickerType === 'select'
-  const { soldout_with_option, unavailable_with_option } = window.variantStrings
+function setLoading(loading: boolean) {
+  state().el.toggleAttribute('data-prodify-loading', loading)
+  emit('variant:loading', { loading })
+}
 
-  for (const input of inputs) {
-    const val = input.getAttribute('value')!
-    if (available.includes(val)) {
-      isSelect ? ((input as HTMLOptionElement).innerText = val) : input.classList.remove('disabled')
-    } else {
-      if (isSelect) {
-        const tmpl = existing.includes(val) ? soldout_with_option : unavailable_with_option
-        ;(input as HTMLOptionElement).innerText = tmpl.replace('[value]', val)
+function syncOptionAvailability(doc: Document) {
+  const current = $$(SEL.option, state().el)
+  const incoming = $$(SEL.option, doc)
+
+  current.forEach((container, i) => {
+    const source = incoming[i]
+    if (!source) return
+
+    const sourceById = new Map<string, HTMLOptionElement | HTMLInputElement>()
+    for (const node of $$<HTMLOptionElement | HTMLInputElement>('option, input', source)) {
+      const id = node.dataset.optionValueId
+      if (id) sourceById.set(id, node)
+    }
+
+    for (const node of $$<HTMLOptionElement | HTMLInputElement>('option, input', container)) {
+      const id = node.dataset.optionValueId
+      const next = id ? sourceById.get(id) : undefined
+      if (!next) continue
+
+      const available = next.dataset.available === 'true'
+      node.dataset.available = String(available)
+
+      if (node instanceof HTMLOptionElement && next instanceof HTMLOptionElement) {
+        if (node.textContent !== next.textContent) node.textContent = next.textContent
+        node.toggleAttribute('selected', next.hasAttribute('selected'))
       } else {
-        input.classList.add('disabled')
+        node.classList.toggle('disabled', !available)
+        const label = node.nextElementSibling
+        if (label instanceof HTMLElement) label.dataset.unavailable = available ? '' : 'true'
       }
     }
-  }
-}
-
-function compareInputValues() {
-  const { variantData, el } = state()
-  if (!variantData || variantData.length <= 1) return
-  const first = $<HTMLInputElement>(':checked', el)
-  if (!first) return
-
-  const matching = variantData.filter((v) => v.options[0] === first.value)
-  const containers = $$(SEL.option, el)
-
-  containers.forEach((container, i) => {
-    if (i === 0) return
-    const inputs = $$('input[type="radio"], option', container)
-    const prevVal = $<HTMLInputElement>(':checked', containers[i - 1])?.value
-    const forPrev = matching.filter((v) => v.options[i - 1] === prevVal)
-
-    setInputAvailability(
-      inputs,
-      forPrev.filter((v) => v.available).map((v) => v.options[i]),
-      forPrev.map((v) => v.options[i])
-    )
   })
 }
 
-function updateURL() {
-  const { currentVariant, el } = state()
-  if (!currentVariant || el.dataset.updateUrl === 'false') return
-  history.replaceState({}, '', `${el.dataset.url}?variant=${currentVariant.id}`)
+function swapProductInfo(doc: Document) {
+  for (const q of [SEL.price, SEL.stockInfo]) {
+    const src = $(q, doc)
+    const tgt = $(q, state().el)
+    if (src && tgt) tgt.replaceWith(src)
+  }
 }
 
-function swapProductInfo() {
-  const { currentVariant, el } = state()
-  if (!currentVariant) return
-
-  fetchDoc(`${el.dataset.url}?variant=${currentVariant.id}&section_id=${el.dataset.section}`)
-    .then((doc) => {
-      for (const q of [SEL.price, SEL.media, `${SEL.form} [name="add"]`]) {
-        const src = $(q, doc),
-          tgt = $(q, el)
-        if (src && tgt) tgt.replaceWith(src)
-      }
-    })
-    .catch(console.error)
+function updateURL(variant: Variant | null, optionValueIds: string[]) {
+  const { el } = state()
+  if (el.dataset.updateUrl === 'false') return
+  const query = variant ? `variant=${variant.id}` : `option_values=${optionValueIds.join(',')}`
+  history.replaceState({}, '', `${el.dataset.url}?${query}`)
 }
 
 function updateQuantity(dir: 'up' | 'down') {
@@ -139,39 +109,87 @@ function updateQuantity(dir: 'up' | 'down') {
   const hidden = $<HTMLInputElement>(SEL.qtyHidden, state().el)
   if (!display || !hidden) return
   const n = parseInt(display.value)
-  display.value = hidden.value = String(dir === 'up' ? n + 1 : Math.max(1, n - 1))
+  const max = parseInt(display.getAttribute('max') ?? '') || 9999
+  const newVal = dir === 'up' ? Math.min(n + 1, max) : Math.max(1, n - 1)
+  display.value = hidden.value = String(newVal)
 }
 
-function onVariantChange(e: Event) {
-  readOptions()
-  matchVariant()
-  setAddButton(true, '', false)
-  compareInputValues()
-  if (e.target instanceof HTMLSelectElement) {
-    const select = e.target
-    $$<HTMLOptionElement>('option', select).forEach((o) =>
-      o.toggleAttribute('selected', o.value === select.value)
-    )
+function onVariantChange(event: Event) {
+  const target = event.target
+  if (!(target instanceof HTMLElement) || !target.closest(SEL.option)) return
+
+  const selected =
+    target instanceof HTMLSelectElement ? target.selectedOptions[0] : (target as HTMLInputElement)
+
+  if (target instanceof HTMLSelectElement) {
+    for (const option of target.options) {
+      option.toggleAttribute('selected', option.value === target.value)
+    }
   }
 
-  if (!state().currentVariant) {
-    setAddButton(true, window.variantStrings.unavailable, true)
-  } else {
-    updateURL()
-    syncVariantInputs()
-    swapProductInfo()
+  const ids = selectedOptionValueIds()
+  if (!ids.length) return
+
+  const { el } = state()
+
+  const connectedUrl = selected?.dataset.connectedProductUrl
+  if (connectedUrl && connectedUrl !== el.dataset.url?.split('?')[0]) {
+    window.location.href = `${connectedUrl}?option_values=${ids.join(',')}`
+    return
   }
+
+  const url = `${el.dataset.url}?section_id=${el.dataset.section}&option_values=${ids.join(',')}`
+
+  state().abort?.abort()
+  const controller = new AbortController()
+  state().abort = controller
+  setLoading(true)
+
+  fetch(url, { signal: controller.signal })
+    .then((r) => r.text())
+    .then((text) => {
+      const doc = new DOMParser().parseFromString(text, 'text/html')
+
+      syncOptionAvailability(doc)
+
+      const variant = parseJson<Variant | null>(SEL.selectedVariant, doc)
+
+      if (!variant) {
+        state().currentVariant = null
+        updateURL(null, ids)
+        emit('variant:unavailable', { optionValueIds: ids })
+        return
+      }
+
+      const stock = parseJson<{ qty: number; managedDeny: boolean }>(SEL.variantStock, doc)
+      state().currentVariant = variant
+
+      swapProductInfo(doc)
+      updateURL(variant, ids)
+      emit('variant:changed', {
+        ...variant,
+        inventory_quantity: stock?.qty ?? 0,
+        managedDeny: stock?.managedDeny ?? false,
+      })
+    })
+    .catch((error) => {
+      if ((error as Error).name !== 'AbortError') console.error(error)
+    })
+    .finally(() => {
+      if (state().abort === controller) {
+        state().abort = undefined
+        setLoading(false)
+      }
+    })
 }
 
-// Init
 const el = $<HTMLElement>(SEL.root)
 if (el && !window.prodify) {
-  window.prodify = { el, pickerType: (el.dataset.prodify as 'select' | 'radio') || 'radio' }
-
-  readOptions()
-  matchVariant()
-  compareInputValues()
-  if (!state().currentVariant) setAddButton(true, window.variantStrings.unavailable, true)
+  window.prodify = {
+    el,
+    pickerType: (el.dataset.prodify as 'select' | 'radio') || 'radio',
+    currentVariant: parseJson<Variant>(SEL.currentVariant, el),
+  }
 
   el.addEventListener('change', onVariantChange)
 

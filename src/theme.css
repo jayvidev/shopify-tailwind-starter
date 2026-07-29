@@ -2,48 +2,118 @@
 
 @plugin '@tailwindcss/typography';
 
+/*
+  Design tokens live here, not in the theme settings. Colours, type and shape
+  are decisions the theme makes; the settings only cover content and behaviour.
+  Values below are Dawn's base palette — change them once and the whole theme
+  follows.
+*/
 @theme {
-  --color-cloud-burst-50: #7179c4;
-  --color-cloud-burst-100: #636cbe;
-  --color-cloud-burst-200: #4953af;
-  --color-cloud-burst-300: #3d4593;
-  --color-cloud-burst-400: #313876;
-  --color-cloud-burst-500: #252a59;
-  --color-cloud-burst-600: #151731;
-  --color-cloud-burst-700: #04050a;
-  --color-cloud-burst-800: #000000;
-  --color-cloud-burst-900: #000000;
+  --color-fg: #121212;
+  --color-fg-muted: #121212bf;
+  --color-fg-subtle: #12121280;
+  --color-bg: #ffffff;
 
-  /* DEFAULT */
-  --color-cloud-burst: #252a59;
+  --color-surface: #f3f3f3;
+  --color-surface-dark: #242833;
+  --color-border: #dcdcdc;
+  --color-border-strong: #121212;
 
-  --color-woodland-50: #c4bc71;
-  --color-woodland-100: #beb563;
-  --color-woodland-200: #afa649;
-  --color-woodland-300: #938a3d;
-  --color-woodland-400: #766f31;
-  --color-woodland-500: #595425;
-  --color-woodland-600: #312f15;
-  --color-woodland-700: #0a0904;
-  --color-woodland-800: #000000;
-  --color-woodland-900: #000000;
-  --color-woodland-950: #000000;
+  --color-accent: #334fb4;
+  --color-sale: #e0245e;
+  --color-success: #428445;
+  --color-error: #eb001b;
 
-  /* DEFAULT */
-  --color-woodland: #595425;
+  /* Self-hosted in assets/ and declared in snippets/font-face.liquid. */
+  --font-body: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
 
-  --font-open-sans: 'Open Sans', sans-serif;
+  /* Shape. Dawn's defaults are square; bump these for a softer theme. */
+  --radius-button: 0px;
+  --radius-input: 0px;
+  --radius-card: 0px;
+  --radius-media: 0px;
+  --radius-badge: 0.4rem;
+  --radius-pill: 2.5rem;
+
+  --shadow-card: 0 4px 5px --alpha(var(--color-fg) / 5%);
+  --shadow-drawer: 0 0 20px --alpha(var(--color-fg) / 10%);
+  --shadow-popup: 0 4px 20px --alpha(var(--color-fg) / 10%);
+
+  --container-page: 120rem;
+
+  --breakpoint-xs: 30rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    overflow-x: clip;
+  }
+
+  body {
+    overflow-x: clip;
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-body);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.01em;
+  }
+
+  [x-cloak] {
+    display: none !important;
+  }
+}
+
+/* Page container: max width plus the horizontal gutter. */
+@utility page {
+  width: 100%;
+  max-width: var(--container-page);
+  margin-inline: auto;
+  padding-inline: --spacing(4);
+
+  @variant md {
+    padding-inline: --spacing(8);
+  }
+}
+
+/* Vertical rhythm between sections. */
+@utility section-spacing {
+  padding-block: --spacing(10);
+
+  @variant md {
+    padding-block: --spacing(16);
+  }
 }
 
 @utility prose {
   max-width: none;
+  font-size: 0.875rem;
+
+  @variant md {
+    font-size: 1rem;
+  }
+
   :where(:not(.not-prose, .not-prose *)) {
-    --tw-prose-body: var(--color-cloud-burst-400);
-    --tw-prose-headings: var(--color-cloud-burst-50);
-    --tw-prose-links: var(--color-woodland-500);
+    --tw-prose-body: var(--color-fg-muted);
+    --tw-prose-headings: var(--color-fg);
+    --tw-prose-links: var(--color-fg);
+    --tw-prose-bold: var(--color-fg);
+    --tw-prose-bullets: var(--color-border);
+    --tw-prose-hr: var(--color-border);
+    --tw-prose-quotes: var(--color-fg);
+    --tw-prose-quote-borders: var(--color-border);
 
     &:where(a:hover) {
-      --tw-prose-links: var(--color-woodland-200);
+      --tw-prose-links: var(--color-accent);
     }
 
     &:where(iframe) {

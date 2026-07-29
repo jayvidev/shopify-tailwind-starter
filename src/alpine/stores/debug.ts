@@ -9,15 +9,15 @@ export default {
         }
       },
       initA11yDebugging() {
-        let focusable = this.getKeyboardFocusableElements()
+        const focusable = this.getKeyboardFocusableElements()
 
         focusable.forEach((element) => {
-          element.addEventListener('focus', function (e) {
+          element.addEventListener('focus', (e) => {
             console.log(e.target)
           })
         })
       },
-      getKeyboardFocusableElements(element = document) {
+      getKeyboardFocusableElements(element: Document | Element = document): Element[] {
         return [
           ...element.querySelectorAll(
             'a[href], button, input, textarea, select, details,[tabindex]:not([tabindex="-1"])'

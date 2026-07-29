@@ -17,10 +17,7 @@ coverage/
 .tmp/
 temp/
 
-assets/*.min.js
-assets/*.min.css
-assets/*.min.woff
-assets/*.min.woff2
+assets/
 
 config/settings_data.json
 config/settings_schema.json
@@ -34,9 +31,3 @@ sections/*.json
 sections/**/*.json
 locales/*.json
 locales/**/*.json
-
-assets/theme.css
-assets/theme.js
-assets/theme.js.map
-assets/prodify.js
-assets/prodify.js.map
