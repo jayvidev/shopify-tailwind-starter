@@ -52,7 +52,7 @@
       "settings": {
         "heading": "Featured collection",
         "description": "",
-        "collection": "",
+        "collection": "frontpage",
         "products_to_show": 8,
         "columns": "4",
         "show_view_all": true
