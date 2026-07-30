@@ -10,15 +10,11 @@
 {
   "current": {
     "logo_width": 100,
-    "badge_position": "bottom left",
-    "predictive_search_enabled": true,
-    "predictive_search_show_vendor": false,
-    "predictive_search_show_price": true,
-    "currency_code_enabled": false,
-    "show_vendor": false,
-    "show_cart_note": false,
+    "favicon": "shopify://shop_images/favicon.svg",
     "show_promo_bar": true,
     "collapse_promo_bar": true,
+    "show_cart_note": false,
+    "show_cart_discount_field": true,
     "discount_tiers_count": 0,
     "discount_tier1_threshold": 100,
     "discount_tier1_amount": 10,
@@ -26,8 +22,42 @@
     "discount_tier2_amount": 25,
     "discount_tier3_threshold": 300,
     "discount_tier3_amount": 45,
-    "show_cart_discount_field": true,
+    "predictive_search_enabled": true,
+    "predictive_search_show_price": true,
+    "predictive_search_show_vendor": false,
+    "show_vendor": false,
     "show_secondary_image": true,
-    "show_quick_add": true
+    "show_quick_add": true,
+    "badge_position": "bottom left",
+    "currency_code_enabled": false,
+    "sections": {
+      "promo-bar": {
+        "type": "promo-bar",
+        "blocks": {
+          "promo-bar-0": {
+            "type": "announcement",
+            "settings": {
+              "text": "Free shipping on orders over 50",
+              "icon": "none"
+            }
+          },
+          "promo-bar-1": {
+            "type": "announcement",
+            "settings": {
+              "text": "30-day returns",
+              "icon": "none"
+            }
+          }
+        },
+        "block_order": [
+          "promo-bar-0",
+          "promo-bar-1"
+        ],
+        "settings": {
+          "speed": 60
+        }
+      }
+    },
+    "content_for_index": []
   }
 }

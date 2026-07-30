@@ -1,55 +1,167 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "image-banner": {
       "type": "image-banner",
       "blocks": {
-        "heading": { "type": "heading", "settings": { "heading": "Your headline here" } },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Your headline here"
+          }
+        },
         "text": {
           "type": "text",
-          "settings": { "text": "<p>Say what makes the shop worth a look.</p>" }
+          "settings": {
+            "text": "<p>Say what makes the shop worth a look.</p>"
+          }
         },
-        "button": { "type": "button", "settings": { "label": "Shop all" } }
+        "button": {
+          "type": "button",
+          "settings": {
+            "label": "Shop all",
+            "link": "",
+            "secondary_label": "",
+            "secondary_link": ""
+          }
+        }
       },
-      "block_order": ["heading", "text", "button"],
-      "settings": { "height": "medium", "content_position": "middle-center", "overlay_opacity": 20 }
+      "block_order": [
+        "heading",
+        "text",
+        "button"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/banner.jpg",
+        "height": "medium",
+        "content_position": "middle-center",
+        "overlay_opacity": 20,
+        "text_color": "#ffffff"
+      }
     },
     "featured-collection": {
       "type": "featured-collection",
-      "settings": { "heading": "Featured collection", "products_to_show": 8, "columns": "4" }
+      "settings": {
+        "heading": "Featured collection",
+        "description": "",
+        "collection": "",
+        "products_to_show": 8,
+        "columns": "4",
+        "show_view_all": true
+      }
     },
     "collection-list": {
       "type": "collection-list",
       "blocks": {
-        "one": { "type": "collection", "settings": {} },
-        "two": { "type": "collection", "settings": {} },
-        "three": { "type": "collection", "settings": {} }
+        "one": {
+          "type": "collection",
+          "settings": {
+            "collection": ""
+          }
+        },
+        "two": {
+          "type": "collection",
+          "settings": {
+            "collection": ""
+          }
+        },
+        "three": {
+          "type": "collection",
+          "settings": {
+            "collection": ""
+          }
+        }
       },
-      "block_order": ["one", "two", "three"],
-      "settings": { "heading": "Shop by category", "columns": "3" }
+      "block_order": [
+        "one",
+        "two",
+        "three"
+      ],
+      "settings": {
+        "heading": "Shop by category",
+        "columns": "3",
+        "show_product_count": false
+      }
     },
     "multicolumn": {
       "type": "multicolumn",
       "blocks": {
-        "one": { "type": "column", "settings": { "heading": "Free shipping" } },
-        "two": { "type": "column", "settings": { "heading": "Easy returns" } },
-        "three": { "type": "column", "settings": { "heading": "Secure checkout" } }
+        "one": {
+          "type": "column",
+          "settings": {
+            "heading": "Free shipping",
+            "text": "<p>Pair text with an image to focus on your chosen product.</p>",
+            "label": "",
+            "link": ""
+          }
+        },
+        "two": {
+          "type": "column",
+          "settings": {
+            "heading": "Easy returns",
+            "text": "<p>Pair text with an image to focus on your chosen product.</p>",
+            "label": "",
+            "link": ""
+          }
+        },
+        "three": {
+          "type": "column",
+          "settings": {
+            "heading": "Secure checkout",
+            "text": "<p>Pair text with an image to focus on your chosen product.</p>",
+            "label": "",
+            "link": ""
+          }
+        }
       },
-      "block_order": ["one", "two", "three"],
-      "settings": { "heading": "Why shop with us", "columns": "3" }
+      "block_order": [
+        "one",
+        "two",
+        "three"
+      ],
+      "settings": {
+        "heading": "Why shop with us",
+        "columns": "3",
+        "image_shape": "landscape"
+      }
     },
     "rich-text": {
       "type": "rich-text",
       "blocks": {
-        "heading": { "type": "heading", "settings": { "heading": "Talk about your brand" } },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Talk about your brand"
+          }
+        },
         "text": {
           "type": "text",
-          "settings": { "text": "<p>Share what the shop is about and why it exists.</p>" }
+          "settings": {
+            "text": "<p>Share what the shop is about and why it exists.</p>"
+          }
         }
       },
-      "block_order": ["heading", "text"],
+      "block_order": [
+        "heading",
+        "text"
+      ],
       "settings": {}
     },
-    "newsletter": { "type": "newsletter", "settings": {} }
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Subscribe to our emails",
+        "text": "<p>Be the first to know about new collections and offers.</p>"
+      }
+    }
   },
   "order": [
     "image-banner",
