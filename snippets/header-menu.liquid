@@ -39,7 +39,8 @@
     >
       <a
         href='{{ link.url }}'
-        class='flex items-center gap-1.5 px-3 py-2 text-sm text-fg no-underline underline-offset-4 hover:underline'
+        class='flex items-center gap-1.5 px-3 py-2 text-sm text-fg no-underline decoration-1 underline-offset-4 hover:underline
+          {%- if is_active %} underline decoration-1{% endif %}'
         {% if has_children %}
           :aria-expanded="hoveredItem === '{{ link_handle }}' ? 'true' : 'false'"
         {% endif %}
@@ -47,24 +48,7 @@
           aria-current='page'
         {% endif %}
       >
-        {%- comment -%}
-          The bold copy is duplicated invisibly so the item doesn't shift width
-          when it becomes active.
-        {%- endcomment -%}
-        <span class='grid'>
-          <span class='col-start-1 row-start-1 {% if is_active %}font-semibold{% else %}font-normal{% endif %}'>
-            {{ link.title | escape }}
-          </span>
-          <span
-            class='invisible col-start-1 row-start-1 font-semibold'
-            aria-hidden='true'
-          >
-            {{ link.title | escape }}
-          </span>
-          <span
-            class='col-start-1 row-start-1 mt-6 h-px w-full {% if is_active %}bg-current{% else %}bg-transparent{% endif %}'
-          ></span>
-        </span>
+        {{ link.title | escape }}
 
         {%- if has_children -%}
           <span

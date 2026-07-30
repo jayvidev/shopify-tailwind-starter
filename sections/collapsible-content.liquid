@@ -28,7 +28,7 @@
             </span>
           </button>
 
-          <div class='overflow-hidden' x-show='openRow === {{ forloop.index }}' x-collapse>
+          <div x-show='openRow === {{ forloop.index }}' x-collapse>
             <div class='prose pb-4'>
               {{ block.settings.content }}
               {%- if block.settings.page != blank -%}

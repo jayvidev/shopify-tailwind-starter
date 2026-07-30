@@ -39,7 +39,7 @@
         <div class='flex items-center justify-between gap-2'>
           <a
             href='{{ link.url }}'
-            class='flex-1 py-3 text-base text-fg no-underline {% if is_active %}font-semibold{% endif %}'
+            class='flex-1 py-3 text-base text-fg no-underline underline-offset-4 {% if is_active %}underline decoration-2{% endif %}'
             {% if link.active %}
               aria-current='page'
             {% endif %}
@@ -63,7 +63,6 @@
 
         {%- if link.links != blank -%}
           <div
-            class='overflow-hidden'
             x-show="openItem === '{{ link_key }}'"
             x-collapse
           >
@@ -97,11 +96,7 @@
                   </div>
 
                   {%- if childlink.links != blank -%}
-                    <div
-                      class='overflow-hidden'
-                      x-show="openChild === '{{ child_key }}'"
-                      x-collapse
-                    >
+                    <div x-show="openChild === '{{ child_key }}'" x-collapse>
                       <ul class='flex flex-col gap-1 py-1 ps-3'>
                         {%- for grandchildlink in childlink.links -%}
                           <li>

@@ -22,10 +22,10 @@
         aria-label='{{ 'sections.header.menu' | t }}'
       >
         <span x-show='!$store.ui.isMobileMenuVisible'>
-          {% render 'icon', icon: 'menu', class: 'size-6' %}
+          {% render 'icon', icon: 'menu', class: 'size-5' %}
         </span>
         <span x-show='$store.ui.isMobileMenuVisible' x-cloak>
-          {% render 'icon', icon: 'close', class: 'size-6' %}
+          {% render 'icon', icon: 'close', class: 'size-5' %}
         </span>
       </button>
 
@@ -67,7 +67,7 @@
           aria-controls='predictive-search'
           aria-label='{{ 'general.search.search' | t }}'
         >
-          {% render 'icon', icon: 'search', class: 'size-5 md:size-6' %}
+          {% render 'icon', icon: 'search', class: 'size-5' %}
         </button>
       {%- else -%}
         <a
@@ -75,7 +75,7 @@
           class='p-2'
           aria-label='{{ 'general.search.search' | t }}'
         >
-          {% render 'icon', icon: 'search', class: 'size-5 md:size-6' %}
+          {% render 'icon', icon: 'search', class: 'size-5' %}
         </a>
       {%- endif -%}
 
@@ -85,7 +85,7 @@
           class='hidden p-2 md:block'
           aria-label='{{ 'customer.log_in' | t }}'
         >
-          {% render 'icon', icon: 'user', class: 'size-5 md:size-6' %}
+          {% render 'icon', icon: 'user', class: 'size-5' %}
         </a>
       {%- endif -%}
 
@@ -96,10 +96,10 @@
         aria-label='{{ 'templates.cart.cart' | t }}'
         aria-controls='minicart'
       >
-        {% render 'icon', icon: 'cart', class: 'size-7 md:size-8' %}
+        {% render 'icon', icon: 'cart', class: 'size-11' %}
         <span
           data-ajax-cart-bind='item_count'
-          class='cart-count-badge absolute inset-e-1 bottom-1.5 flex size-4 items-center justify-center rounded-full bg-fg text-[10px] font-semibold text-bg'
+          class='cart-count-badge absolute inset-e-2.5 bottom-2.5 flex size-4 items-center justify-center rounded-full bg-fg text-[10px] font-semibold text-bg'
         >
           {{- cart.item_count -}}
         </span>

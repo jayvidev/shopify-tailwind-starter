@@ -1,5 +1,7 @@
 {%- liquid
-  assign collection = collections[section.settings.collection]
+  # A `collection` setting hands back the collection itself, not its handle —
+  # `collections[…]` on it returns an empty drop.
+  assign featured_collection = section.settings.collection
   assign products_to_show = section.settings.products_to_show
 
   case section.settings.columns
@@ -25,22 +27,39 @@
       {%- endif -%}
     </div>
 
-    {%- if section.settings.show_view_all and collection.all_products_count > products_to_show -%}
+    {%- if section.settings.show_view_all and featured_collection.all_products_count > products_to_show -%}
       {%- assign view_all_label = 'sections.featured_collection.view_all' | t -%}
-      {% render 'button', label: view_all_label, href: collection.url, variant: 'outline', size: 'sm' %}
+      {% render 'button',
+        label: view_all_label,
+        href: featured_collection.url,
+        variant: 'outline',
+        size: 'sm'
+      %}
     {%- endif -%}
   </div>
 
-  {%- if collection.products.size > 0 -%}
+  {%- if featured_collection.products.size > 0 -%}
     <div class='grid grid-gap {{ grid_classes }}'>
-      {%- for product in collection.products limit: products_to_show -%}
+      {%- for product in featured_collection.products limit: products_to_show -%}
         {% render 'product-card', product: product %}
       {%- endfor -%}
     </div>
   {%- else -%}
-    <p class='py-10 text-center text-fg-subtle'>
-      {{ 'sections.collection_template.empty' | t }}
-    </p>
+    {%- comment -%}
+      Placeholders until a collection is picked, so the section is visible in the
+      editor instead of looking broken.
+    {%- endcomment -%}
+    <div class='grid grid-gap {{ grid_classes }}'>
+      {%- for i in (1..products_to_show) -%}
+        <div class='flex flex-col'>
+          <div class='mb-3 aspect-square overflow-hidden rounded-media bg-surface'>
+            {{ 'product-1' | placeholder_svg_tag: 'size-full object-cover opacity-40' }}
+          </div>
+          <p class='text-sm font-medium'>{{ 'onboarding.product_title' | t }}</p>
+          <p class='text-sm text-fg-subtle'>{{ 1999 | money }}</p>
+        </div>
+      {%- endfor -%}
+    </div>
   {%- endif -%}
 </div>
 

@@ -37,7 +37,7 @@
   <div class='flex items-center justify-between border-b border-border px-5 py-4'>
     <h2 class='text-lg font-medium'>
       {{ 'sections.cart.title' | t }}
-      <span class='text-fg-subtle' data-ajax-cart-bind='item_count'>{{ cart.item_count }}</span>
+      <span class='text-fg-subtle'>{{ cart.item_count }}</span>
     </h2>
     <button
       type='button'
@@ -215,9 +215,7 @@
 
       <div class='mb-1 flex items-baseline justify-between'>
         <span class='text-sm font-medium'>{{ 'sections.cart.estimated_total' | t }}</span>
-        <span class='text-base font-semibold' data-ajax-cart-bind='total_price|money'>
-          {{- cart.total_price | money -}}
-        </span>
+        <span class='text-base font-semibold'>{{ cart.total_price | money }}</span>
       </div>
 
       <p class='mb-4 text-xs text-fg-subtle'>

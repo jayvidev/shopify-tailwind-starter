@@ -18,12 +18,15 @@
     <div class='grid grid-gap {{ grid_classes }}'>
       {%- for block in section.blocks -%}
         {%- liquid
-          assign block_collection = collections[block.settings.collection]
+          # A `collection` setting hands back the collection itself, not its handle.
+          assign block_collection = block.settings.collection
           assign card_image = block.settings.image | default: block_collection.featured_image
           assign card_alt = card_image.alt | default: block_collection.title | escape
+          assign block_url = block_collection.url | default: routes.all_products_collection_url
+          assign block_title = block_collection.title | default: 'onboarding.collection_title' | t
         -%}
         <a
-          href='{{ block_collection.url | default: '#' }}'
+          href='{{ block_url }}'
           class='group flex flex-col no-underline'
           {{ block.shopify_attributes }}
         >
@@ -45,9 +48,9 @@
           </div>
 
           <h3 class='text-sm font-medium text-fg underline-offset-4 group-hover:underline md:text-base'>
-            {{ block_collection.title | default: 'Collection' }}
+            {{ block_title }}
           </h3>
-          {%- if section.settings.show_product_count and block_collection != blank -%}
+          {%- if section.settings.show_product_count and block_collection.title != blank -%}
             <p class='text-xs text-fg-subtle'>
               {{ 'products.facets.product_count_simple' | t: count: block_collection.all_products_count }}
             </p>

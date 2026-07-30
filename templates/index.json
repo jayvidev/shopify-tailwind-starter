@@ -44,7 +44,8 @@
         "height": "medium",
         "content_position": "middle-center",
         "overlay_opacity": 20,
-        "text_color": "#ffffff"
+        "text_color": "#ffffff",
+        "image_behavior": "fixed"
       }
     },
     "featured-collection": {
