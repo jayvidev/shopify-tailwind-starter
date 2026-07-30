@@ -1,0 +1,150 @@
+{%- if settings.show_promo_bar and section.blocks.size > 0 -%}
+  {%- liquid
+    # Short messages need a second pass through the blocks, or the marquee has a
+    # visible gap before it loops.
+    if section.blocks.size < 4
+      assign reps = 2
+    else
+      assign reps = 1
+    endif
+  -%}
+
+  <div
+    id='site-promo-bar-wrapper'
+    class='relative z-40'
+    x-data='promoMarquee'
+    {% if settings.collapse_promo_bar %}
+      {%- comment -%}
+        Only scrolling collapses the bar — opening a drawer leaves the header
+        alone.
+      {%- endcomment -%}
+      x-show='$store.ui.isPromoBarVisible'
+      x-collapse
+    {% endif %}
+  >
+    <div
+      id='site-promo-bar'
+      class='select-none overflow-hidden bg-fg py-2.5 text-bg'
+    >
+      <div class='promo-marquee-fade relative'>
+        <div
+          class='promo-marquee-track flex w-max'
+          data-promo-marquee
+          data-promo-marquee-speed='{{ section.settings.speed }}'
+        >
+          {%- comment -%}
+            Two identical copies side by side: the track animates to -50%, so the
+            second copy is already in place when it wraps.
+          {%- endcomment -%}
+          {%- for copy in (1..2) -%}
+            <div
+              class='flex items-center'
+              data-promo-marquee-copy
+              {% if copy == 2 %}
+                aria-hidden='true'
+              {% endif %}
+            >
+              {%- for rep in (1..reps) -%}
+                {%- for block in section.blocks -%}
+                  <span
+                    class='flex items-center gap-2 px-4 text-xs whitespace-nowrap md:text-sm'
+                    {{ block.shopify_attributes }}
+                  >
+                    {%- if block.settings.icon != 'none' -%}
+                      {% render 'icon', icon: block.settings.icon, class: 'size-4 shrink-0' %}
+                    {%- endif -%}
+                    <span>{{- block.settings.text -}}</span>
+                  </span>
+                {%- endfor -%}
+              {%- endfor -%}
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  @keyframes promo-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .promo-marquee-fade {
+    mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  }
+  .promo-marquee-track {
+    /* The duration is set from the track width in promo-marquee.ts. */
+    animation: promo-marquee 30s linear infinite;
+    will-change: transform;
+  }
+  #site-promo-bar:hover .promo-marquee-track {
+    animation-play-state: paused;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .promo-marquee-track {
+      animation: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Promo bar",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Shown when \"Show promo bar\" is on under Theme settings → Promo bar."
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 20,
+      "max": 140,
+      "step": 10,
+      "default": 60,
+      "label": "Scroll speed",
+      "info": "Pixels per second. The same on every page, whatever the copy length."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement",
+      "limit": 20,
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "default": "Free shipping on orders over 50",
+          "label": "Text"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "default": "none",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "check", "label": "Check" },
+            { "value": "tag", "label": "Tag" },
+            { "value": "discount", "label": "Discount" },
+            { "value": "star", "label": "Star" },
+            { "value": "mail", "label": "Mail" }
+          ],
+          "label": "Icon"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      { "type": "announcement", "settings": { "text": "Free shipping on orders over 50" } },
+      { "type": "announcement", "settings": { "text": "30-day returns" } }
+    ]
+  }
+}
+{% endschema %}

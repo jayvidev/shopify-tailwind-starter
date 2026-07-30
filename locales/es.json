@@ -38,7 +38,8 @@
       "label": "Paginación",
       "page": "Página {{ number }}",
       "next": "Página siguiente",
-      "previous": "Pagina anterior"
+      "previous": "Pagina anterior",
+      "load_more": "Cargar más"
     },
     "search": {
       "search": "Búsqueda",
@@ -166,7 +167,7 @@
       "shipping_policy_html": "Los <a href=\"{{ link }}\">gastos de envío</a> se calculan en la pantalla de pago.",
       "choose_options": "Seleccionar opciones",
       "choose_product_options": "Elegir opciones para {{ product_name }}",
-      "value_unavailable": "{{ option_value }}: no disponible",
+      "value_unavailable": "{{ option_value }} — no disponible",
       "variant_sold_out_or_unavailable": "Variante agotada o no disponible",
       "inventory_in_stock": "En existencias",
       "inventory_in_stock_show_count": "{{ quantity }} en existencias",
@@ -185,7 +186,8 @@
       "product_variants": "Variantes de producto",
       "taxes_included": "Impuestos incluidos.",
       "duties_included": "Aranceles incluidos.",
-      "duties_and_taxes_included": "Aranceles e impuestos incluidos."
+      "duties_and_taxes_included": "Aranceles e impuestos incluidos.",
+      "value_sold_out": "{{ option_value }} — agotado"
     },
     "modal": {
       "label": "Galería multimedia"
@@ -322,7 +324,21 @@
       "duties_included_taxes_at_checkout_shipping_at_checkout_with_policy_html": "Aranceles incluidos. Impuestos, descuentos y <a href=\"{{ link }}\">envío</a> calculados en la pantalla de pago.",
       "duties_included_taxes_at_checkout_shipping_at_checkout_without_policy": "Aranceles incluidos. Impuestos, descuentos y envío calculados en la pantalla de pago.",
       "taxes_at_checkout_shipping_at_checkout_with_policy_html": "Impuestos, descuentos y <a href=\"{{ link }}\">envío</a> calculados en la pantalla de pago.",
-      "taxes_at_checkout_shipping_at_checkout_without_policy": "Impuestos, descuentos y envío calculados en la pantalla de pago."
+      "taxes_at_checkout_shipping_at_checkout_without_policy": "Impuestos, descuentos y envío calculados en la pantalla de pago.",
+      "tiers": {
+        "max_reached": "Descuento máximo desbloqueado: {{ amount }} de descuento",
+        "current": "Llevas {{ amount }} de descuento.",
+        "next": "Añade {{ remaining }} más para {{ amount }} de descuento.",
+        "first": "Añade {{ remaining }} más y consigue {{ amount }} de descuento."
+      },
+      "discount_code": {
+        "label": "Código de descuento",
+        "placeholder": "Código de descuento",
+        "apply": "Aplicar",
+        "remove": "Quitar descuento"
+      },
+      "subtotal": "Subtotal",
+      "remove": "Quitar"
     },
     "footer": {
       "payment": "Formas de pago"

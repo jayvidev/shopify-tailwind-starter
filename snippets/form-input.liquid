@@ -1,0 +1,63 @@
+{% doc %}
+  Renders a labelled text input.
+
+  @param {string} [id] - Unique id, links the label to the input
+  @param {string} [name] - Field name
+  @param {string} [label] - Visible label
+  @param {string} [type] - Input type. Defaults to 'text'
+  @param {string} [placeholder] - Placeholder text
+  @param {boolean} [required] - Marks the field as required
+  @param {string} [value] - Initial value
+  @param {string} [size] - 'sm' or 'md'. Defaults to 'md'
+  @param {string} [inputmode] - Virtual keyboard hint
+  @param {string} [alpine_model] - x-model expression
+  @param {string} [alpine_keydown] - Expression run on Enter
+
+  @example
+  {% render 'form-input', label: 'Email', id: 'ContactForm-email', name: 'contact[email]', type: 'email' %}
+{% enddoc %}
+
+{% liquid
+  if size == 'sm'
+    assign input_size_class = 'px-3 py-1.5 text-xs'
+    assign label_class = 'text-fg-subtle text-[10px]'
+  else
+    assign input_size_class = 'px-3 py-1.5 text-sm md:text-base'
+    assign label_class = 'text-fg-subtle text-xs md:text-base'
+  endif
+%}
+
+<div class='flex flex-col gap-2 w-full'>
+  {% if label %}
+    <label for='{{ id }}' class='{{ label_class }}'>
+      {{ label }}
+    </label>
+  {% endif %}
+  <input
+    type='{{ type | default: 'text' }}'
+    id='{{ id }}'
+    name='{{ name }}'
+    placeholder='{{ placeholder }}'
+    {% if required %}
+      required
+    {% endif %}
+    {% if min != blank %}
+      min='{{ min }}'
+    {% endif %}
+    {% if step != blank %}
+      step='{{ step }}'
+    {% endif %}
+    {% if inputmode != blank %}
+      inputmode='{{ inputmode }}'
+    {% endif %}
+    value='{{ value }}'
+    {% if alpine_model %}
+      x-model='{{ alpine_model }}'
+    {% endif %}
+    {% if alpine_keydown %}
+      @keydown.enter='{{ alpine_keydown }}'
+    {% endif %}
+    {{ attr }}
+    class='w-full {{ input_size_class }} rounded-input border border-border-strong text-fg placeholder:text-fg-subtle focus:border-border-strong transition-colors bg-bg'
+  >
+</div>

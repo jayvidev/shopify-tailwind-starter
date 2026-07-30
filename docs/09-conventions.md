@@ -7,7 +7,7 @@
 | Files | kebab-case | `product-media-gallery.ts` |
 | Alpine `name` | camelCase | `productMediaGallery` |
 | Sections | kebab-case, `main-` for template mains | `main-collection.liquid` |
-| Section class | matches the file | `"class": "section-hexacore-grid"` |
+| Section class | matches the file | `"class": "section-main-collection"` |
 | CSS custom properties | kebab-case, prefixed by feature | `--section-padding-top` |
 | Constants | SCREAMING_SNAKE at module top | `const DESKTOP_BREAKPOINT = 768` |
 
@@ -61,8 +61,17 @@ output, and formatting it fights the next build.
 
 ## Build output
 
-`assets/` is committed on purpose — see `01-setup.md`. **Run `pnpm build` before
-committing**, or you ship the previous JS.
+`assets/` is committed on purpose — Shopify's GitHub integration serves the branch
+without building it. **Run `pnpm build` before committing**, or you ship the
+previous JS. See `01-setup.md`.
+
+## Styling
+
+Tailwind utilities in the markup, tokens in `src/theme.css`. Colours, radii and
+shadows are not theme settings — restyling means editing the `@theme` block.
+
+Reach for `@utility` (see `page`, `section-spacing`, `grid-gap`) when a pattern
+repeats across sections. Everything else stays inline.
 
 ## Things that fail silently
 

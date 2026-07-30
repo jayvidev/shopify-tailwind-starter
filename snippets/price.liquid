@@ -1,0 +1,60 @@
+{% doc %}
+  Renders a product or variant price, with the compare-at price when on sale.
+
+  @param {object} product - Product or variant to price
+  @param {boolean} [use_variant] - Price the selected variant instead of the product
+  @param {boolean} [show_from] - Prefix with "From" when the product's price varies
+  @param {string} [class] - Extra classes on the wrapper
+  @param {string} [price_class] - Classes for the current price. Defaults to 'text-sm md:text-base'
+  @param {string} [compare_class] - Classes for the compare-at price. Defaults to 'text-xs md:text-sm'
+
+  @example
+  {% render 'price', product: product, use_variant: true, show_from: true %}
+{% enddoc %}
+
+{%- liquid
+  if use_variant
+    assign target = product.selected_or_first_available_variant
+  else
+    assign target = product
+  endif
+
+  assign price = target.price | default: 0
+  assign compare_at_price = target.compare_at_price
+  assign on_sale = false
+  if compare_at_price > price
+    assign on_sale = true
+  endif
+
+  if settings.currency_code_enabled
+    assign money_price = price | money_with_currency
+    assign money_compare_at_price = compare_at_price | money_with_currency
+  else
+    assign money_price = price | money
+    assign money_compare_at_price = compare_at_price | money
+  endif
+
+  assign price_class = price_class | default: 'text-sm md:text-base'
+  assign compare_class = compare_class | default: 'text-xs md:text-sm'
+-%}
+
+<div class='flex flex-wrap items-baseline gap-x-2 gap-y-0.5 {{ class }}'>
+  <span class='{{ price_class }} font-medium {% if on_sale %}text-sale{% else %}text-fg{% endif %}'>
+    {%- if show_from and product.price_varies -%}
+      {{ 'products.product.price.from_price_html' | t: price: money_price }}
+    {%- else -%}
+      {{ money_price }}
+    {%- endif -%}
+  </span>
+
+  {%- if on_sale -%}
+    <s class='{{ compare_class }} text-fg-subtle'>
+      <span class='sr-only'>{{ 'products.product.price.regular_price' | t }}</span>
+      {{ money_compare_at_price }}
+    </s>
+  {%- endif -%}
+
+  {%- unless target.available -%}
+    <span class='sr-only'>{{ 'products.product.sold_out' | t }}</span>
+  {%- endunless -%}
+</div>

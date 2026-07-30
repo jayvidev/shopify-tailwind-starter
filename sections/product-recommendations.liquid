@@ -1,77 +1,57 @@
+{%- comment -%}
+  Shopify's recommendations endpoint renders this section, so the markup is
+  fetched only when the browser reaches it — hence `data-url` plus the
+  `<product-recommendations>` behaviour Shopify provides.
+{%- endcomment -%}
+
+{%- liquid
+  assign recommendations_url = routes.product_recommendations_url
+  assign recommendations_url = recommendations_url | append: '?section_id=' | append: section.id
+  assign recommendations_url = recommendations_url | append: '&product_id=' | append: product.id
+  assign recommendations_url = recommendations_url | append: '&limit=' | append: section.settings.products_to_show
+-%}
+
+<product-recommendations class='block' data-url='{{ recommendations_url }}'>
+  {%- if recommendations.performed and recommendations.products_count > 0 -%}
+    <div class='page section-spacing'>
+      {%- if section.settings.heading != blank -%}
+        <h2 class='mb-6 text-2xl font-semibold md:text-3xl'>{{ section.settings.heading }}</h2>
+      {%- endif -%}
+
+      <div class='relative' x-data='slider' @resize.window.debounce.100ms='updateScroll()'>
+        <div
+          class='flex snap-x gap-4 overflow-x-auto scroll-smooth pb-2'
+          x-ref='slider'
+          @scroll.passive='updateScroll()'
+        >
+          {%- for recommendation in recommendations.products -%}
+            <div class='w-44 shrink-0 snap-start md:w-60'>
+              {% render 'product-card', product: recommendation %}
+            </div>
+          {%- endfor -%}
+        </div>
+
+        {% render 'slider-navigation' %}
+      </div>
+    </div>
+  {%- endif -%}
+</product-recommendations>
+
 {% schema %}
 {
   "name": "Product recommendations",
+  "tag": "section",
   "settings": [
+    { "type": "text", "id": "heading", "default": "You may also like", "label": "Heading" },
     {
-      "type": "text",
-      "id": "heading",
-      "label": "Heading"
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "default": 6,
+      "label": "Products to show"
     }
   ]
 }
 {% endschema %}
-
-<div class='px-6 md:px-8 py-12'>
-  <div class='container'>
-    <div
-      class='product-recommendations'
-      data-url='{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit=4&intent=related'
-    >
-      {%- if recommendations.performed? and recommendations.products_count > 0 -%}
-        {% if section.settings.heading != blank %}
-          <div class='mb-8'>
-            <h2>{{ section.settings.heading }}</h2>
-          </div>
-        {% else %}
-          <div class='mb-8'>
-            {% if recommendations.intent == 'related' %}
-              <h2>You may also like</h2>
-            {% elsif recommendations.intent == 'complementary' %}
-              <h2>Pair it with</h2>
-            {% endif %}
-          </div>
-        {% endif %}
-
-        <div class='grid-wrapper'>
-          <ul class='product-grid grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4'>
-            {%- for product in recommendations.products -%}
-              <li class='product'>
-                {% render 'product-grid-item', prod: product %}
-              </li>
-            {%- endfor -%}
-          </ul>
-        </div>
-      {%- endif -%}
-    </div>
-  </div>
-</div>
-
-{% javascript %}
-  const handleIntersection = (entries, observer) => {
-    if (!entries[0].isIntersecting) return
-
-    observer.unobserve(productRecommendationsSection)
-
-    const url = productRecommendationsSection.dataset.url
-
-    fetch(url)
-      .then((response) => response.text())
-      .then((text) => {
-        const html = document.createElement('div')
-        html.innerHTML = text
-        const recommendations = html.querySelector('.product-recommendations')
-
-        if (recommendations && recommendations.innerHTML.trim().length) {
-          productRecommendationsSection.innerHTML = recommendations.innerHTML
-        }
-      })
-      .catch((e) => {
-        console.error(e)
-      })
-  }
-
-  const productRecommendationsSection = document.querySelector('.product-recommendations')
-  const observer = new IntersectionObserver(handleIntersection, { rootMargin: '0px 0px 200px 0px' })
-
-  observer.observe(productRecommendationsSection)
-{% endjavascript %}

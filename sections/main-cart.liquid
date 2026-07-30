@@ -1,148 +1,195 @@
-{% schema %}
-{
-  "name": "Cart Section",
-  "class": "section-main-collection",
-  "tag": "section",
-  "settings": [
-    {
-      "type": "text",
-      "id": "summary-message",
-      "label": "Cart Summary Message",
-      "default": "Taxes and shipping calculated at checkout"
-    }
-  ]
-}
-{% endschema %}
+{%- comment -%}
+  Cart page. Wrapped in `data-ajax-cart-section` so liquid-ajax-cart re-renders
+  it after every change — quantity edits and removals never reload the page.
+{%- endcomment -%}
 
-<div
-  class='cart px-6 py-12 md:px-8 [&_.error-notif]:block [&_.error-notif]:text-xs [&_.error-notif]:text-red-500 [&_a]:no-underline'
-  data-ajax-cart-section
->
-  <form
-    action='{{ routes.cart_url }}'
-    method='post'
-    id='cart'
-  >
-    <div class='cart-inner container'>
-      {% if cart.item_count > 0 %}
-        <table class='w-full [&_tr>td]:pb-4 [&_tr>th]:pb-4'>
-          <tr class='text-left'>
-            <th>Product</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th></th>
-            <th>Total</th>
-          </tr>
-          {% for line_item in cart.items %}
-            <tr>
-              <td>
-                {{ line_item.title }}
-                <div data-ajax-cart-errors='{{ line_item.key }}' class='text-xs text-red-500'>
-                  <!-- Error messages appear here -->
-                </div>
-              </td>
-              <td>
-                {{ line_item.price | money }}
-              </td>
-              <td>
-                <ajax-cart-quantity class='flex'>
-                  <a
-                    href='{{ routes.cart_change_url }}?id={{ line_item.key }}&quantity={{ line_item.quantity | minus: 1 | at_least: 1 }}'
-                    data-ajax-cart-quantity-minus
-                  >
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      viewBox='0 0 24 24'
-                      fill='currentColor'
-                      class='w-6 h-6'
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M5.25 12a.75.75 0 01.75-.75h12a.75.75 0 010 1.5H6a.75.75 0 01-.75-.75z"
-                        clip-rule="evenodd" />
-                    </svg>
-                  </a>
-                  <input
-                    type='number'
-                    value='{{ line_item.quantity }}'
-                    name='updates[]'
-                    data-ajax-cart-quantity-input='{{ line_item.key }}'
-                    class='noscroll w-10 appearance-none text-center [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
-                    readonly
-                  >
-                  <img
-                    class='loading-indicator hidden h-4 w-4'
-                    src='{{ 'loading.gif' | asset_url }}'
-                    alt='Loading Indicator'
-                    role='alert'
-                    aria-busy='false'
-                  >
-                  <a
-                    href='{{ routes.cart_change_url }}?id={{ line_item.key }}&quantity={{ line_item.quantity | plus: 1 }}'
-                    data-ajax-cart-quantity-plus
-                  >
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      viewBox='0 0 24 24'
-                      fill='currentColor'
-                      class='w-6 h-6'
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M12 5.25a.75.75 0 01.75.75v5.25H18a.75.75 0 010 1.5h-5.25V18a.75.75 0 01-1.5 0v-5.25H6a.75.75 0 010-1.5h5.25V6a.75.75 0 01.75-.75z"
-                        clip-rule="evenodd" />
-                    </svg>
-                  </a>
-                </ajax-cart-quantity>
-              </td>
-              <td>
-                <a
-                  href='{{ line_item.url_to_remove }}'
-                  @click.prevent='window.location.replace($el.href)'
-                  >Remove</a
-                >
-              </td>
-              <td>
-                {{ line_item.final_line_price | money }}
-              </td>
-            </tr>
-          {% endfor %}
-        </table>
+<div class='page section-spacing' data-ajax-cart-section>
+  <h1 class='mb-8 text-2xl font-semibold md:text-3xl'>{{ 'sections.cart.title' | t }}</h1>
 
-        <div class='cart-summary-row flex flex-col py-7.5'>
-          <div class='totals mb-2.5 flex items-center'>
-            <h3 class='mr-8'>Subtotal</h3>
-            <p>{{ cart.original_total_price | money }}</p>
-          </div>
-          <small class='mb-2.5'>
-            {{ section.settings['summary-message'] }}
-          </small>
-          <button
-            class='btn mt-4 max-w-87.5'
-            type='submit'
-            name='checkout'
-            form='cart'
-          >
-            {{ 'sections.cart.checkout' | t }}
-          </button>
-        </div>
-      {% else %}
-        <h2>You have no items in your cart.</h2>
-      {% endif %}
+  {%- if cart.item_count == 0 -%}
+    <div class='flex flex-col items-center gap-6 py-16 text-center'>
+      {% render 'icon', icon: 'cart-empty', class: 'size-20 text-fg-subtle' %}
+      <p class='text-base font-medium'>{{ 'sections.cart.empty' | t }}</p>
+      {%- assign continue_label = 'general.continue_shopping' | t -%}
+      {% render 'button', label: continue_label, href: routes.all_products_collection_url %}
     </div>
-  </form>
+  {%- else -%}
+    <div class='grid grid-cols-1 items-start gap-10 lg:grid-cols-[1fr_20rem]'>
+      <div>
+        <div class='hidden grid-cols-[1fr_8rem_8rem] gap-4 border-b border-border pb-3 text-xs uppercase tracking-wide text-fg-subtle md:grid'>
+          <span>{{ 'sections.cart.headings.product' | t }}</span>
+          <span class='text-center'>{{ 'sections.cart.headings.quantity' | t }}</span>
+          <span class='text-end'>{{ 'sections.cart.headings.total' | t }}</span>
+        </div>
+
+        <ul class='flex flex-col'>
+          {%- for line_item in cart.items -%}
+            {%- liquid
+              assign line_image = line_item.variant.featured_media.preview_image | default: line_item.image
+              assign line_image_alt = line_item.title | escape
+              assign quantity_down = line_item.quantity | minus: 1
+              assign quantity_up = line_item.quantity | plus: 1
+            -%}
+            <li class='grid grid-cols-[1fr_auto] items-start gap-4 border-b border-border py-5 md:grid-cols-[1fr_8rem_8rem]'>
+              <div class='flex min-w-0 gap-4'>
+                <a
+                  href='{{ line_item.url }}'
+                  class='block size-20 shrink-0 overflow-hidden rounded-media bg-surface md:size-24'
+                >
+                  {%- if line_image -%}
+                    {{
+                      line_image
+                      | image_url: width: 300
+                      | image_tag:
+                        alt: line_image_alt,
+                        loading: 'lazy',
+                        widths: '100, 200, 300',
+                        sizes: '96px',
+                        class: 'size-full object-cover'
+                    }}
+                  {%- endif -%}
+                </a>
+
+                <div class='flex min-w-0 flex-col gap-1'>
+                  <a href='{{ line_item.url }}' class='text-sm font-medium text-fg no-underline'>
+                    {{ line_item.product.title }}
+                  </a>
+                  {%- unless line_item.product.has_only_default_variant -%}
+                    <p class='text-xs text-fg-subtle'>
+                      {%- for option in line_item.options_with_values -%}
+                        {{ option.value }}
+                        {%- unless forloop.last %} / {% endunless -%}
+                      {%- endfor -%}
+                    </p>
+                  {%- endunless -%}
+                  <p class='text-xs text-fg-subtle'>{{ line_item.original_price | money }}</p>
+
+                  {%- for discount in line_item.line_level_discount_allocations -%}
+                    <p class='flex items-center gap-1 text-xs text-success'>
+                      {% render 'icon', icon: 'discount', class: 'size-3 shrink-0' %}
+                      {{ discount.discount_application.title }} (-{{ discount.amount | money }})
+                    </p>
+                  {%- endfor -%}
+                </div>
+              </div>
+
+              <div class='flex flex-col items-start gap-2 md:items-center'>
+                <div class='flex items-center rounded-input border border-border'>
+                  <button
+                    type='button'
+                    class='flex size-9 cursor-pointer items-center justify-center transition-colors hover:bg-surface disabled:opacity-40'
+                    @click='$store.cart.updateQuantity("{{ line_item.key }}", {{ quantity_down }})'
+                    :disabled='$store.cart.isCartLoading'
+                    aria-label='{{ 'products.product.quantity.decrease' | t: product: line_item.title }}'
+                  >
+                    {% render 'icon', icon: 'minus', class: 'size-3' %}
+                  </button>
+                  <span class='relative flex h-9 w-10 items-center justify-center text-sm font-medium'>
+                    <span
+                      class='absolute inset-0 flex items-center justify-center'
+                      x-show='$store.cart.processingId === "{{ line_item.key }}"'
+                      x-cloak
+                    >
+                      {% render 'icon', icon: 'spinner', class: 'size-3.5 animate-spin text-fg-subtle' %}
+                    </span>
+                    <span x-show='$store.cart.processingId !== "{{ line_item.key }}"'>
+                      {{- line_item.quantity -}}
+                    </span>
+                  </span>
+                  <button
+                    type='button'
+                    class='flex size-9 cursor-pointer items-center justify-center transition-colors hover:bg-surface disabled:opacity-40'
+                    @click='$store.cart.updateQuantity("{{ line_item.key }}", {{ quantity_up }})'
+                    :disabled='$store.cart.isCartLoading'
+                    aria-label='{{ 'products.product.quantity.increase' | t: product: line_item.title }}'
+                  >
+                    {% render 'icon', icon: 'plus', class: 'size-3' %}
+                  </button>
+                </div>
+
+                <button
+                  type='button'
+                  class='cursor-pointer text-xs text-fg-subtle underline transition-colors hover:text-error'
+                  @click='$store.cart.removeItem("{{ line_item.key }}")'
+                  :disabled='$store.cart.isCartLoading'
+                >
+                  {{ 'sections.cart.remove' | t }}
+                </button>
+              </div>
+
+              <div class='col-start-2 row-start-1 text-end text-sm font-medium md:col-start-3'>
+                {{ line_item.final_line_price | money }}
+                {%- if line_item.original_line_price > line_item.final_line_price -%}
+                  <s class='block text-xs font-normal text-fg-subtle'>
+                    {{ line_item.original_line_price | money }}
+                  </s>
+                {%- endif -%}
+              </div>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+
+      <div class='rounded-card border border-border p-5 lg:sticky lg:top-24'>
+        {%- if settings.discount_tiers_count > 0 -%}
+          <div class='-mx-5 -mt-5 mb-5'>{% render 'cart-discount-tiers' %}</div>
+        {%- endif -%}
+
+        {%- if settings.show_cart_discount_field -%}
+          {% render 'cart-discount-form' %}
+        {%- endif -%}
+
+        <form action='{{ routes.cart_url }}' method='post' class='flex flex-col gap-4'>
+          {%- if settings.show_cart_note -%}
+            <div>
+              <label for='cart-note' class='mb-1 block text-sm font-medium'>
+                {{ 'sections.cart.note' | t }}
+              </label>
+              <textarea
+                id='cart-note'
+                name='note'
+                rows='3'
+                class='w-full resize-none rounded-input border border-border bg-bg px-3 py-2 text-sm'
+              >{{ cart.note }}</textarea>
+            </div>
+          {%- endif -%}
+
+          <div class='flex items-baseline justify-between'>
+            <span class='text-sm font-medium'>{{ 'sections.cart.estimated_total' | t }}</span>
+            <span class='text-lg font-semibold'>{{ cart.total_price | money }}</span>
+          </div>
+
+          <p class='text-xs text-fg-subtle'>
+            {%- if cart.taxes_included and shop.shipping_policy.body != blank -%}
+              {{ 'sections.cart.taxes_included_shipping_at_checkout_with_policy_html' | t: link: shop.shipping_policy.url }}
+            {%- elsif cart.taxes_included -%}
+              {{ 'sections.cart.taxes_included_shipping_at_checkout_without_policy' | t }}
+            {%- elsif shop.shipping_policy.body != blank -%}
+              {{ 'sections.cart.taxes_at_checkout_shipping_at_checkout_with_policy_html' | t: link: shop.shipping_policy.url }}
+            {%- else -%}
+              {{ 'sections.cart.taxes_at_checkout_shipping_at_checkout_without_policy' | t }}
+            {%- endif -%}
+          </p>
+
+          {%- assign checkout_label = 'sections.cart.checkout' | t -%}
+          {% render 'button',
+            label: checkout_label,
+            type: 'submit',
+            full: true,
+            attr: 'name="checkout"',
+            loading_expr: '$store.cart.isCartLoading',
+            disabled_expr: '$store.cart.isCartLoading'
+          %}
+        </form>
+      </div>
+    </div>
+  {%- endif -%}
 </div>
 
-{% comment %} Remove to allow user to key in quantity {% endcomment %}
-{% comment %}
-  <script>
-    document.addEventListener("wheel", function(event){
-      if (document.activeElement.type === "number" &&
-         document.activeElement.classList.contains("noscroll"))
-      {
-          event.preventDefault();
-          document.activeElement.blur();
-      }
-    });
-  </script>
-{% endcomment %}
+{% schema %}
+{
+  "name": "Cart",
+  "class": "section-main-cart",
+  "tag": "section"
+}
+{% endschema %}

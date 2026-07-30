@@ -1,0 +1,22 @@
+{
+  "type": "footer",
+  "name": "Footer group",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "menu": { "type": "menu", "settings": { "heading": "Shop", "menu": "footer" } },
+        "newsletter": {
+          "type": "newsletter",
+          "settings": {
+            "heading": "Newsletter",
+            "text": "<p>Sign up for new arrivals and offers.</p>"
+          }
+        }
+      },
+      "block_order": ["menu", "newsletter"],
+      "settings": { "show_social_icons": true, "show_payment_icons": true }
+    }
+  },
+  "order": ["footer"]
+}

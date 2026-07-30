@@ -10,56 +10,103 @@
 ![Liquid](https://img.shields.io/badge/Liquid-7AB55C?style=flat&logo=shopify&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?logo=tailwindcss&logoColor=white)
 ![Alpine.js](https://img.shields.io/badge/Alpine.js-8BC0D0?logo=alpine.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
 
 </div>
 
 # Shopify Tailwind Starter
 
-This starter is configured for a manual build-and-commit workflow with direct Shopify Git integration. It does not use GitHub Actions for building or deploying; instead, all compiled production assets are tracked and committed directly to the Git repository.
+A complete storefront in Tailwind, with the behaviour in typed Alpine modules
+instead of inline scripts.
 
-## Workflow
+- **Liquid** for markup, **Tailwind v4** for styles, **Alpine 3** for behaviour
+- **TypeScript** bundled by esbuild — `pnpm typecheck` is the gate, esbuild only
+  strips types
+- **liquid-ajax-cart** for the cart: drawer, cart page and quick add never reload
+- **Section Rendering API** for collection filters, sorting, load-more and
+  predictive search
 
-1. **Local Development**:
-   Run the local Shopify CLI dev server and automatically compile CSS and JS on change (watch mode):
-   ```bash
-   pnpm dev
-   ```
+Design tokens — colours, type, radii, shadows — live in `src/theme.css`, not in
+the theme settings. The settings cover content and behaviour.
 
-2. **Build for Production**:
-   Before making any commit or pushing changes, you must compile the assets locally:
-   ```bash
-   pnpm build
-   ```
-   This generates the production-ready files in the `assets/` folder (`theme.css`, `theme.js`, `prodify.js`).
+## What's in it
 
-3. **Commit & Push**:
-   The compiled assets in `assets/` are tracked by Git (despite being ignored locally in `.gitignore`). When you commit and push to your main branch (e.g., `main`), Shopify's Git integration automatically pulls the repository and updates your theme.
-   ```bash
-   git add .
-   git commit -m "Build and development changes"
-   git push origin main
-   ```
+| Area | Included |
+|---|---|
+| Cart | Drawer + cart page, line-level loading, discount codes, opt-in spend-more-save-more tiers |
+| Collections | Filter sidebar, mobile filter drawer, sorting, price range, load more — all without reloads |
+| Search | Predictive search panel plus a full results page sharing the filter UI |
+| Product | Variant switching, gallery with deferred video/3D, quantity rules, sticky add to cart |
+| Content sections | Image banner, slideshow, featured collection, collection list, multicolumn, rich text, collapsible content, video, newsletter |
+| Templates | Product, collection, search, cart, blog, article, page, contact, 404, password, gift card, customer accounts |
 
----
+## Getting started
 
-## Shopify CLI Setup
+```bash
+pnpm install
+cp shopify.theme.toml.example shopify.theme.toml   # fill in your store
+pnpm dev
+```
 
-Create a `shopify.theme.toml` file in the root directory for local development:
+`shopify.theme.toml`:
 
 ```toml
 [environments.development]
 store = "your-store.myshopify.com"
-theme = "" # Leave empty to use a safe, automatic development theme
-store-password = "your-store-password" # only if the store has password protection
+theme = ""                        # empty uses a development theme
+store-password = "…"              # only for password-protected stores
 ```
 
----
+## Commands
 
-## Available Commands
+| Command | Purpose |
+|---|---|
+| `pnpm dev` | Shopify CLI dev server plus Tailwind and esbuild in watch mode |
+| `pnpm build` | Minified CSS and JS for production |
+| `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm shopify theme check` | Liquid, schema and translation validation |
+| `pnpm format` | Prettier, including the Liquid plugin |
+| `pnpm package` | Build, then zip the theme for a manual upload |
 
-| Command | Action / Purpose |
-| :--- | :--- |
-| `pnpm dev` | Starts the Shopify CLI local server and watches CSS/JS files. |
-| `pnpm build` | Compiles and minifies CSS (Tailwind v4) and JS (esbuild) for production. |
-| `pnpm format` | Formats all files with Prettier. |
-| `pnpm package` | Builds the assets and packages the theme into a `theme.zip` archive. |
+Run all three checks before committing — they catch different things:
+
+```bash
+pnpm typecheck && pnpm build && pnpm shopify theme check
+```
+
+## Deploying
+
+The theme is served through the **Shopify GitHub integration**: Shopify reads the
+branch and never runs a build, so the compiled `assets/` are committed.
+
+```bash
+pnpm build          # always before committing
+git add .
+git commit -m "…"
+git push
+```
+
+Committing a source change without rebuilding ships the previous JS silently.
+`pnpm package` builds and zips instead, for a manual upload.
+
+## Documentation
+
+`docs/` is the long version, and it's worth reading before adding anything:
+
+| File | Covers |
+|---|---|
+| [`00-overview.md`](docs/00-overview.md) | The mental model and the design decisions |
+| [`01-setup.md`](docs/01-setup.md) | Running it locally, commands, deploying |
+| [`02-architecture.md`](docs/02-architecture.md) | Folder map, bundles, imports, types |
+| [`03-alpine.md`](docs/03-alpine.md) | Stores, components, magics, events |
+| [`04-liquid.md`](docs/04-liquid.md) | Section and snippet conventions |
+| [`05-sections-api.md`](docs/05-sections-api.md) | Updating part of a page without a reload |
+| [`06-theme-features.md`](docs/06-theme-features.md) | How the cart, filters, search and product page work |
+| [`07-i18n.md`](docs/07-i18n.md) | Copy, translations, schema labels |
+| [`08-accessibility.md`](docs/08-accessibility.md) | Focus, drawers, labels |
+| [`09-conventions.md`](docs/09-conventions.md) | Naming, comments, styling, what fails silently |
+| [`ai-prompts.md`](docs/ai-prompts.md) | Prompts for coding agents that follow these conventions |
+
+## License
+
+MIT

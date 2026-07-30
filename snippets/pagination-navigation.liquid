@@ -1,51 +1,61 @@
+{% doc %}
+  Renders numbered pagination. The collection and search templates load pages
+  through `collection.ts` instead; this is for blogs, orders and addresses.
+
+  @param {object} paginate - The `paginate` object of the enclosing tag
+
+  @example
+  {% render 'pagination-navigation', paginate: paginate %}
+{% enddoc %}
+
 {%- if paginate.pages > 1 -%}
-  <nav class='pagination-nav my-12 max-w-max mx-auto' role='navigation'>
-    <ol class='pagination flex items-center space-x-2' role='menu'>
+  <nav class='mt-10 flex justify-center' role='navigation' aria-label='{{ 'general.pagination.label' | t }}'>
+    <ol class='flex items-center gap-1'>
       {%- if paginate.previous -%}
-        <li role='presentation'>
-          <a href='{{ paginate.previous.url }}' role='menuitem'>
-            <span aria-hidden='true'>&laquo;</span>
-            Previous
+        <li>
+          <a
+            href='{{ paginate.previous.url }}'
+            class='flex size-9 items-center justify-center rounded-input border border-border text-fg no-underline transition-colors hover:bg-surface'
+            aria-label='{{ 'general.pagination.previous' | t }}'
+          >
+            {% render 'icon', icon: 'chevron-left', class: 'size-3' %}
           </a>
-        </li>
-      {%- else -%}
-        <li class='disabled' role='presentation'>
-          <span aria-hidden='true'>&laquo;</span>
-          Previous
         </li>
       {%- endif -%}
 
       {%- for part in paginate.parts -%}
-        {%- if part.is_link -%}
-          <li role='presentation'>
-            <a href='{{ part.url }}' role='menuitem'>
+        <li>
+          {%- if part.is_link -%}
+            <a
+              href='{{ part.url }}'
+              class='flex size-9 items-center justify-center rounded-input border border-border text-sm text-fg no-underline transition-colors hover:bg-surface'
+            >
               {{ part.title }}
             </a>
-          </li>
-        {%- else -%}
-          {%- if part.title == paginate.current_page -%}
-            <li aria-current='page' class='active' role='presentation'>
+          {%- elsif part.title == paginate.current_page -%}
+            <span
+              class='flex size-9 items-center justify-center rounded-input border border-fg bg-fg text-sm text-bg'
+              aria-current='page'
+            >
               {{ part.title }}
-            </li>
+            </span>
           {%- else -%}
-            <li role='presentation'>
+            <span class='flex size-9 items-center justify-center text-sm text-fg-subtle'>
               {{ part.title }}
-            </li>
+            </span>
           {%- endif -%}
-        {%- endif -%}
+        </li>
       {%- endfor -%}
 
       {%- if paginate.next -%}
-        <li role='presentation'>
-          <a href='{{ paginate.next.url }}' role='menuitem'>
-            Next
-            <span aria-hidden='true'>&raquo;</span>
+        <li>
+          <a
+            href='{{ paginate.next.url }}'
+            class='flex size-9 items-center justify-center rounded-input border border-border text-fg no-underline transition-colors hover:bg-surface'
+            aria-label='{{ 'general.pagination.next' | t }}'
+          >
+            {% render 'icon', icon: 'chevron-right', class: 'size-3' %}
           </a>
-        </li>
-      {%- else -%}
-        <li class='disabled' role='presentation'>
-          Next
-          <span aria-hidden='true'>&raquo;</span>
         </li>
       {%- endif -%}
     </ol>

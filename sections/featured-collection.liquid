@@ -1,0 +1,80 @@
+{%- liquid
+  assign collection = collections[section.settings.collection]
+  assign products_to_show = section.settings.products_to_show
+
+  case section.settings.columns
+    when '2'
+      assign grid_classes = 'grid-cols-2'
+    when '5'
+      assign grid_classes = 'grid-cols-2 md:grid-cols-3 lg:grid-cols-5'
+    when '4'
+      assign grid_classes = 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+    else
+      assign grid_classes = 'grid-cols-2 md:grid-cols-3'
+  endcase
+-%}
+
+<div class='page section-spacing'>
+  <div class='mb-6 flex flex-wrap items-end justify-between gap-3'>
+    <div class='flex flex-col gap-2'>
+      {%- if section.settings.heading != blank -%}
+        <h2 class='text-2xl font-semibold md:text-3xl'>{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.description != blank -%}
+        <div class='prose'>{{ section.settings.description }}</div>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.show_view_all and collection.all_products_count > products_to_show -%}
+      {%- assign view_all_label = 'sections.featured_collection.view_all' | t -%}
+      {% render 'button', label: view_all_label, href: collection.url, variant: 'outline', size: 'sm' %}
+    {%- endif -%}
+  </div>
+
+  {%- if collection.products.size > 0 -%}
+    <div class='grid grid-gap {{ grid_classes }}'>
+      {%- for product in collection.products limit: products_to_show -%}
+        {% render 'product-card', product: product %}
+      {%- endfor -%}
+    </div>
+  {%- else -%}
+    <p class='py-10 text-center text-fg-subtle'>
+      {{ 'sections.collection_template.empty' | t }}
+    </p>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Featured collection",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "default": "Featured collection", "label": "Heading" },
+    { "type": "richtext", "id": "description", "label": "Description" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 24,
+      "step": 1,
+      "default": 8,
+      "label": "Products to show"
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "default": "4",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" },
+        { "value": "5", "label": "5" }
+      ],
+      "label": "Desktop columns"
+    },
+    { "type": "checkbox", "id": "show_view_all", "default": true, "label": "Show \"View all\"" }
+  ],
+  "presets": [{ "name": "Featured collection" }]
+}
+{% endschema %}

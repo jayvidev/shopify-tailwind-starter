@@ -1,0 +1,179 @@
+{%- liquid
+  assign height_classes = 'min-h-[28rem] md:min-h-[34rem]'
+  if section.settings.height == 'small'
+    assign height_classes = 'min-h-[20rem] md:min-h-[26rem]'
+  elsif section.settings.height == 'large'
+    assign height_classes = 'min-h-[34rem] md:min-h-[44rem]'
+  endif
+
+  case section.settings.content_position
+    when 'top-left'
+      assign position_classes = 'items-start justify-start text-start'
+    when 'top-center'
+      assign position_classes = 'items-start justify-center text-center'
+    when 'middle-left'
+      assign position_classes = 'items-center justify-start text-start'
+    when 'bottom-left'
+      assign position_classes = 'items-end justify-start text-start'
+    when 'bottom-center'
+      assign position_classes = 'items-end justify-center text-center'
+    else
+      assign position_classes = 'items-center justify-center text-center'
+  endcase
+-%}
+
+<div class='relative flex overflow-hidden {{ height_classes }} {{ position_classes }}'>
+  {%- if section.settings.image != blank -%}
+    {%- assign banner_alt = section.settings.image.alt | default: section.settings.heading | escape -%}
+    {{
+      section.settings.image
+      | image_url: width: 3000
+      | image_tag:
+        alt: banner_alt,
+        loading: 'eager',
+        fetchpriority: 'high',
+        sizes: '100vw',
+        widths: '600, 900, 1200, 1600, 2000, 2600, 3000',
+        class: 'absolute inset-0 size-full object-cover'
+    }}
+  {%- else -%}
+    <div class='absolute inset-0 bg-surface'></div>
+  {%- endif -%}
+
+  {%- comment -%} Overlay keeps the copy legible over any photo. {%- endcomment -%}
+  {%- if section.settings.overlay_opacity > 0 -%}
+    <div
+      class='absolute inset-0 bg-fg'
+      style='opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }}'
+    ></div>
+  {%- endif -%}
+
+  <div class='page relative flex flex-col gap-4 py-16 {{ position_classes }}'>
+    <div class='flex max-w-2xl flex-col gap-4 {% if section.settings.content_position contains 'center' %}items-center{% else %}items-start{% endif %}'>
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'heading' -%}
+            <h2
+              class='text-3xl font-semibold md:text-4xl lg:text-5xl'
+              style='color: {{ section.settings.text_color }}'
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.heading }}
+            </h2>
+          {%- when 'text' -%}
+            <div
+              class='prose'
+              style='color: {{ section.settings.text_color }}'
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.text }}
+            </div>
+          {%- when 'button' -%}
+            <div class='flex flex-wrap gap-3' {{ block.shopify_attributes }}>
+              {%- if block.settings.label != blank -%}
+                {% render 'button',
+                  label: block.settings.label,
+                  href: block.settings.link,
+                  size: 'lg'
+                %}
+              {%- endif -%}
+              {%- if block.settings.secondary_label != blank -%}
+                {% render 'button',
+                  label: block.settings.secondary_label,
+                  href: block.settings.secondary_link,
+                  variant: 'outline',
+                  size: 'lg'
+                %}
+              {%- endif -%}
+            </div>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Image banner",
+  "tag": "section",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    {
+      "type": "select",
+      "id": "height",
+      "default": "medium",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" }
+      ],
+      "label": "Banner height"
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "default": "middle-center",
+      "options": [
+        { "value": "top-left", "label": "Top left" },
+        { "value": "top-center", "label": "Top center" },
+        { "value": "middle-left", "label": "Middle left" },
+        { "value": "middle-center", "label": "Middle center" },
+        { "value": "bottom-left", "label": "Bottom left" },
+        { "value": "bottom-center", "label": "Bottom center" }
+      ],
+      "label": "Content position"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 20,
+      "label": "Image overlay opacity"
+    },
+    { "type": "color", "id": "text_color", "default": "#ffffff", "label": "Text color" }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "limit": 1,
+      "settings": [
+        { "type": "inline_richtext", "id": "heading", "default": "Image banner", "label": "Heading" }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>Give customers details about the banner image or content on the template.</p>",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Buttons",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "label", "default": "Shop all", "label": "First button label" },
+        { "type": "url", "id": "link", "label": "First button link" },
+        { "type": "text", "id": "secondary_label", "label": "Second button label" },
+        { "type": "url", "id": "secondary_link", "label": "Second button link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image banner",
+      "blocks": [{ "type": "heading" }, { "type": "text" }, { "type": "button" }]
+    }
+  ]
+}
+{% endschema %}

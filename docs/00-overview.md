@@ -2,15 +2,12 @@
 
 ## What this is
 
-A Shopify theme built on the **Shopify + Tailwind + Alpine starter**. Most of
-what follows describes the starter itself; this document is also the map of
-where this theme diverges from it.
+A Shopify theme starter: a complete storefront in Tailwind, with the behaviour
+driven by typed Alpine modules instead of inline scripts.
 
 - **Liquid** for markup, **Tailwind v4** for styles, **Alpine 3** for behaviour
 - **TypeScript** compiled by esbuild into a handful of bundles under `assets/`
 - **liquid-ajax-cart** drives the cart; no page reloads for cart operations
-- Deployed through the **Shopify GitHub integration** — see `01-setup.md`, this
-  one has consequences
 
 ## Mental model
 
@@ -24,7 +21,7 @@ where this theme diverges from it.
 │                                             src/money       │
 │                                                             │
 │  Shared state lives in Alpine stores, never in globals:     │
-│      $store.ui · $store.cart · $store.tiers · $store.wishlist│
+│      $store.ui · $store.cart · $store.tiers                 │
 │                                                             │
 │  Anything that needs fresh HTML asks Shopify for one section│
 │  (?section_id=) instead of refetching the page — src/sections│
@@ -44,33 +41,25 @@ bundled. See `04-liquid.md` for the few exceptions that earn their place.
 | Web components | `src/elements/` | Self-contained widgets with their own lifecycle |
 | Pure modules | `src/*.ts` | No DOM assumptions: money, quantity, scroll, sections |
 | Types | `src/types/` | Shopify object shapes, Alpine magics, globals |
-| Styles | `src/theme.css` | Tailwind entry plus the handful of global rules |
-| Copy | `locales/` | UI strings and schema labels, `es` + `en` |
+| Styles | `src/theme.css` | Tailwind entry, the design tokens, a few global rules |
+| Copy | `locales/` | UI strings and schema labels, `en` + `es` |
 
-## What comes from the starter
+## Design decisions worth knowing upfront
 
-Everything below is generic and should stay in sync with the starter. If you fix
-a bug here, fix it there.
+**Tokens live in code, not in the theme settings.** Colours, type, radii and
+shadows are `@theme` values in `src/theme.css`. Themes often expose all of that
+through `settings_schema.json`; this one deliberately doesn't, so restyling has
+one obvious place and the settings stay about content and behaviour. See
+`09-conventions.md`.
 
-`helpers` · `money` · `scroll` · `sections` · `quantity` · `constants` ·
-`strings` · `product-media` · `scroll-animate` · `types/*` ·
-stores `ui` / `cart` / `debug` · components `slider` / `dropdown` / `collection` /
-`product-info` / `sticky-add-to-cart` / `video-poster` / `popup` /
-`promo-marquee` / `wishlist-page` · elements `gallery-zoom` / `predictive-search` /
-`product-image-zoom` · `prodify/`
+**Editor labels are written in English inline.** Section and settings schemas use
+plain strings rather than `t:` keys. Storefront copy always goes through
+`locales/`. One less file to keep in sync for labels only staff ever read.
 
-## What belongs to this theme
-
-Documented in `06-theme-features.md`. These are opt-in features layered on top
-of the starter — don't port them back without stripping the parts that only
-make sense here.
-
-| Module | Why it's specific |
-|---|---|
-| `judgeme.ts` + `product-reviews` | Integration with one particular review app |
-| `stores/discount-tiers.ts` | Spend-more-save-more rules for this shop |
-| `stores/wishlist.ts` | Fixed storage key and default copy |
-| `money.ts` | Falls back to `es-ES` when `window.theme.moneyLocale` is unset |
+**Icons are one snippet.** `snippets/icon.liquid` holds the whole set inline.
+Splitting them into `assets/icon-*.svg` pays off past a hundred icons or when CSS
+needs to reference them; at this size one file is easier to edit and costs no
+extra requests.
 
 ## Where to go next
 
@@ -81,6 +70,7 @@ make sense here.
 | Add a store, component or magic | `03-alpine.md` |
 | Write a section or snippet | `04-liquid.md` |
 | Update part of a page without reloading | `05-sections-api.md` |
-| Touch reviews, tiers or the wishlist | `06-theme-features.md` |
+| Know how the cart, filters or search work | `06-theme-features.md` |
 | Add or translate copy | `07-i18n.md` |
 | Keep it accessible | `08-accessibility.md` |
+| Match the house style | `09-conventions.md` |

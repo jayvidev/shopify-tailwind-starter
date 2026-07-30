@@ -37,31 +37,25 @@ them is a superset of the others.
 
 ## Deploying ⚠️
 
-**This repo is connected to the store through the Shopify GitHub integration.**
+The theme is connected to the store through the **Shopify GitHub integration**.
 Shopify reads the files straight from the branch and **never runs a build**.
 
 That means:
 
-- The contents of `assets/` **must be committed**. `.gitignore` only excludes
-  `assets/*.map`.
+- The contents of `assets/` are **tracked and committed**. `.gitignore` lists the
+  build output, but those files were added before that and stay tracked — git
+  ignores nothing it already follows.
 - **Run `pnpm build` before committing**, not before deploying. Whatever is on
   the branch is what the storefront serves.
 - Committing a source change without rebuilding ships the previous JS silently.
 
-A quick way to check you didn't forget:
-
 ```bash
-pnpm build && git status --short assets/
+pnpm build
+git status --short assets/     # anything here still needs committing
 ```
 
-Empty output means the branch is up to date.
+## Requirements note
 
-> The starter deploys with the Shopify CLI instead, so it does *not* version its
-> build output. Don't copy that `.gitignore` over.
-
-## Known snag: two pnpm versions
-
-`node_modules` was created by pnpm 11 (`~/Library/pnpm/pnpm`), while Homebrew
-installs pnpm 10 on the PATH. They use different store versions, so `pnpm add`
-fails with `ERR_PNPM_UNEXPECTED_STORE`. Either use the newer binary explicitly
-or align the versions.
+`node_modules` here is managed with pnpm. If `pnpm add` fails with
+`ERR_PNPM_UNEXPECTED_STORE`, two pnpm versions are on the PATH with different
+store layouts — align them, or call the newer binary explicitly.

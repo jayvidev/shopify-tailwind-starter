@@ -1,0 +1,45 @@
+{% doc %}
+  Renders the shop's social links from Theme settings → Social media. Emits
+  nothing when no links are set.
+
+  @param {string} [class] - Extra classes on the list
+
+  @example
+  {% render 'social-icons' %}
+{% enddoc %}
+
+{%- liquid
+  assign networks = 'instagram,facebook,tiktok,youtube,pinterest,twitter' | split: ','
+  assign has_any = false
+  for network in networks
+    assign setting_key = 'social_' | append: network | append: '_link'
+    if settings[setting_key] != blank
+      assign has_any = true
+      break
+    endif
+  endfor
+-%}
+
+{%- if has_any -%}
+  <ul class='flex flex-wrap items-center gap-3 {{ class }}'>
+    {%- for network in networks -%}
+      {%- liquid
+        assign setting_key = 'social_' | append: network | append: '_link'
+        assign url = settings[setting_key]
+      -%}
+      {%- if url != blank -%}
+        <li>
+          <a
+            href='{{ url }}'
+            class='flex size-9 items-center justify-center rounded-full border border-border text-fg transition-colors hover:bg-fg hover:text-bg'
+            target='_blank'
+            rel='noopener'
+          >
+            <span class='sr-only'>{{ network | capitalize }}</span>
+            {% render 'icon', icon: network, class: 'size-4' %}
+          </a>
+        </li>
+      {%- endif -%}
+    {%- endfor -%}
+  </ul>
+{%- endif -%}

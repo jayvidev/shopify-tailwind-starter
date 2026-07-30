@@ -1,0 +1,93 @@
+{%- comment -%}
+  Video section. Only the cover image ships with the page; the player is inside a
+  `<template x-if>`, so nothing loads until someone presses play.
+{%- endcomment -%}
+
+<div class='page section-spacing'>
+  {%- if section.settings.heading != blank -%}
+    <h2 class='mb-6 text-center text-2xl font-semibold md:text-3xl'>{{ section.settings.heading }}</h2>
+  {%- endif -%}
+
+  <div
+    class='relative overflow-hidden rounded-media bg-surface'
+    x-data='{ playing: false }'
+  >
+    <template x-if='!playing'>
+      <button
+        type='button'
+        class='group relative block w-full cursor-pointer'
+        @click='playing = true'
+        aria-label='{{ 'sections.video.load_video' | t: description: section.settings.heading }}'
+      >
+        {%- liquid
+          assign poster = section.settings.cover_image | default: section.settings.video.preview_image
+          assign poster_alt = section.settings.cover_image.alt | default: section.settings.heading | escape
+        -%}
+        {%- if poster -%}
+          {{
+            poster
+            | image_url: width: 2000
+            | image_tag:
+              alt: poster_alt,
+              loading: 'lazy',
+              sizes: '100vw',
+              widths: '600, 900, 1200, 1600, 2000',
+              class: 'aspect-video w-full object-cover'
+          }}
+        {%- else -%}
+          <div class='aspect-video w-full bg-surface'></div>
+        {%- endif -%}
+
+        <span class='absolute inset-0 flex items-center justify-center'>
+          <span class='flex size-16 items-center justify-center rounded-full bg-bg/90 text-fg transition-transform group-hover:scale-105'>
+            {% render 'icon', icon: 'play', class: 'size-5' %}
+          </span>
+        </span>
+      </button>
+    </template>
+
+    <template x-if='playing'>
+      <div class='aspect-video w-full'>
+        {%- if section.settings.video != blank -%}
+          {{
+            section.settings.video
+            | video_tag:
+              autoplay: true,
+              loop: section.settings.loop,
+              controls: true,
+              class: 'size-full object-cover'
+          }}
+        {%- elsif section.settings.video_url != blank -%}
+          <iframe
+            src='{{ section.settings.video_url }}?autoplay=1'
+            class='size-full'
+            allow='autoplay; encrypted-media'
+            allowfullscreen
+            title='{{ section.settings.heading | escape }}'
+          ></iframe>
+        {%- endif -%}
+      </div>
+    </template>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Video",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "default": "Video", "label": "Heading" },
+    { "type": "video", "id": "video", "label": "Video" },
+    {
+      "type": "video_url",
+      "id": "video_url",
+      "accept": ["youtube", "vimeo"],
+      "label": "Video URL",
+      "info": "Used when no hosted video is selected."
+    },
+    { "type": "image_picker", "id": "cover_image", "label": "Cover image" },
+    { "type": "checkbox", "id": "loop", "default": false, "label": "Loop video" }
+  ],
+  "presets": [{ "name": "Video" }]
+}
+{% endschema %}

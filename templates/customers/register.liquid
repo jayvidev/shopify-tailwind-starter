@@ -1,47 +1,49 @@
-<div class='account-register'>
-  <div class='account-register-inner shell'>
-    <h1>Sign Up</h1>
-    {% form 'create_customer', novalidate: 'novalidate' %}
-      {{ form_errors | default_errors }}
-      <div class='first-name'>
-        <label for='first-name' class='visually-hidden'>First name</label>
-        <input type='text' name='customer[first_name]' placeholder='First Name'>
-      </div>
+<div class='page section-spacing'>
+  <div class='mx-auto max-w-sm'>
+    <h1 class='mb-6 text-2xl font-semibold'>{{ 'customer.register.title' | t }}</h1>
 
-      <div class='last-name'>
-        <label for='last-name' class='visually-hidden'>Last name</label>
-        <input type='text' name='customer[last_name]' placeholder='Last Name'>
-      </div>
+    {%- form 'create_customer', class: 'flex flex-col gap-4' -%}
+      {{ form.errors | default_errors }}
 
-      <div class='email'>
-        <label for='email' class='visually-hidden'>Email</label>
-        <input type='email' name='customer[email]' placeholder='Email Address'>
-      </div>
+      {%- assign first_name_label = 'customer.register.first_name' | t -%}
+      {%- assign last_name_label = 'customer.register.last_name' | t -%}
+      {%- assign email_label = 'customer.register.email' | t -%}
+      {%- assign password_label = 'customer.register.password' | t -%}
 
-      <div class='password' x-data='{inputVal: null}'>
-        <label for='password' x-show="inputVal == '' || inputVal == null" class=''>Password</label>
-        <input type='password' name='customer[password]' x-model='inputVal' autocomplete='off'>
-      </div>
+      {% render 'form-input',
+        id: 'register-first-name',
+        name: 'customer[first_name]',
+        label: first_name_label
+      %}
+      {% render 'form-input',
+        id: 'register-last-name',
+        name: 'customer[last_name]',
+        label: last_name_label
+      %}
+      {% render 'form-input',
+        id: 'register-email',
+        name: 'customer[email]',
+        type: 'email',
+        label: email_label,
+        required: true
+      %}
+      {% render 'form-input',
+        id: 'register-password',
+        name: 'customer[password]',
+        type: 'password',
+        label: password_label,
+        required: true
+      %}
 
-      <div id='accepts_marketing' class='clearfix large_form'>
-        <label for='marketing' style='font-weight:normal'
-          >Sign up for the latest Couplet updates, special offers, and more. Unsubscribe at any
-          time. See our Private Policy for details.</label
-        >
-        <input
-          type='checkbox'
-          name='customer[accepts_marketing]'
-          checked='checked'
-          value='true'
-          id='marketing'
-        >
-      </div>
+      {%- assign submit_label = 'customer.register.submit' | t -%}
+      {% render 'button', label: submit_label, type: 'submit', full: true %}
+    {%- endform -%}
 
-      <div class='submit'>
-        <input type='submit' value='Sign up'>
-      </div>
-    {% endform %}
-
-    <div>Already signed up? <a href='{{ routes.account_login_url }}'>Login</a></div>
+    <a
+      href='{{ routes.account_login_url }}'
+      class='mt-4 inline-block text-sm text-fg underline underline-offset-4'
+    >
+      {{ 'customer.log_in' | t }}
+    </a>
   </div>
 </div>

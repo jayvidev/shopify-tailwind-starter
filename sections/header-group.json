@@ -1,0 +1,17 @@
+{
+  "type": "header",
+  "name": "Header group",
+  "sections": {
+    "header": {
+      "type": "header",
+      "settings": {
+        "menu": "main-menu",
+        "menu_type_desktop": "dropdown",
+        "logo_position": "left",
+        "show_account": true,
+        "show_line_separator": true
+      }
+    }
+  },
+  "order": ["header"]
+}

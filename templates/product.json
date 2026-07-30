@@ -1,34 +1,33 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "main": {
       "type": "main-product",
       "blocks": {
-        "collapsable_row_7EjzKy": {
-          "type": "collapsable_row",
-          "settings": {
-            "heading": "Some Heading",
-            "content": "<p>Model info unavailable</p>"
-          }
-        }
+        "vendor": { "type": "vendor", "settings": {} },
+        "title": { "type": "title", "settings": {} },
+        "price": { "type": "price", "settings": {} },
+        "inventory": { "type": "inventory", "settings": {} },
+        "variant_picker": { "type": "variant_picker", "settings": {} },
+        "quantity": { "type": "quantity", "settings": {} },
+        "buy_buttons": { "type": "buy_buttons", "settings": { "show_dynamic_checkout": true } },
+        "description": { "type": "description", "settings": {} }
       },
-      "block_order": ["collapsable_row_7EjzKy"],
-      "settings": {
-        "picker_type": "radio"
-      }
+      "block_order": [
+        "vendor",
+        "title",
+        "price",
+        "inventory",
+        "variant_picker",
+        "quantity",
+        "buy_buttons",
+        "description"
+      ],
+      "settings": { "enable_sticky_add_to_cart": true, "low_stock_threshold": 5 }
     },
-    "product-recommendations": {
+    "recommendations": {
       "type": "product-recommendations",
-      "settings": {}
+      "settings": { "heading": "You may also like", "products_to_show": 6 }
     }
   },
-  "order": ["main", "product-recommendations"]
+  "order": ["main", "recommendations"]
 }

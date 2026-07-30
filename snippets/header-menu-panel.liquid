@@ -1,0 +1,115 @@
+{% doc %}
+  Renders the panel for one navigation item with children: a narrow dropdown
+  anchored to the item, or a full-width mega menu with one column per child.
+
+  Rendered by `header-menu`, and shares its `hoveredItem` state.
+
+  @param {object} link - The parent link
+  @param {string} link_handle - Key used to match `hoveredItem`
+  @param {string} menu_type - 'dropdown' or 'mega'
+
+  @example
+  {% render 'header-menu-panel', link: link, link_handle: link.handle, menu_type: 'mega' %}
+{% enddoc %}
+
+{%- liquid
+  if menu_type == 'mega'
+    assign panel_classes = 'absolute inset-x-0 top-full max-h-[calc(100dvh-6rem)] overflow-y-auto border-t border-border'
+  else
+    assign panel_classes = 'absolute inset-s-0 top-full min-w-56 border border-border'
+  endif
+-%}
+
+<div
+  class='z-50 bg-bg text-fg shadow-drawer {{ panel_classes }}'
+  x-show="hoveredItem === '{{ link_handle }}'"
+  x-transition:enter='transition ease-out duration-200'
+  x-transition:enter-start='opacity-0 -translate-y-2'
+  x-transition:enter-end='opacity-100 translate-y-0'
+  x-transition:leave='transition ease-in duration-150'
+  x-transition:leave-start='opacity-100 translate-y-0'
+  x-transition:leave-end='opacity-0 -translate-y-2'
+  @mouseenter="hoveredItem = '{{ link_handle }}'"
+  x-cloak
+>
+  {%- if menu_type == 'mega' -%}
+    <div class='page py-10'>
+      <ul class='grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4 lg:grid-cols-5'>
+        {%- for childlink in link.links -%}
+          <li>
+            <a
+              href='{{ childlink.url }}'
+              class='mb-2 block text-sm font-semibold text-fg underline-offset-4 hover:underline'
+              {% if childlink.current %}
+                aria-current='page'
+              {% endif %}
+            >
+              {{ childlink.title | escape }}
+            </a>
+
+            {%- if childlink.links != blank -%}
+              <ul class='flex flex-col gap-1'>
+                {%- for grandchildlink in childlink.links -%}
+                  <li>
+                    <a
+                      href='{{ grandchildlink.url }}'
+                      class='block text-sm text-fg-muted no-underline transition-colors hover:text-fg'
+                      {% if grandchildlink.current %}
+                        aria-current='page'
+                      {% endif %}
+                    >
+                      {{ grandchildlink.title | escape }}
+                    </a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  {%- else -%}
+    <ul class='flex flex-col py-2'>
+      {%- for childlink in link.links -%}
+        <li class='group/sub relative'>
+          <a
+            href='{{ childlink.url }}'
+            class='flex items-center justify-between gap-2 px-4 py-2 text-sm no-underline transition-colors hover:bg-surface'
+            {% if childlink.current %}
+              aria-current='page'
+            {% endif %}
+          >
+            {{ childlink.title | escape }}
+            {%- if childlink.links != blank -%}
+              {% render 'icon', icon: 'chevron-right', class: 'size-3 shrink-0' %}
+            {%- endif -%}
+          </a>
+
+          {%- comment -%}
+            Third level opens to the side on hover. CSS-only, so it keeps working
+            for keyboard users through :focus-within.
+          {%- endcomment -%}
+          {%- if childlink.links != blank -%}
+            <ul
+              class='invisible absolute inset-s-full top-0 z-50 min-w-52 border border-border bg-bg py-2 opacity-0 shadow-drawer transition group-hover/sub:visible group-hover/sub:opacity-100 group-focus-within/sub:visible group-focus-within/sub:opacity-100'
+            >
+              {%- for grandchildlink in childlink.links -%}
+                <li>
+                  <a
+                    href='{{ grandchildlink.url }}'
+                    class='block px-4 py-2 text-sm no-underline transition-colors hover:bg-surface'
+                    {% if grandchildlink.current %}
+                      aria-current='page'
+                    {% endif %}
+                  >
+                    {{ grandchildlink.title | escape }}
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+</div>

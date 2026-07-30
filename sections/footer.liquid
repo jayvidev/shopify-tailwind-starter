@@ -1,27 +1,212 @@
+<div class='border-t border-border bg-bg'>
+  <div class='page py-12 md:py-16'>
+    {%- if section.blocks.size > 0 -%}
+      <div class='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4'>
+        {%- for block in section.blocks -%}
+          <div
+            class='flex flex-col gap-4 {% if block.type == 'newsletter' %}sm:col-span-2{% endif %}'
+            {{ block.shopify_attributes }}
+          >
+            {%- case block.type -%}
+              {%- when 'menu' -%}
+                {%- if block.settings.heading != blank -%}
+                  <h2 class='text-sm font-semibold'>{{ block.settings.heading }}</h2>
+                {%- endif -%}
+                {%- if block.settings.menu != blank -%}
+                  <ul class='flex flex-col gap-2'>
+                    {%- for link in linklists[block.settings.menu].links -%}
+                      <li>
+                        <a
+                          href='{{ link.url }}'
+                          class='text-sm text-fg-muted no-underline transition-colors hover:text-fg'
+                        >
+                          {{ link.title }}
+                        </a>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                {%- endif -%}
+
+              {%- when 'text' -%}
+                {%- if block.settings.heading != blank -%}
+                  <h2 class='text-sm font-semibold'>{{ block.settings.heading }}</h2>
+                {%- endif -%}
+                {%- if block.settings.text != blank -%}
+                  <div class='prose prose-sm'>{{ block.settings.text }}</div>
+                {%- endif -%}
+
+              {%- when 'newsletter' -%}
+                {%- if block.settings.heading != blank -%}
+                  <h2 class='text-sm font-semibold'>{{ block.settings.heading }}</h2>
+                {%- endif -%}
+                {%- if block.settings.text != blank -%}
+                  <div class='prose prose-sm'>{{ block.settings.text }}</div>
+                {%- endif -%}
+
+                {%- form 'customer', class: 'flex flex-col gap-2' -%}
+                  <input type='hidden' name='contact[tags]' value='newsletter'>
+
+                  <div class='flex items-start gap-2'>
+                    <div class='flex-1'>
+                      <label class='sr-only' for='footer-newsletter-email'>
+                        {{ 'newsletter.label' | t }}
+                      </label>
+                      <input
+                        id='footer-newsletter-email'
+                        type='email'
+                        name='contact[email]'
+                        value='{{ form.email }}'
+                        autocomplete='email'
+                        placeholder='{{ 'newsletter.label' | t }}'
+                        required
+                        class='h-11 w-full rounded-input border border-border bg-bg px-3 text-sm placeholder:text-fg-subtle'
+                        aria-describedby='footer-newsletter-feedback'
+                      >
+                    </div>
+                    {%- assign subscribe_label = 'newsletter.button_label' | t -%}
+                    {% render 'button',
+                      label: subscribe_label,
+                      type: 'submit',
+                      size: 'sm',
+                      class: 'h-11! py-0!'
+                    %}
+                  </div>
+
+                  <p id='footer-newsletter-feedback' class='text-xs'>
+                    {%- if form.errors -%}
+                      <span class='text-error'>{{ form.errors.messages.email }}</span>
+                    {%- elsif form.posted_successfully? -%}
+                      <span class='text-success'>{{ 'newsletter.success' | t }}</span>
+                    {%- endif -%}
+                  </p>
+                {%- endform -%}
+
+              {%- when 'image' -%}
+                {%- if block.settings.image != blank -%}
+                  {%- liquid
+                    assign footer_image_alt = block.settings.image.alt | default: shop.name | escape
+                    assign footer_image_width = block.settings.image_width
+                    assign footer_image_height = footer_image_width | divided_by: block.settings.image.aspect_ratio
+                    assign footer_image_sizes = footer_image_width | append: 'px'
+                    assign footer_image_style = 'max-width: ' | append: footer_image_width | append: 'px'
+                  -%}
+                  {{
+                    block.settings.image
+                    | image_url: width: 600
+                    | image_tag:
+                      alt: footer_image_alt,
+                      loading: 'lazy',
+                      width: footer_image_width,
+                      height: footer_image_height,
+                      sizes: footer_image_sizes,
+                      class: 'h-auto w-auto object-contain',
+                      style: footer_image_style
+                  }}
+                {%- endif -%}
+            {%- endcase -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.show_social_icons -%}
+      {% render 'social-icons', class: 'mt-10' %}
+    {%- endif -%}
+
+    <div class='mt-10 flex flex-col gap-4 border-t border-border pt-6 md:flex-row md:items-center md:justify-between'>
+      <div class='flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-fg-subtle'>
+        <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}</span>
+        {%- for policy in shop.policies -%}
+          {%- if policy != blank -%}
+            <a
+              href='{{ policy.url }}'
+              class='text-fg-subtle no-underline transition-colors hover:text-fg'
+            >
+              {{ policy.title }}
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {%- if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
+        <ul class='flex flex-wrap items-center gap-2'>
+          {%- for type in shop.enabled_payment_types -%}
+            <li>{{ type | payment_type_svg_tag: class: 'h-6 w-auto' }}</li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
 {% schema %}
 {
-  "name": "footer",
-  "class": "footer",
+  "name": "Footer",
   "tag": "footer",
   "settings": [
     {
-      "type": "paragraph",
-      "content": "t:sections.footer.settings.paragraph"
+      "type": "checkbox",
+      "id": "show_social_icons",
+      "default": true,
+      "label": "Show social icons",
+      "info": "Links come from Theme settings → Social media."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "default": true,
+      "label": "Show payment icons"
     }
-  ]
+  ],
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Menu",
+      "settings": [
+        { "type": "text", "id": "heading", "default": "Shop", "label": "Heading" },
+        { "type": "link_list", "id": "menu", "default": "footer", "label": "Menu" }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        { "type": "text", "id": "heading", "default": "About us", "label": "Heading" },
+        { "type": "richtext", "id": "text", "label": "Text" }
+      ]
+    },
+    {
+      "type": "newsletter",
+      "name": "Newsletter",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "heading", "default": "Newsletter", "label": "Heading" },
+        { "type": "richtext", "id": "text", "label": "Text" }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        {
+          "type": "range",
+          "id": "image_width",
+          "min": 50,
+          "max": 400,
+          "step": 10,
+          "unit": "px",
+          "default": 120,
+          "label": "Image width"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [{ "type": "menu" }, { "type": "newsletter" }]
+  },
+  "enabled_on": {
+    "groups": ["footer"]
+  }
 }
 {% endschema %}
-
-<div class='px-6 md:px-8 py-12'>
-  <div class='container'>
-    <div>
-      {% for link in linklists.footer.links %}
-        <a href='{{ link.url }}'>
-          {{ link.title }}
-        </a>
-      {% endfor %}
-    </div>
-
-    <small> &copy; {{ 'now' | date: '%Y' }} Shopify Tailwind Starter Theme </small>
-  </div>
-</div>

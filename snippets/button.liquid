@@ -1,0 +1,92 @@
+{% doc %}
+  Renders a button, or an anchor styled as one when `href` is given.
+
+  @param {string} label - Button label
+  @param {string} [href] - Renders an <a> instead of a <button>
+  @param {string} [type] - Button type. Defaults to 'submit'
+  @param {string} [variant] - 'solid', 'outline' or 'ghost'. Defaults to 'solid'
+  @param {string} [size] - 'sm', 'md' or 'lg'. Defaults to 'md'
+  @param {string} [icon] - Icon name rendered before the label
+  @param {string} [icon_class] - Overrides the icon size. Defaults to 'size-4'
+  @param {boolean} [full] - Stretches the button to the full width
+  @param {boolean} [disabled] - Renders as disabled
+  @param {string} [class] - Extra classes. `size` owns the padding, so override it
+  @param {string} [attr] - Raw attributes appended to the tag
+  @param {string} [loading_expr] - Alpine expression that toggles the spinner
+  @param {string} [click_expr] - Alpine expression bound to @click
+  @param {string} [disabled_expr] - Alpine expression bound to :disabled
+
+  @example
+  {% render 'button', label: 'Add to cart', variant: 'solid', full: true %}
+  {% render 'button', label: 'View all', href: collection.url, variant: 'outline' %}
+{% enddoc %}
+
+{% liquid
+  assign variant = variant | default: 'solid'
+  assign size = size | default: 'md'
+
+  case size
+    when 'sm'
+      assign size_classes = 'px-4 py-2 text-xs'
+    when 'lg'
+      assign size_classes = 'px-8 py-4 text-base'
+    else
+      assign size_classes = 'px-6 py-3 text-sm'
+  endcase
+
+  case variant
+    when 'outline'
+      assign variant_classes = 'bg-transparent text-fg border border-fg hover:bg-fg hover:text-bg'
+    when 'ghost'
+      assign variant_classes = 'bg-transparent text-fg border border-transparent hover:bg-surface'
+    else
+      assign variant_classes = 'bg-fg text-bg border border-fg hover:bg-transparent hover:text-fg'
+  endcase
+
+  assign base_classes = 'inline-flex items-center justify-center gap-2 rounded-button font-medium tracking-wide cursor-pointer transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg disabled:cursor-not-allowed disabled:opacity-50'
+
+  if full
+    assign base_classes = base_classes | append: ' w-full'
+  endif
+
+  assign icon_classes = icon_class | default: 'size-4' | append: ' shrink-0'
+%}
+
+{%- capture button_content -%}
+  {%- if loading_expr != blank -%}
+    <span x-show='{{ loading_expr }}' x-cloak>
+      {%- render 'icon', icon: 'spinner', class: 'size-4 animate-spin' -%}
+    </span>
+  {%- endif -%}
+  {%- if icon != blank -%}
+    {% render 'icon', icon: icon, class: icon_classes %}
+  {%- endif -%}
+  <span>{{ label }}</span>
+{%- endcapture -%}
+
+{% if href != blank %}
+  <a
+    href='{{ href }}'
+    class='{{ base_classes }} {{ size_classes }} {{ variant_classes }} {{ class }}'
+    {{ attr }}
+  >
+    {{ button_content }}
+  </a>
+{% else %}
+  <button
+    type='{{ type | default: 'submit' }}'
+    class='{{ base_classes }} {{ size_classes }} {{ variant_classes }} {{ class }}'
+    {% if disabled %}
+      disabled
+    {% endif %}
+    {% if click_expr != blank %}
+      @click='{{ click_expr }}'
+    {% endif %}
+    {% if disabled_expr != blank %}
+      :disabled='{{ disabled_expr }}'
+    {% endif %}
+    {{ attr }}
+  >
+    {{ button_content }}
+  </button>
+{% endif %}

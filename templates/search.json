@@ -2,7 +2,7 @@
   "sections": {
     "main": {
       "type": "main-search",
-      "settings": {}
+      "settings": { "products_per_page": 16, "columns": "3" }
     }
   },
   "order": ["main"]

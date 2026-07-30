@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang='{{ request.locale.iso_code }}' class='no-js'>
+  <head>
+    {% render 'head-meta' %}
+
+    {%- if settings.favicon != blank -%}
+      <link rel='icon' href='{{ settings.favicon | image_url: width: 32, height: 32 }}'>
+    {%- endif -%}
+
+    <title>{{ 'gift_cards.issued.subtext' | t }} · {{ shop.name }}</title>
+
+    {{ content_for_header }}
+
+    {% render 'head-css' %}
+    {% render 'head-scripts' %}
+    {% render 'font-face' %}
+    {% render 'assets-tag', file: 'theme.css' %}
+    {% render 'assets-tag', file: 'theme.js' %}
+  </head>
+
+  <body class='gift-card-template antialiased' x-data>
+    <div class='page flex min-h-dvh flex-col items-center justify-center gap-6 py-16 text-center'>
+      <a href='{{ routes.root_url }}' class='no-underline'>{% render 'header-logo' %}</a>
+
+      {%- assign gift_card_value = gift_card.initial_value | money -%}
+      <h1 class='text-2xl font-semibold md:text-3xl'>
+        {{ 'gift_cards.issued.title' | t: value: gift_card_value, shop: shop.name }}
+      </h1>
+
+      {%- if gift_card.expired -%}
+        <p class='text-sm text-error'>{{ 'gift_cards.issued.expired' | t }}</p>
+      {%- elsif gift_card.expires_on -%}
+        {%- assign expires_on = gift_card.expires_on | date: format: 'date' -%}
+        <p class='text-sm text-fg-subtle'>
+          {{ 'gift_cards.issued.expiration_date' | t: expires_on: expires_on }}
+        </p>
+      {%- endif -%}
+
+      <div class='flex w-full max-w-sm flex-col items-center gap-4 rounded-card border border-border p-6'>
+        <p class='text-sm text-fg-subtle'>{{ 'gift_cards.issued.subtext' | t }}</p>
+
+        <p class='sr-only' id='gift-card-code-label'>
+          {{ 'gift_cards.issued.gift_card_code' | t }}
+        </p>
+        <p
+          class='w-full rounded-input border border-border bg-surface px-4 py-3 font-mono text-sm tracking-widest'
+          aria-labelledby='gift-card-code-label'
+        >
+          {{ gift_card.code | format_code }}
+        </p>
+
+        {%- assign shop_label = 'gift_cards.issued.shop_link' | t -%}
+        {% render 'button', label: shop_label, href: routes.all_products_collection_url, full: true %}
+      </div>
+
+      <p class='text-xs text-fg-subtle'>{{ 'gift_cards.issued.how_to_use_gift_card' | t }}</p>
+    </div>
+  </body>
+</html>

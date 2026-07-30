@@ -1,0 +1,140 @@
+{% doc %}
+  Renders the sticky add-to-cart bar. It slides in once the product form scrolls
+  out of view and submits that same form, so there is only ever one form on the
+  page — see `src/alpine/components/sticky-add-to-cart.ts`.
+
+  @param {object} product - The product
+  @param {object} current_variant - The selected variant
+  @param {string} section_id - Id of the product section, used to find the form and anchor
+  @param {string} add_to_cart_label - Add-to-cart copy
+  @param {string} sold_out_label - Sold-out copy
+
+  @example
+  {% render 'sticky-add-to-cart',
+    product: product,
+    current_variant: current_variant,
+    section_id: section.id,
+    add_to_cart_label: add_to_cart_label,
+    sold_out_label: sold_out_label
+  %}
+{% enddoc %}
+
+{%- liquid
+  assign sticky_image = current_variant.featured_media.preview_image | default: product.featured_media.preview_image
+  assign sticky_image = sticky_image | default: product.featured_image
+  assign sticky_image_alt = product.title | escape
+  assign sticky_image_url = sticky_image | image_url: width: 200
+  assign variant_price = current_variant.price | default: 0 | divided_by: 100.0
+  assign variant_compare_price = current_variant.compare_at_price | default: 0 | divided_by: 100.0
+-%}
+
+<div
+  id='sticky-add-to-cart'
+  class='fixed inset-x-0 bottom-0 z-60 border-t border-border bg-bg px-4 py-3 transition-transform duration-300 md:px-8'
+  x-data='
+    stickyAddToCart({
+      formId: "product-form-{{ section_id }}",
+      anchorId: "product-anchor-{{ section_id }}",
+      variantId: {{ current_variant.id }},
+      variantTitle: {{ current_variant.title | json }},
+      variantImage: {{ sticky_image_url | json }},
+      variantPrice: {{ variant_price }},
+      variantComparePrice: {{ variant_compare_price }},
+      available: {{ current_variant.available | default: false | json }},
+      maxQty: {{ current_variant.inventory_quantity | default: 999 }},
+      minQty: {{ current_variant.quantity_rule.min | default: 1 }},
+      stepQty: {{ current_variant.quantity_rule.increment | default: 1 }},
+      ruleMax: {{ current_variant.quantity_rule.max | default: 0 }},
+      strings: {
+        soldOut: {{ sold_out_label | json }},
+        addToCart: {{ add_to_cart_label | json }}
+      }
+    })
+  '
+  :class="isVisible ? 'translate-y-0' : 'translate-y-full'"
+  @scroll.window.passive='updateVisibility()'
+  @resize.window.passive='updateVisibility()'
+  @variant:changed.window='onVariantChanged($event.detail)'
+  @variant:unavailable.window='available = false'
+  @liquid-ajax-cart:request-end.document='adding = false'
+  x-cloak
+>
+  <div class='page flex items-center justify-between gap-4'>
+    <button
+      type='button'
+      class='flex min-w-0 flex-1 cursor-pointer items-center gap-3 text-start'
+      @click='scrollToProduct()'
+    >
+      {%- if sticky_image -%}
+        <span class='hidden size-12 shrink-0 overflow-hidden rounded-media bg-surface sm:block'>
+          <img
+            src='{{ sticky_image_url }}'
+            :src='variantImage'
+            alt='{{ sticky_image_alt }}'
+            width='96'
+            height='96'
+            class='size-full object-cover'
+            loading='lazy'
+          >
+        </span>
+      {%- endif -%}
+
+      <span class='flex min-w-0 flex-col'>
+        <span class='truncate text-sm font-medium'>{{ product.title }}</span>
+        <span class='flex items-baseline gap-2 text-sm'>
+          <span x-text='$amount(variantPrice)'>{{ current_variant.price | money }}</span>
+          <template x-if='variantComparePrice > variantPrice'>
+            <s class='text-xs text-fg-subtle' x-text='$amount(variantComparePrice)'></s>
+          </template>
+        </span>
+      </span>
+    </button>
+
+    <div class='flex shrink-0 items-center gap-2'>
+      <div class='hidden items-center rounded-input border border-border sm:flex'>
+        <button
+          type='button'
+          class='flex size-9 cursor-pointer items-center justify-center disabled:opacity-40'
+          @click='decrement()'
+          :disabled='!available || qty <= minQty'
+          aria-label='{{ 'products.product.quantity.decrease' | t: product: product.title }}'
+        >
+          {% render 'icon', icon: 'minus', class: 'size-3' %}
+        </button>
+        <span class='w-8 text-center text-sm font-medium' x-text='qty'></span>
+        <button
+          type='button'
+          class='flex size-9 cursor-pointer items-center justify-center disabled:opacity-40'
+          @click='increment()'
+          :disabled='!available || qty >= maxQty'
+          aria-label='{{ 'products.product.quantity.increase' | t: product: product.title }}'
+        >
+          {% render 'icon', icon: 'plus', class: 'size-3' %}
+        </button>
+      </div>
+
+      {%- comment -%}
+        Its own form rather than a proxy submit of the main one: liquid-ajax-cart
+        needs the `<ajax-cart-product-form>` wrapper around whatever is submitted.
+      {%- endcomment -%}
+      <ajax-cart-product-form>
+        <form action='{{ routes.cart_add_url }}' method='post' @submit='adding = true'>
+          <input type='hidden' name='id' :value='variantId'>
+          <input type='hidden' name='quantity' :value='qty'>
+
+          <button
+            type='submit'
+            name='add'
+            class='flex cursor-pointer items-center justify-center gap-2 rounded-button border border-fg bg-fg px-5 py-2.5 text-sm font-medium text-bg transition-colors hover:bg-transparent hover:text-fg disabled:cursor-not-allowed disabled:opacity-50'
+            :disabled='btnDisabled'
+          >
+            <span x-show='adding' x-cloak>
+              {% render 'icon', icon: 'spinner', class: 'size-4 animate-spin' %}
+            </span>
+            <span x-text='btnText'>{{ add_to_cart_label }}</span>
+          </button>
+        </form>
+      </ajax-cart-product-form>
+    </div>
+  </div>
+</div>

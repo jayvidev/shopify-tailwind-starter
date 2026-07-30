@@ -1,0 +1,32 @@
+<div class='page section-spacing'>
+  <div class='mx-auto max-w-sm'>
+    <h1 class='mb-6 text-2xl font-semibold'>{{ 'customer.activate_account.title' | t }}</h1>
+    <p class='mb-4 text-sm text-fg-muted'>{{ 'customer.activate_account.subtext' | t }}</p>
+
+    {%- form 'activate_customer_password', class: 'flex flex-col gap-4' -%}
+      {{ form.errors | default_errors }}
+
+      {%- assign password_label = 'customer.activate_account.password' | t -%}
+      {%- assign confirm_label = 'customer.activate_account.password_confirm' | t -%}
+      {% render 'form-input',
+        id: 'activate-password',
+        name: 'customer[password]',
+        type: 'password',
+        label: password_label,
+        required: true
+      %}
+      {% render 'form-input',
+        id: 'activate-password-confirm',
+        name: 'customer[password_confirmation]',
+        type: 'password',
+        label: confirm_label,
+        required: true
+      %}
+
+      {%- assign submit_label = 'customer.activate_account.submit' | t -%}
+      {%- assign cancel_label = 'customer.activate_account.cancel' | t -%}
+      {% render 'button', label: submit_label, type: 'submit', full: true %}
+      {% render 'button', label: cancel_label, type: 'submit', variant: 'outline', full: true, attr: 'name="decline"' %}
+    {%- endform -%}
+  </div>
+</div>

@@ -1,0 +1,41 @@
+{% doc %}
+  Renders the shop logo from Theme settings → Branding, falling back to the shop
+  name as text. Rendered inside the header's home link, so it emits no link of
+  its own.
+
+  @param {string} [class] - Extra classes on the image or wordmark
+
+  @example
+  {% render 'header-logo' %}
+{% enddoc %}
+
+{%- if settings.logo != blank -%}
+  {%- liquid
+    assign logo_width = settings.logo_width | default: 100
+    assign logo_height = logo_width | divided_by: settings.logo.aspect_ratio
+    assign logo_alt = settings.logo.alt | default: shop.name | escape
+    assign logo_retina_width = logo_width | times: 2
+    assign logo_widths = logo_width | append: ', ' | append: logo_retina_width
+    assign logo_sizes = logo_width | append: 'px'
+    assign logo_classes = 'block h-auto w-auto object-contain ' | append: class
+    assign logo_style = 'max-width: ' | append: logo_width | append: 'px'
+  -%}
+  {{
+    settings.logo
+    | image_url: width: 600
+    | image_tag:
+      alt: logo_alt,
+      loading: 'eager',
+      fetchpriority: 'high',
+      width: logo_width,
+      height: logo_height,
+      widths: logo_widths,
+      sizes: logo_sizes,
+      class: logo_classes,
+      style: logo_style
+  }}
+{%- else -%}
+  <span class='text-lg font-semibold tracking-tight md:text-xl {{ class }}'>
+    {{ shop.name }}
+  </span>
+{%- endif -%}

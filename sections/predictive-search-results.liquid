@@ -1,19 +1,109 @@
+{%- comment -%}
+  Fetched by `src/elements/predictive-search.ts` through the Section Rendering
+  API (`/search/suggest?q=…&section_id=predictive-search-results`) and injected
+  into the panel, so this file renders results only — no page chrome.
+{%- endcomment -%}
+
 {%- if predictive_search.performed -%}
-  <div id='predictive-search-results' class='mt-6'>
-    {%- if predictive_search.resources.products.size > 0 -%}
-      <h3 id='predictive-search-products' class='font-palatino font-normal! text-base mb-5'>
-        Did you mean?
-      </h3>
-      <ul role='listbox' aria-labelledby='predictive-search-products'>
-        {%- for product in predictive_search.resources.products -%}
-          <li role='option'>
-            <a href='{{ product.url }}' class='font-bold text-base tracking-wider'>
-              <span>{{ product.title }}</span>
-            </a>
-          </li>
-        {%- endfor -%}
-      </ul>
+  {%- liquid
+    assign products = predictive_search.resources.products
+    assign queries = predictive_search.resources.queries
+    assign total_results = products.size | plus: queries.size
+  -%}
+
+  <div id='predictive-search-results' class='flex flex-col'>
+    {%- if total_results == 0 -%}
+      <p class='py-8 text-center text-sm text-fg-subtle'>
+        {{ 'templates.search.no_results' | t: terms: predictive_search.terms }}
+      </p>
+    {%- else -%}
+      {%- if queries.size > 0 -%}
+        <ul class='flex flex-wrap gap-2 border-b border-border py-3'>
+          {%- for query in queries -%}
+            <li>
+              <a
+                href='{{ query.url }}'
+                class='inline-flex items-center gap-1.5 rounded-pill bg-surface px-3 py-1.5 text-xs text-fg no-underline transition-colors hover:bg-fg hover:text-bg'
+              >
+                {% render 'icon', icon: 'search', class: 'size-3 shrink-0' %}
+                {{ query.styled_text }}
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+      {%- if products.size > 0 -%}
+        <div class='flex items-center justify-between gap-4 border-b border-border py-3'>
+          <h2 id='predictive-search-products' class='truncate text-sm font-medium'>
+            {{ 'templates.search.search_for' | t: terms: predictive_search.terms }}
+          </h2>
+          {%- comment -%}
+            The element replaces this with the real total from the search page —
+            predictive search only ever returns the first few.
+          {%- endcomment -%}
+          <span class='shrink-0 text-sm text-fg-subtle' id='predictive-search-total-count'>
+            {{- products.size -}}
+          </span>
+        </div>
+
+        <ul
+          class='grid grid-cols-1 gap-x-6 gap-y-3 py-4 md:grid-cols-2 lg:grid-cols-3'
+          role='listbox'
+          aria-labelledby='predictive-search-products'
+        >
+          {%- for product in products -%}
+            {%- liquid
+              assign card_image = product.featured_media.preview_image | default: product.featured_image
+              assign card_image_alt = product.title | escape
+            -%}
+            <li role='option'>
+              <a
+                href='{{ product.url }}'
+                class='group flex items-center gap-3 no-underline'
+              >
+                <div class='size-16 shrink-0 overflow-hidden rounded-media bg-surface'>
+                  {%- if card_image -%}
+                    {{
+                      card_image
+                      | image_url: width: 200
+                      | image_tag:
+                        alt: card_image_alt,
+                        loading: 'lazy',
+                        widths: '100, 200',
+                        sizes: '64px',
+                        class: 'size-full object-cover transition-transform duration-300 group-hover:scale-105'
+                    }}
+                  {%- endif -%}
+                </div>
+
+                <div class='min-w-0 flex-1'>
+                  {%- if settings.predictive_search_show_vendor and product.vendor != blank -%}
+                    <p class='text-xs text-fg-subtle'>{{ product.vendor }}</p>
+                  {%- endif -%}
+                  <p class='truncate text-sm font-medium text-fg'>{{ product.title }}</p>
+                  {%- if settings.predictive_search_show_price -%}
+                    {% render 'price', product: product, price_class: 'text-xs md:text-sm' %}
+                  {%- endif -%}
+                </div>
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        <a
+          href='{{ routes.search_url }}?q={{ predictive_search.terms | url_encode }}'
+          class='border-t border-border py-3 text-center text-sm font-medium text-fg underline'
+        >
+          {{ 'templates.search.title' | t }}
+        </a>
+      {%- endif -%}
     {%- endif -%}
-    <button class='mt-5'>Search for “{{ predictive_search.terms }}”</button>
   </div>
 {%- endif -%}
+
+{% schema %}
+{
+  "name": "Predictive search results"
+}
+{% endschema %}

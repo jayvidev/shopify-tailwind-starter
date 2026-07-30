@@ -285,7 +285,7 @@ export default {
           }
         }
 
-        replaceSelector(html, '#ProductCountDesktop')
+        replaceSelector(html, '#ProductCount')
       } catch (error) {
         console.error('Error loading more products:', error)
       } finally {

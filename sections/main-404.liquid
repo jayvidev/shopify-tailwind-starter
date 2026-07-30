@@ -1,14 +1,16 @@
-{% schema %}
-{
-  "name": "404 Section",
-  "class": "section-404",
-  "tag": "section",
-  "settings": []
-}
-{% endschema %}
-
-<div class='px-6 md:px-8 py-8'>
-  <div class='container'>
-    <h1>404 Page Not Found</h1>
+<div class='page section-spacing'>
+  <div class='mx-auto flex max-w-lg flex-col items-center gap-5 py-16 text-center'>
+    <h1 class='text-3xl font-semibold md:text-4xl'>{{ 'templates.404.title' | t }}</h1>
+    <p class='text-fg-subtle'>{{ 'templates.404.subtext' | t }}</p>
+    {%- assign continue_label = 'general.continue_shopping' | t -%}
+    {% render 'button', label: continue_label, href: routes.all_products_collection_url %}
   </div>
 </div>
+
+{% schema %}
+{
+  "name": "404",
+  "class": "section-main-404",
+  "tag": "section"
+}
+{% endschema %}

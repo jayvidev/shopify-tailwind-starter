@@ -1,130 +1,458 @@
-{%- case icon -%}
-  {%- when 'bubble-bottom' -%}
+{% doc %}
+  Renders an icon. The whole set is inlined here: one file to edit, nothing extra
+  to request.
+
+  @param {string} icon - Icon name. Aliases: menu, user, tag, check, model, chevron-down/up/left/right
+  @param {string} [class] - Classes on the <svg>, e.g. 'size-5'
+
+  @example
+  {% render 'icon', icon: 'cart', class: 'size-6' %}
+{% enddoc %}
+
+{%- liquid
+  assign extra_class = class
+
+  case icon
+    when 'menu'
+      assign icon_name = 'hamburger'
+    when 'user'
+      assign icon_name = 'account'
+    when 'tag'
+      assign icon_name = 'price-tag'
+    when 'check'
+      assign icon_name = 'checkmark'
+    when 'model'
+      assign icon_name = '3d-model'
+    when 'chevron-down'
+      assign icon_name = 'caret'
+    when 'chevron-right'
+      assign icon_name = 'caret'
+      assign extra_class = extra_class | append: ' -rotate-90'
+    when 'chevron-left'
+      assign icon_name = 'caret'
+      assign extra_class = extra_class | append: ' rotate-90'
+    when 'chevron-up'
+      assign icon_name = 'caret'
+      assign extra_class = extra_class | append: ' rotate-180'
+    else
+      assign icon_name = icon
+  endcase
+
+  assign class = extra_class
+-%}
+
+{%- case icon_name -%}
+  {%- when '3d-model' -%}
     <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
       xmlns='http://www.w3.org/2000/svg'
       fill='none'
-      viewBox='0 0 24 24'
-      stroke-width='1.5'
-      stroke='currentColor'
-      {% if class != blank %}class='{{ class }}'{% endif %}
+      viewBox='0 0 18 21'
     >
-      <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+      <path fill="currentColor" d="m7.68 20.629-6.4-3.906A2.71 2.71 0 0 1 0 14.405v-7.81a2.72 2.72 0 0 1 1.278-2.318l6.4-3.9a2.52 2.52 0 0 1 2.644-.003l6.4 3.9A2.72 2.72 0 0 1 18 6.6v7.809a2.71 2.71 0 0 1-1.279 2.318l-6.4 3.906A2.54 2.54 0 0 1 9 21a2.54 2.54 0 0 1-1.32-.371M8.724 2.078l-6.4 3.9a.71.71 0 0 0-.321.612v7.81a.71.71 0 0 0 .32.61L8 18.48v-7.561a1.77 1.77 0 0 1 .934-1.555l6.512-3.523L9.28 2.08a.52.52 0 0 0-.556-.002"/>
     </svg>
-
+  {%- when 'account' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 18 19'
+    >
+      <path fill="currentColor" fill-rule="evenodd" d="M6 4.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-4a4 4 0 1 0 0 8 4 4 0 0 0 0-8m5.58 12.15c1.12.82 1.83 2.24 1.91 4.85H1.51c.08-2.6.79-4.03 1.9-4.85C4.66 11.75 6.5 11.5 9 11.5s4.35.26 5.58 1.15M9 10.5c-2.5 0-4.65.24-6.17 1.35C1.27 12.98.5 14.93.5 18v.5h17V18c0-3.07-.77-5.02-2.33-6.15-1.52-1.1-3.67-1.35-6.17-1.35" clip-rule="evenodd"/>
+    </svg>
+  {%- when 'arrow' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 14 10'
+    >
+      <path fill="currentColor" fill-rule="evenodd" d="M8.537.808a.5.5 0 0 1 .817-.162l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 1 1-.708-.708L11.793 5.5H1a.5.5 0 0 1 0-1h10.793L8.646 1.354a.5.5 0 0 1-.109-.546" clip-rule="evenodd"/>
+    </svg>
+  {%- when 'caret' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      viewBox='0 0 10 6'
+    >
+      <path fill="currentColor" fill-rule="evenodd" d="M9.354.646a.5.5 0 0 0-.708 0L5 4.293 1.354.646a.5.5 0 0 0-.708.708l4 4a.5.5 0 0 0 .708 0l4-4a.5.5 0 0 0 0-.708" clip-rule="evenodd"/>
+    </svg>
+  {%- when 'cart-empty' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 40 40'
+    >
+      <path fill="currentColor" fill-rule="evenodd" d="M15.75 11.8h-3.16l-.77 11.6a5 5 0 0 0 4.99 5.34h7.38a5 5 0 0 0 4.99-5.33L28.4 11.8zm0 1h-2.22l-.71 10.67a4 4 0 0 0 3.99 4.27h7.38a4 4 0 0 0 4-4.27l-.72-10.67h-2.22v.63a4.75 4.75 0 1 1-9.5 0zm8.5 0h-7.5v.63a3.75 3.75 0 1 0 7.5 0z"/>
+    </svg>
   {%- when 'cart' -%}
-    <div {% if class != blank %}class='{{ class }}'{% endif %}>
-      <svg
-        class='bi bi-bag bi-bag-empty hidden in-[.js-ajax-cart-empty]:block'
-        fill='currentColor'
-        height='22'
-        viewbox='0 0 16 16'
-        width='22'
-        xmlns='http://www.w3.org/2000/svg'
-      >
-        <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z" />
-      </svg>
-      <svg
-        class='bi bi-bag-fill block in-[.js-ajax-cart-empty]:hidden'
-        fill='currentColor'
-        height='22'
-        viewbox='0 0 16 16'
-        width='22'
-        xmlns='http://www.w3.org/2000/svg'
-      >
-        <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5z" />
-      </svg>
-    </div>
-
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 40 40'
+    >
+      <path fill="currentColor" fill-rule="evenodd" d="M20.5 6.5a4.75 4.75 0 0 0-4.75 4.75v.56h-3.16l-.77 11.6a5 5 0 0 0 4.99 5.34h7.38a5 5 0 0 0 4.99-5.33l-.77-11.6h-3.16v-.57A4.75 4.75 0 0 0 20.5 6.5m3.75 5.31v-.56a3.75 3.75 0 1 0-7.5 0v.56zm-7.5 1h7.5v.56a3.75 3.75 0 1 1-7.5 0zm-1 0v.56a4.75 4.75 0 1 0 9.5 0v-.56h2.22l.71 10.67a4 4 0 0 1-3.99 4.27h-7.38a4 4 0 0 1-4-4.27l.72-10.67z"/>
+    </svg>
+  {%- when 'checkmark' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 12 9'
+    >
+      <path fill="currentColor" fill-rule="evenodd" d="M11.35.643a.5.5 0 0 1 .006.707l-6.77 6.886a.5.5 0 0 1-.719-.006L.638 4.845a.5.5 0 1 1 .724-.69l2.872 3.011 6.41-6.517a.5.5 0 0 1 .707-.006z" clip-rule="evenodd"/>
+    </svg>
+  {%- when 'close-small' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 12 13'
+    >
+      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M8.486 9.33 2.828 3.67M2.885 9.385l5.544-5.77"/>
+    </svg>
   {%- when 'close' -%}
     <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
       xmlns='http://www.w3.org/2000/svg'
-      width='24'
-      height='24'
-      viewBox='0 0 24 24'
-      fill='currentColor'
-      {% if class != blank %}class='{{ class }}'{% endif %}
+      fill='none'
+      viewBox='0 0 18 17'
     >
-      <path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"/>
+      <path fill="currentColor" d="M.865 15.978a.5.5 0 0 0 .707.707l7.433-7.431 7.579 7.282a.501.501 0 0 0 .846-.37.5.5 0 0 0-.153-.351L9.712 8.546l7.417-7.416a.5.5 0 1 0-.707-.708L8.991 7.853 1.413.573a.5.5 0 1 0-.693.72l7.563 7.268z"/>
     </svg>
-
+  {%- when 'discount' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      viewBox='0 0 12 12'
+    >
+      <path fill="currentColor" fill-rule="evenodd" d="M7 0h3a2 2 0 0 1 2 2v3a1 1 0 0 1-.3.7l-6 6a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 0-1.4l6-6A1 1 0 0 1 7 0m2 2a1 1 0 1 0 2 0 1 1 0 0 0-2 0" clip-rule="evenodd"/>
+    </svg>
   {%- when 'error' -%}
     <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      viewBox='0 0 13 13'
+    >
+      <circle cx="6.5" cy="6.5" r="5.5" stroke="#fff" stroke-width="2"/><circle cx="6.5" cy="6.5" r="5.5" fill="#EB001B" stroke="#EB001B" stroke-width=".7"/><path fill="#fff" d="m5.874 3.528.1 4.044h1.053l.1-4.044zm.627 6.133c.38 0 .68-.288.68-.656s-.3-.656-.68-.656-.681.288-.681.656.3.656.68.656"/><path fill="#fff" stroke="#EB001B" stroke-width=".7" d="M5.874 3.178h-.359l.01.359.1 4.044.008.341h1.736l.008-.341.1-4.044.01-.359H5.873Zm.627 6.833c.56 0 1.03-.432 1.03-1.006s-.47-1.006-1.03-1.006-1.031.432-1.031 1.006.47 1.006 1.03 1.006Z"/>
+    </svg>
+  {%- when 'eye' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      viewBox='0 0 20 20'
+    >
+      <path d="M9.524 4.8c-2.761.13-5.44 1.82-8.352 4.865a.484.484 0 0 0 0 .67c2.911 3.044 5.59 4.736 8.352 4.865 2.75.13 5.743-1.286 9.298-4.86a.48.48 0 0 0 0-.68c-3.555-3.574-6.549-4.99-9.298-4.86m-.049-1.04c3.177-.15 6.44 1.503 10.081 5.164a1.526 1.526 0 0 1 0 2.152c-3.641 3.66-6.904 5.314-10.08 5.165-3.167-.149-6.085-2.08-9.053-5.185a1.53 1.53 0 0 1 0-2.112C3.391 5.84 6.31 3.907 9.475 3.76"/><path d="M13.58 10a3.564 3.564 0 0 1-3.568 3.559A3.564 3.564 0 0 1 6.443 10a3.564 3.564 0 0 1 3.569-3.558A3.564 3.564 0 0 1 13.581 10m-3.568 2.517A2.524 2.524 0 0 0 12.542 10a2.524 2.524 0 0 0-2.53-2.517A2.524 2.524 0 0 0 7.482 10a2.524 2.524 0 0 0 2.53 2.517"/>
+    </svg>
+  {%- when 'facebook' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      viewBox='0 0 20 20'
+    >
+      <path fill="currentColor" d="M18 10.049C18 5.603 14.419 2 10 2s-8 3.603-8 8.049C2 14.067 4.925 17.396 8.75 18v-5.624H6.719v-2.328h2.03V8.275c0-2.017 1.195-3.132 3.023-3.132.874 0 1.79.158 1.79.158v1.98h-1.009c-.994 0-1.303.621-1.303 1.258v1.51h2.219l-.355 2.326H11.25V18c3.825-.604 6.75-3.933 6.75-7.951"/>
+    </svg>
+  {%- when 'filter' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
       xmlns='http://www.w3.org/2000/svg'
       fill='none'
-      viewBox='0 0 24 24'
-      stroke-width='1.5'
-      stroke='currentColor'
-      {% if class != blank %}class='{{ class }}'{% endif %}
+      viewBox='0 0 20 20'
     >
-      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+      <path fill="currentColor" fill-rule="evenodd" d="M4.833 6.5a1.667 1.667 0 1 1 3.334 0 1.667 1.667 0 0 1-3.334 0M4.05 7H2.5a.5.5 0 0 1 0-1h1.55a2.5 2.5 0 0 1 4.9 0h8.55a.5.5 0 0 1 0 1H8.95a2.5 2.5 0 0 1-4.9 0m11.117 6.5a1.667 1.667 0 1 0-3.334 0 1.667 1.667 0 0 0 3.334 0M13.5 11a2.5 2.5 0 0 1 2.45 2h1.55a.5.5 0 0 1 0 1h-1.55a2.5 2.5 0 0 1-4.9 0H2.5a.5.5 0 0 1 0-1h8.55a2.5 2.5 0 0 1 2.45-2"/>
     </svg>
-
-  {%- when 'menu' -%}
+  {%- when 'hamburger' -%}
     <svg
-      viewbox='0 0 100 80'
-      width='40'
-      height='40'
-      fill='currentColor'
-      {% if class != blank %}class='{{ class }}'{% endif %}
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 18 16'
     >
-      <rect height="20" width="100"></rect>
-      <rect
-        height="20"
-        width="100"
-        y="30"></rect>
-      <rect
-        height="20"
-        width="100"
-        y="60"></rect>
+      <path fill="currentColor" d="M1 .5a.5.5 0 1 0 0 1h15.71a.5.5 0 0 0 0-1zM.5 8a.5.5 0 0 1 .5-.5h15.71a.5.5 0 0 1 0 1H1A.5.5 0 0 1 .5 8m0 7a.5.5 0 0 1 .5-.5h15.71a.5.5 0 0 1 0 1H1a.5.5 0 0 1-.5-.5"/>
     </svg>
-
+  {%- when 'heart' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      viewBox='0 0 20 20'
+    >
+      <path fill-rule="evenodd" d="M10 5.24 8.515 3.773a4.433 4.433 0 0 0-6.21 0 4.293 4.293 0 0 0 0 6.128L10 17.495l7.695-7.593a4.293 4.293 0 0 0 0-6.128 4.433 4.433 0 0 0-6.21 0zm.765-2.177c2.113-2.084 5.538-2.084 7.65 0a5.29 5.29 0 0 1 0 7.55l-7.695 7.593a1.03 1.03 0 0 1-1.44 0l-7.696-7.594a5.29 5.29 0 0 1 0-7.549C3.697.98 7.122.98 9.234 3.063l.766.755z"/>
+    </svg>
+  {%- when 'info' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 15 14'
+    >
+      <path fill="currentColor" fill-opacity=".75" fill-rule="evenodd" d="M14.5 7a7 7 0 1 1-14 0 7 7 0 0 1 14 0m-7 6.174A6.174 6.174 0 1 0 7.5.826a6.174 6.174 0 0 0 0 12.348" clip-rule="evenodd"/><path fill="currentColor" fill-opacity=".75" fill-rule="evenodd" d="M8.192 3.554c0-.39-.276-.725-.69-.725-.41 0-.696.329-.696.725 0 .392.29.719.696.719.411 0 .69-.332.69-.72" clip-rule="evenodd"/><path fill="currentColor" fill-opacity=".75" d="M6.971 5.724a.33.33 0 0 1 .33-.33H7.7a.33.33 0 0 1 .33.33v5.123a.33.33 0 0 1-.33.33h-.397a.33.33 0 0 1-.33-.33z"/>
+    </svg>
+  {%- when 'instagram' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      viewBox='0 0 20 20'
+    >
+      <path fill="currentColor" fill-rule="evenodd" d="M13.23 3.492c-.84-.037-1.096-.046-3.23-.046-2.144 0-2.39.01-3.238.055-.776.027-1.195.164-1.487.273a2.4 2.4 0 0 0-.912.593 2.5 2.5 0 0 0-.602.922c-.11.282-.238.702-.274 1.486-.046.84-.046 1.095-.046 3.23s.01 2.39.046 3.229c.004.51.097 1.016.274 1.495.145.365.319.639.602.913.282.282.538.456.92.602.474.176.974.268 1.479.273.848.046 1.103.046 3.238.046s2.39-.01 3.23-.046c.784-.036 1.203-.164 1.486-.273.374-.146.648-.329.921-.602.283-.283.447-.548.602-.922.177-.476.27-.979.274-1.486.037-.84.046-1.095.046-3.23s-.01-2.39-.055-3.229c-.027-.784-.164-1.204-.274-1.495a2.4 2.4 0 0 0-.593-.913 2.6 2.6 0 0 0-.92-.602c-.284-.11-.703-.237-1.488-.273ZM6.697 2.05c.857-.036 1.131-.045 3.302-.045a63 63 0 0 1 3.302.045c.664.014 1.321.14 1.943.374a4 4 0 0 1 1.414.922c.41.397.728.88.93 1.414.23.622.354 1.279.365 1.942C18 7.56 18 7.824 18 10.005c0 2.17-.01 2.444-.046 3.292-.036.858-.173 1.442-.374 1.943-.2.53-.474.976-.92 1.423a3.9 3.9 0 0 1-1.415.922c-.51.191-1.095.337-1.943.374-.857.036-1.122.045-3.302.045-2.171 0-2.445-.009-3.302-.055-.849-.027-1.432-.164-1.943-.364a4.15 4.15 0 0 1-1.414-.922 4.1 4.1 0 0 1-.93-1.423c-.183-.51-.329-1.085-.365-1.943C2.009 12.45 2 12.167 2 10.004c0-2.161 0-2.435.055-3.302.027-.848.164-1.432.365-1.942a4.4 4.4 0 0 1 .92-1.414 4.2 4.2 0 0 1 1.415-.93c.51-.183 1.094-.33 1.943-.366Zm.427 4.806a4.105 4.105 0 1 1 5.805 5.805 4.105 4.105 0 0 1-5.805-5.805m1.882 5.371a2.668 2.668 0 1 0 2.042-4.93 2.668 2.668 0 0 0-2.042 4.93m5.922-5.942a.958.958 0 1 1-1.355-1.355.958.958 0 0 1 1.355 1.355" clip-rule="evenodd"/>
+    </svg>
+  {%- when 'lock' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      viewBox='0 0 20 20'
+    >
+      <path fill-rule="evenodd" d="M16.5 7.118h-13V19h13zm-13-1a1 1 0 0 0-1 1V19a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V7.118a1 1 0 0 0-1-1z"/><path d="M11.443 11.92c0 .82-.646 1.486-1.443 1.486s-1.443-.665-1.443-1.486c0-.82.646-1.486 1.443-1.486s1.443.665 1.443 1.486"/><path d="M10.019 11.92c.345 0 .625.28.625.625v3.152a.625.625 0 1 1-1.25 0v-3.152c0-.345.28-.625.625-.625M6.242 3.76a3.759 3.759 0 1 1 7.516 0v2.36h-1V3.76a2.759 2.759 0 1 0-5.516 0v2.36h-1z"/>
+    </svg>
   {%- when 'minus' -%}
     <svg
-      xmlns='http://www.w3.org/2000/svg'
       aria-hidden='true'
       focusable='false'
-      role='presentation'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
       fill='none'
       viewBox='0 0 10 2'
-      {% if class != blank %}class='{{ class }}'{% endif %}
     >
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M.5 1C.5.7.7.5 1 .5h8a.5.5 0 110 1H1A.5.5 0 01.5 1z" fill="currentColor">
+      <path fill="currentColor" fill-rule="evenodd" d="M.5 1C.5.7.7.5 1 .5h8a.5.5 0 1 1 0 1H1A.5.5 0 0 1 .5 1" clip-rule="evenodd"/>
     </svg>
-
-  {%- when 'plus' -%}
+  {%- when 'pause' -%}
     <svg
-      xmlns='http://www.w3.org/2000/svg'
       aria-hidden='true'
       focusable='false'
-      role='presentation'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 8 12'
+    >
+      <path fill="currentColor" d="M1.2.75c-.387 0-.7.235-.7.525v9.45c0 .29.313.525.7.525s.7-.235.7-.525v-9.45c0-.29-.313-.525-.7-.525m5.6 0c-.387 0-.7.235-.7.525v9.45c0 .29.313.525.7.525s.7-.235.7-.525v-9.45c0-.29-.313-.525-.7-.525"/>
+    </svg>
+  {%- when 'pinterest' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      viewBox='0 0 20 20'
+    >
+      <path fill="currentColor" d="M10 2.01a8.1 8.1 0 0 1 5.666 2.353 8.09 8.09 0 0 1 1.277 9.68A7.95 7.95 0 0 1 10 18.04a8.2 8.2 0 0 1-2.276-.307c.403-.653.672-1.24.816-1.729l.567-2.2c.134.27.393.5.768.702.384.192.768.297 1.19.297q1.254 0 2.248-.72a4.7 4.7 0 0 0 1.537-1.969c.37-.89.554-1.848.537-2.813 0-1.249-.48-2.315-1.43-3.227a5.06 5.06 0 0 0-3.65-1.374c-.893 0-1.729.154-2.478.461a5.02 5.02 0 0 0-3.236 4.552c0 .72.134 1.355.413 1.902.269.538.672.922 1.22 1.152.096.039.182.039.25 0 .066-.028.114-.096.143-.192l.173-.653c.048-.144.02-.288-.105-.432a2.26 2.26 0 0 1-.548-1.565 3.803 3.803 0 0 1 3.976-3.861c1.047 0 1.863.288 2.44.855.585.576.883 1.315.883 2.228a6.8 6.8 0 0 1-.317 2.122 3.8 3.8 0 0 1-.893 1.556c-.384.384-.836.576-1.345.576-.413 0-.749-.144-1.018-.451-.259-.307-.345-.672-.25-1.085q.22-.77.452-1.537l.173-.701c.057-.25.086-.451.086-.624 0-.346-.096-.634-.269-.855-.192-.22-.451-.336-.797-.336-.432 0-.797.192-1.085.595-.288.394-.442.893-.442 1.499.005.374.063.746.173 1.104l.058.144c-.576 2.478-.913 3.938-1.037 4.36-.116.528-.154 1.153-.125 1.863A8.07 8.07 0 0 1 2 10.03c0-2.208.778-4.11 2.343-5.666A7.72 7.72 0 0 1 10 2.001z"/>
+    </svg>
+  {%- when 'play' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 10 14'
+    >
+      <path fill="currentColor" fill-rule="evenodd" d="M1.482.815A1 1 0 0 0 0 1.69v10.517a1 1 0 0 0 1.525.851L10.54 7.5a1 1 0 0 0-.043-1.728z" clip-rule="evenodd"/>
+    </svg>
+  {%- when 'plus' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
       fill='none'
       viewBox='0 0 10 10'
-      {% if class != blank %}class='{{ class }}'{% endif %}
     >
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M1 4.51a.5.5 0 000 1h3.5l.01 3.5a.5.5 0 001-.01V5.5l3.5-.01a.5.5 0 00-.01-1H5.5L5.49.99a.5.5 0 00-1 .01v3.5l-3.5.01H1z" fill="currentColor">
+      <path fill="currentColor" fill-rule="evenodd" d="M1 4.51a.5.5 0 0 0 0 1h3.5l.01 3.5a.5.5 0 0 0 1-.01V5.5l3.5-.01a.5.5 0 0 0-.01-1H5.5L5.49.99a.5.5 0 0 0-1 .01v3.5l-3.5.01z" clip-rule="evenodd"/>
     </svg>
-
+  {%- when 'price-tag' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      viewBox='0 0 20 20'
+    >
+      <path fill-rule="evenodd" d="m1.162 11.842 6.93 6.987c.198.2.52.2.717 0l10.03-10.143a.5.5 0 0 0 .148-.36V1.531a.51.51 0 0 0-.507-.51h-7.093a.5.5 0 0 0-.358.15L1.162 11.12a.514.514 0 0 0 0 .722M20 1.532C20 .686 19.32 0 18.48 0h-7.093c-.403 0-.79.162-1.075.449L.445 10.398a1.54 1.54 0 0 0 0 2.167l6.93 6.986a1.51 1.51 0 0 0 2.151-.001l10.03-10.143A1.54 1.54 0 0 0 20 8.325z"/><path d="M15.903 8.23a2.86 2.86 0 0 1-4.066 0 2.915 2.915 0 0 1 0-4.1 2.86 2.86 0 0 1 4.066 0 2.915 2.915 0 0 1 0 4.1m-3.35-.723a1.85 1.85 0 0 0 2.633 0 1.89 1.89 0 0 0 0-2.654 1.85 1.85 0 0 0-2.633 0 1.89 1.89 0 0 0 0 2.654"/>
+    </svg>
+  {%- when 'remove' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      viewBox='0 0 16 16'
+    >
+      <path fill="currentColor" d="M14 3h-3.53a3.07 3.07 0 0 0-.6-1.65C9.44.82 8.8.5 8 .5s-1.44.32-1.87.85A3.06 3.06 0 0 0 5.53 3H2a.5.5 0 0 0 0 1h1.25v10c0 .28.22.5.5.5h8.5a.5.5 0 0 0 .5-.5V4H14a.5.5 0 0 0 0-1M6.91 1.98c.23-.29.58-.48 1.09-.48s.85.19 1.09.48c.2.24.3.6.36 1.02h-2.9c.05-.42.17-.78.36-1.02m4.84 11.52h-7.5V4h7.5z"/><path fill="currentColor" d="M6.55 5.25a.5.5 0 0 0-.5.5v6a.5.5 0 0 0 1 0v-6a.5.5 0 0 0-.5-.5m2.9 0a.5.5 0 0 0-.5.5v6a.5.5 0 0 0 1 0v-6a.5.5 0 0 0-.5-.5"/>
+    </svg>
+  {%- when 'reset' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      fill='none'
+      stroke='currentColor'
+      viewBox='0 0 18 18'
+    >
+      <circle cx="9" cy="9" r="8.5" stroke-opacity=".2"/><path stroke-linecap="round" stroke-linejoin="round" d="M11.83 11.83 6.172 6.17M6.229 11.885l5.544-5.77"/>
+    </svg>
+  {%- when 'return' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      viewBox='0 0 20 20'
+    >
+      <path d="M11.571 1.059c0-.309.249-.559.556-.559h1.33C17.07.5 20 3.453 20 7.09s-2.93 6.589-6.543 6.589L1.9 13.71l-.591-.59.59-.572 11.558.013c2.997 0 5.432-2.451 5.432-5.472 0-3.02-2.435-5.471-5.432-5.471h-1.33a.557.557 0 0 1-.556-.56"/><path d="M6.003 7.007a.553.553 0 0 1 .786.011.56.56 0 0 1-.012.79zM1.31 13.12l5.43 5.426a.56.56 0 0 1 0 .79.553.553 0 0 1-.785 0L.162 13.503a.56.56 0 0 1 .007-.796l3.035-2.965 2.8-2.735.773.801-2.798 2.736c-1.025 1-2.108 2.027-2.67 2.576"/>
+    </svg>
   {%- when 'search' -%}
     <svg
-      xmlns='http://www.w3.org/2000/svg'
-      viewBox='0 0 101 101'
-      width='28'
-      height='22'
-      fill='currentColor'
-      {% if class != blank %}class='{{ class }}'{% endif %}
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      fill='none'
+      viewBox='0 0 18 19'
     >
-      <path d="M63.3 59.9c3.8-4.6 6.2-10.5 6.2-17 0-14.6-11.9-26.5-26.5-26.5S16.5 28.3 16.5 42.9 28.4 69.4 43 69.4c6.4 0 12.4-2.3 17-6.2l20.6 20.6c.5.5 1.1.7 1.7.7.6 0 1.2-.2 1.7-.7.9-.9.9-2.5 0-3.4L63.3 59.9zm-20.4 4.7c-12 0-21.7-9.7-21.7-21.7s9.7-21.7 21.7-21.7 21.7 9.7 21.7 21.7-9.7 21.7-21.7 21.7z"></path>
+      <path fill="currentColor" fill-rule="evenodd" d="M11.03 11.68A5.784 5.784 0 1 1 2.85 3.5a5.784 5.784 0 0 1 8.18 8.18m.26 1.12a6.78 6.78 0 1 1 .72-.7l5.4 5.4a.5.5 0 1 1-.71.7z" clip-rule="evenodd"/>
     </svg>
-
-  {%- when 'user' -%}
+  {%- when 'share' -%}
     <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
       xmlns='http://www.w3.org/2000/svg'
       fill='none'
-      viewBox='0 0 24 24'
-      stroke-width='1.5'
-      stroke='currentColor'
-      {% if class != blank %}class='{{ class }}'{% endif %}
+      viewBox='0 0 13 12'
     >
-      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M1.625 8.125v2.167a1.083 1.083 0 0 0 1.083 1.083h7.584a1.083 1.083 0 0 0 1.083-1.083V8.125"/><path fill="currentColor" fill-rule="evenodd" d="M6.148 1.271a.5.5 0 0 1 .707 0L9.563 3.98a.5.5 0 0 1-.707.707L6.501 2.332 4.147 4.687a.5.5 0 1 1-.708-.707z" clip-rule="evenodd"/><path fill="currentColor" fill-rule="evenodd" d="M6.5 1.125a.5.5 0 0 1 .5.5v6.5a.5.5 0 0 1-1 0v-6.5a.5.5 0 0 1 .5-.5" clip-rule="evenodd"/>
+    </svg>
+  {%- when 'spinner' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      viewBox='0 0 66 66'
+    >
+      <circle stroke-width="6" cx="33" cy="33" r="30" fill="none" class="path"/>
+    </svg>
+  {%- when 'star' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      viewBox='0 0 20 20'
+    >
+      <path fill-rule="evenodd" d="m10 2.626-1.46 4.71c-.192.62-.743 1.041-1.365 1.041H2.453l3.82 2.91a1.55 1.55 0 0 1 .522 1.685l-1.46 4.71 3.821-2.911a1.38 1.38 0 0 1 1.688 0l3.82 2.91-1.459-4.71c-.192-.62.019-1.3.522-1.683l3.82-2.911h-4.722c-.622 0-1.173-.42-1.366-1.04zm.455-1.78a.472.472 0 0 0-.91 0L7.63 7.027a.48.48 0 0 1-.455.347H.98c-.464 0-.657.622-.282.908l5.012 3.82a.52.52 0 0 1 .174.56l-1.914 6.18c-.143.462.361.847.736.56l5.013-3.818a.46.46 0 0 1 .562 0l5.013 3.819c.375.286.88-.099.736-.561l-1.914-6.18a.52.52 0 0 1 .174-.56l5.012-3.82c.375-.286.182-.908-.282-.908h-6.195a.48.48 0 0 1-.455-.347z"/>
+    </svg>
+  {%- when 'success' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      viewBox='0 0 13 13'
+    >
+      <path fill="#428445" stroke="#fff" stroke-width=".7" d="M6.5 12.35a5.85 5.85 0 1 0 0-11.7 5.85 5.85 0 0 0 0 11.7Z"/><path stroke="#fff" d="m5.533 8.664 3.72-3.982M4.106 6.769l2.032 1.857"/>
+    </svg>
+  {%- when 'tiktok' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      viewBox='0 0 20 20'
+    >
+      <path fill="currentColor" d="M10.511 1.705h2.74s-.157 3.51 3.795 3.768v2.711s-2.114.129-3.796-1.158l.028 5.606A5.073 5.073 0 1 1 8.213 7.56h.708v2.785a2.298 2.298 0 1 0 1.618 2.205z"/>
+    </svg>
+  {%- when 'truck' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      viewBox='0 0 20 20'
+    >
+      <path d="M0 3.752c0-.277.224-.502.5-.502h10.147a.5.5 0 0 1 .5.502v9.91l-.595 1.003H7.223V13.66h2.923V4.253H1.002v9.408h1.682v1.004H.501A.5.5 0 0 1 0 14.163zm18.999 4.332-7.851-1.975V5.075l8.473 2.131a.5.5 0 0 1 .379.487v6.47a.5.5 0 0 1-.5.502h-2.193v-1.003H19zm-7.851 5.578h2.196v1.003h-2.792z"/><path d="M7.713 14.185a2.56 2.56 0 0 1-2.56 2.565 2.56 2.56 0 0 1-2.56-2.565 2.56 2.56 0 0 1 2.56-2.564 2.56 2.56 0 0 1 2.56 2.564m-2.56 1.562a1.56 1.56 0 0 0 1.558-1.562 1.56 1.56 0 0 0-1.559-1.56 1.56 1.56 0 0 0-1.558 1.56 1.56 1.56 0 0 0 1.558 1.562m12.368-1.562a2.56 2.56 0 0 1-2.56 2.565 2.56 2.56 0 0 1-2.56-2.565 2.56 2.56 0 0 1 2.56-2.564 2.56 2.56 0 0 1 2.56 2.564m-2.56 1.562a1.56 1.56 0 0 0 1.558-1.562 1.56 1.56 0 0 0-1.559-1.56 1.56 1.56 0 0 0-1.558 1.56 1.56 1.56 0 0 0 1.558 1.562"/>
+    </svg>
+  {%- when 'twitter' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      viewBox='0 0 20 20'
+    >
+      <path fill="currentColor" fill-rule="evenodd" d="M7.273 2.8 10.8 7.822 15.218 2.8h1.768l-5.4 6.139 5.799 8.254h-4.658l-3.73-5.31-4.671 5.31H2.558l5.654-6.427L2.615 2.8zm6.242 13.125L5.07 4.109h1.405l8.446 11.816z" clip-rule="evenodd"/>
+    </svg>
+  {%- when 'unavailable' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 20 20'
+    >
+      <path fill="#DE3618" stroke="#fff" d="M13.94 3.94 10 7.878l-3.94-3.94A1.499 1.499 0 1 0 3.94 6.06L7.88 10l-3.94 3.94a1.499 1.499 0 1 0 2.12 2.12L10 12.12l3.94 3.94a1.497 1.497 0 0 0 2.12 0 1.5 1.5 0 0 0 0-2.12L12.122 10l3.94-3.94a1.499 1.499 0 1 0-2.121-2.12z"/>
+    </svg>
+  {%- when 'warning' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      width='14'
+      height='14'
+      viewBox='0 0 14 14'
+      fill='none'
+      xmlns='http://www.w3.org/2000/svg'
+    >
+      <circle cx="7" cy="10" r="0.75" fill="currentColor"/>
+      <path d="M7.00005 4.74914V7.49913M3.40529 12.0932H10.6443C11.8065 12.0932 12.5583 10.865 12.0296 9.83002L8.43091 2.78541C7.8549 1.65783 6.24497 1.65407 5.66369 2.77893L2.02335 9.82354C1.48831 10.8589 2.23985 12.0932 3.40529 12.0932Z" stroke="currentColor" stroke-width="var(--icon-stroke-width)" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  {%- when 'youtube' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      viewBox='0 0 20 20'
+    >
+      <path fill="currentColor" d="M18.16 5.87c.34 1.309.34 4.08.34 4.08s0 2.771-.34 4.08a2.13 2.13 0 0 1-1.53 1.53c-1.309.34-6.63.34-6.63.34s-5.321 0-6.63-.34a2.13 2.13 0 0 1-1.53-1.53c-.34-1.309-.34-4.08-.34-4.08s0-2.771.34-4.08a2.17 2.17 0 0 1 1.53-1.53C4.679 4 10 4 10 4s5.321 0 6.63.34a2.17 2.17 0 0 1 1.53 1.53M8.3 12.5l4.42-2.55L8.3 7.4z"/>
+    </svg>
+  {%- when 'zoom' -%}
+    <svg
+      aria-hidden='true'
+      focusable='false'
+      class='{{ class }}'
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 19 19'
+    >
+      <path fill="currentColor" fill-rule="evenodd" d="M4.667 7.94a.5.5 0 0 1 .499-.501l5.534-.014a.5.5 0 1 1 .002 1l-5.534.014a.5.5 0 0 1-.5-.5" clip-rule="evenodd"/><path fill="currentColor" fill-rule="evenodd" d="M7.926 4.665a.5.5 0 0 1 .501.498l.014 5.534a.5.5 0 1 1-1 .003l-.014-5.534a.5.5 0 0 1 .499-.501" clip-rule="evenodd"/><path fill="currentColor" fill-rule="evenodd" d="M12.832 3.03a6.931 6.931 0 1 0-9.802 9.802 6.931 6.931 0 0 0 9.802-9.802M2.323 2.323a7.931 7.931 0 0 1 11.296 11.136l4.628 4.628a.5.5 0 0 1-.707.707l-4.662-4.662A7.932 7.932 0 0 1 2.323 2.323" clip-rule="evenodd"/>
     </svg>
 {%- endcase -%}

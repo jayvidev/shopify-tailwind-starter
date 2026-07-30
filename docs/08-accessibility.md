@@ -12,7 +12,7 @@ nothing on focus.
 
 ```css
 :focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--color-fg);
   outline-offset: 2px;
 }
 ```
@@ -20,13 +20,13 @@ nothing on focus.
 Text fields are the exception, for a reason worth knowing: **browsers match
 `:focus-visible` on them even on a mouse click** — you're about to type, so the
 intent is the same. The detached ring read as a second border floating around
-the field, so fields get a 1px outline at `-1px` offset (it lands on their own
-border) plus a soft halo that stays visible when the border is already primary:
+the field, so fields get a 1px outline at `-1px` offset — it lands on their own
+border — plus a soft halo that stays visible when that border is already dark:
 
 ```css
 input:not([type='checkbox'], …):focus-visible {
-  outline-color: var(--color-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent);
+  outline-color: var(--color-fg);
+  box-shadow: 0 0 0 3px --alpha(var(--color-fg) / 15%);
 }
 ```
 
@@ -101,7 +101,7 @@ it's what `filter-checkbox.liquid` does.
 
 ## Skip link
 
-In `layout/theme.liquid`, rendered with `form-button` so it matches everything
+In `layout/theme.liquid`, rendered with `button` so it matches everything
 else, hidden until focused with `not-focus:sr-only`.
 
 ## Checking

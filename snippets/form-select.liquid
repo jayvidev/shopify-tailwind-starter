@@ -1,0 +1,233 @@
+{% doc %}
+  Renders a custom dropdown backed by a hidden native select.
+
+  @param {string} id - Unique id
+  @param {string} name - Name of the underlying select
+  @param {string} [form_id] - form attribute for the hidden select
+  @param {string} [selected_value] - Currently selected value
+  @param {object} [options] - Option values, for the variant picker
+  @param {object} [option_objects] - Objects with .value and .name, for sort and similar
+  @param {string} [size] - 'sm' or 'md'. Defaults to 'md'
+  @param {string} [placeholder] - Shown when no value is selected
+  @param {object} [current_option] - product_option being rendered
+  @param {number} [position] - Option position, written to data-option-position
+
+  @example
+  {% render 'form-select', id: 'sort-by', name: 'sort_by', option_objects: collection.sort_options %}
+{% enddoc %}
+
+{%- liquid
+  if size == 'sm'
+    assign btn_size_class = 'py-1.5 px-3 text-[0.8rem]'
+    assign opt_size_class = 'px-3 py-1.5 text-[0.8rem]'
+    assign swatch_size_class = 'size-4'
+    assign chevron_size_class = 'size-4'
+  else
+    assign btn_size_class = 'py-2 md:py-2.5 px-3 md:px-4 text-sm md:text-base'
+    assign opt_size_class = 'px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base'
+    assign swatch_size_class = 'size-4.5 md:size-6'
+    assign chevron_size_class = 'size-4'
+  endif
+  assign select_form_id = form_id
+  assign generic_mode = false
+  if option_objects and current_option == blank
+    assign generic_mode = true
+  endif
+-%}
+
+<div
+  class='relative custom-select-container w-full'
+  {%- liquid
+    assign is_color = false
+    assign downcased_option = current_option.name | downcase
+    if downcased_option contains 'color' or downcased_option contains 'colour'
+      assign is_color = true
+    endif
+  -%}
+  x-data='
+    dropdown({
+      selected: {{ selected_value | json }},
+      listboxId: {{ id | default: 'dropdown' | json }},
+      isColor: {{ is_color | default: false | json }},
+      swatches: {
+        {%- if is_color -%}
+          {%- for value in current_option.values -%}
+            "{{ value | escape }}": {
+              "color": {{ value.swatch.color | json }},
+              "image": {% if value.swatch.image %}{{ value.swatch.image | image_url: width: 50 | json }}{% else %}null{% endif %}
+            }{%- unless forloop.last -%},{%- endunless -%}
+          {%- endfor -%}
+        {%- endif -%}
+      }
+    })
+  '
+  @resize.window.debounce.100ms='onResize()'
+  @keydown='onKeydown($event)'
+  @keydown.escape.stop='close($refs.button)'
+  @focusin.window='if (!$el.contains($event.target)) close()'
+  @click.outside='close()'
+>
+  <!-- Trigger Button -->
+  <button
+    type='button'
+    x-ref='button'
+    @click='toggle()'
+    :aria-expanded='open'
+    aria-haspopup='listbox'
+    :aria-controls='listboxId + "-listbox"'
+    :aria-activedescendant='activeDescendantId()'
+    class='w-full flex items-center justify-between rounded-input border border-border-strong text-fg {{ btn_size_class }} bg-bg cursor-pointer transition-all duration-200 group'
+  >
+    <div class='flex items-center gap-3 overflow-hidden'>
+      {% if is_color %}
+        <span
+          class='{{ swatch_size_class }} rounded-full border border-border shrink-0'
+          :style="`background-color: ${swatches[selected]?.color || 'transparent'}; ${swatches[selected]?.image ? 'background-image: url(' + swatches[selected].image + '); background-size: cover;' : ''}`"
+        ></span>
+      {% endif %}
+      <span
+        class='truncate font-medium'
+        x-text='optionLabels[selected] || selected || {{ placeholder | default: '' | json }}'
+      ></span>
+    </div>
+
+    <svg
+      class='{{ chevron_size_class }} text-fg transition-transform duration-300'
+      :class="{ 'rotate-180': open }"
+      xmlns='http://www.w3.org/2000/svg'
+      viewBox='0 0 20 20'
+      fill='currentColor'
+    >
+      <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+    </svg>
+  </button>
+
+  <div
+    x-ref='menu'
+    x-show='open'
+    x-transition:enter='transition ease-out duration-200'
+    x-transition:enter-start='opacity-0 translate-y-1 scale-95'
+    x-transition:enter-end='opacity-100 translate-y-0 scale-100'
+    x-transition:leave='transition ease-in duration-150'
+    x-transition:leave-start='opacity-100 translate-y-0 scale-100'
+    x-transition:leave-end='opacity-0 translate-y-1 scale-95'
+    class='absolute z-50 mt-1.5 min-w-full w-max max-w-[85vw] md:max-w-[150%] rounded-input bg-bg border border-border-strong shadow-popup max-h-64 overflow-y-auto no-scrollbar'
+    :class="{ 'right-0': openLeft, 'left-0': !openLeft }"
+    x-cloak
+    role='listbox'
+    :id='listboxId + "-listbox"'
+  >
+    <div class='py-1.5 px-1.5 flex flex-col gap-1'>
+      {%- if generic_mode -%}
+        {%- if placeholder -%}
+          <div class='w-full flex items-center gap-3 {{ opt_size_class }} text-fg/30 cursor-default select-none px-3'>
+            <span class='flex-1 truncate'>{{ placeholder }}</span>
+          </div>
+        {%- endif -%}
+        {%- for opt in option_objects -%}
+          <button
+            type='button'
+            role='option'
+            :id='listboxId + "-opt-{{ forloop.index0 }}"'
+            :aria-selected="selected === '{{ opt.value | escape }}'"
+            @click="selectValue('{{ opt.value | escape }}')"
+            class='w-full flex items-center gap-3 {{ opt_size_class }} text-left transition-colors duration-150 focus:bg-surface cursor-pointer'
+            :class="{ 'bg-surface font-medium': selected === '{{ opt.value | escape }}', 'bg-bg': selected !== '{{ opt.value | escape }}', 'text-fg': true, 'hover:bg-surface': true, 'ring-1 ring-fg ring-inset': selected === '{{ opt.value | escape }}' || activeIndex === {{ forloop.index0 }} }"
+          >
+            <span class='flex-1 truncate'>{{ opt.name | escape }}</span>
+            <svg
+              x-show="selected === '{{ opt.value | escape }}'"
+              class='{{ chevron_size_class }} text-fg shrink-0'
+              xmlns='http://www.w3.org/2000/svg'
+              viewBox='0 0 20 20'
+              fill='currentColor'
+            >
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        {%- endfor -%}
+      {%- else -%}
+        {% for value in options %}
+          <button
+            type='button'
+            role='option'
+            :id='listboxId + "-opt-{{ forloop.index0 }}"'
+            :aria-selected="selected === '{{ value | escape }}'"
+            :aria-disabled="optionAvailable['{{ value | escape }}'] === false"
+            @click="selectValue('{{ value | escape }}')"
+            class='w-full flex items-center gap-3 {{ opt_size_class }} text-left transition-colors duration-150 focus:bg-surface cursor-pointer'
+            :class="
+              {
+                'bg-surface font-medium': selected === '{{ value | escape }}',
+                'bg-bg': selected !== '{{ value | escape }}',
+                'text-fg': true,
+                'hover:bg-surface': true,
+                'opacity-45': optionAvailable['{{ value | escape }}'] === false,
+                'ring-1 ring-fg ring-inset':
+                  selected === '{{ value | escape }}' || activeIndex === {{ forloop.index0 }}
+              }
+            "
+          >
+            {% if is_color %}
+              <span
+                class='{{ swatch_size_class }} rounded-full border border-border shrink-0'
+                :style="`background-color: ${swatches[&quot;{{ value | escape }}&quot;]?.color || 'transparent'}; ${swatches[&quot;{{ value | escape }}&quot;]?.image ? 'background-image: url(' + swatches[&quot;{{ value | escape }}&quot;]?.image + '); background-size: cover;' : ''}`"
+              ></span>
+            {% endif %}
+            <span
+              class='flex-1 truncate'
+              x-text='optionLabels[&quot;{{ value | escape }}&quot;] || &quot;{{ value | escape }}&quot;'
+            ></span>
+            <svg
+              x-show="selected === '{{ value | escape }}'"
+              class='{{ chevron_size_class }} text-fg shrink-0'
+              xmlns='http://www.w3.org/2000/svg'
+              viewBox='0 0 20 20'
+              fill='currentColor'
+            >
+              <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        {% endfor %}
+      {%- endif -%}
+    </div>
+  </div>
+
+  <!-- Hidden Native Select -->
+  <select
+    id='{{ id }}'
+    name='{{ name }}'
+    {% if select_form_id != blank %}
+      form='{{ select_form_id }}'
+    {% endif %}
+    x-ref='nativeSelect'
+    class='hidden'
+    data-option-position='{{ position }}'
+  >
+    {%- if placeholder -%}
+      <option
+        value=''
+        disabled
+        {% if selected_value == blank %}
+          selected
+        {% endif %}
+      >
+        {{ placeholder }}
+      </option>
+    {%- endif -%}
+    {%- if generic_mode -%}
+      {%- for opt in option_objects -%}
+        <option
+          value='{{ opt.value | escape }}'
+          {%- if opt.value == selected_value %}
+            selected
+          {%- endif -%}
+        >
+          {{ opt.name | escape }}
+        </option>
+      {%- endfor -%}
+    {%- else -%}
+      {% render 'product-variant-options', option: current_option, picker_type: 'select' %}
+    {%- endif -%}
+  </select>
+</div>

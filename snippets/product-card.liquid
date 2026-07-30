@@ -1,0 +1,194 @@
+{% doc %}
+  Renders a product card: media with hover swap, badges, title, price, colour
+  swatches and an optional quick-add button.
+
+  Quick add posts through the cart store, so it opens the minicart like any
+  other add — see `src/alpine/stores/cart.ts`.
+
+  @param {object} product - The product to render
+  @param {boolean} [show_hover] - Swap to the second image on hover. Defaults to the theme setting
+  @param {boolean} [show_vendor] - Show the vendor. Defaults to the theme setting
+  @param {boolean} [show_quick_add] - Show the quick-add button. Defaults to the theme setting
+  @param {string} [aspect] - Media aspect ratio. Defaults to 'aspect-square'
+  @param {string} [sizes] - Image `sizes` attribute
+  @param {string} [class] - Extra classes on the card root
+  @param {string} [image_loading] - 'lazy' or 'eager'. Defaults to 'lazy'
+
+  @example
+  {% render 'product-card', product: product %}
+{% enddoc %}
+
+{%- liquid
+  assign aspect = aspect | default: 'aspect-square'
+  assign sizes = sizes | default: '(min-width: 768px) 25vw, 50vw'
+  assign image_loading = image_loading | default: 'lazy'
+
+  if show_hover == null
+    assign show_hover = settings.show_secondary_image
+  endif
+  if show_vendor == null
+    assign show_vendor = settings.show_vendor
+  endif
+  if show_quick_add == null
+    assign show_quick_add = settings.show_quick_add
+  endif
+
+  assign card_image = product.featured_media.preview_image | default: product.featured_image
+  assign secondary_image = null
+  if show_hover and product.images.size > 1
+    assign secondary_image = product.images[1]
+  endif
+
+  assign on_sale = false
+  if product.compare_at_price > product.price and product.available
+    assign on_sale = true
+  endif
+
+  assign variant = product.selected_or_first_available_variant
+  assign has_one_variant = false
+  if product.variants.size == 1
+    assign has_one_variant = true
+  endif
+
+  case settings.badge_position
+    when 'bottom right'
+      assign badge_position_classes = 'bottom-2 right-2 items-end'
+    when 'top left'
+      assign badge_position_classes = 'top-2 left-2 items-start'
+    when 'top right'
+      assign badge_position_classes = 'top-2 right-2 items-end'
+    else
+      assign badge_position_classes = 'bottom-2 left-2 items-start'
+  endcase
+-%}
+
+<div class='group relative flex flex-col {{ class }}'>
+  <div class='relative mb-3 overflow-hidden rounded-media bg-surface {{ aspect }}'>
+    <a
+      href='{{ product.url }}'
+      class='block size-full'
+      aria-label='{{ product.title | escape }}'
+      tabindex='-1'
+    >
+      {%- if card_image -%}
+        {%- assign card_image_alt = card_image.alt | default: product.title | escape -%}
+        {{
+          card_image
+          | image_url: width: 1200
+          | image_tag:
+            alt: card_image_alt,
+            loading: image_loading,
+            sizes: sizes,
+            widths: '200, 300, 400, 600, 800, 1000, 1200',
+            class: 'absolute inset-0 size-full object-cover transition duration-500 ease-out group-hover:scale-105'
+        }}
+        {%- if secondary_image -%}
+          {%- assign secondary_image_alt = secondary_image.alt | default: product.title | escape -%}
+          {{
+            secondary_image
+            | image_url: width: 1200
+            | image_tag:
+              alt: secondary_image_alt,
+              loading: 'lazy',
+              sizes: sizes,
+              widths: '200, 300, 400, 600, 800, 1000, 1200',
+              class: 'absolute inset-0 size-full object-cover opacity-0 transition duration-500 ease-out group-hover:scale-105 group-hover:opacity-100'
+          }}
+        {%- endif -%}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'absolute inset-0 size-full object-cover opacity-40' }}
+      {%- endif -%}
+    </a>
+
+    <div class='pointer-events-none absolute z-10 flex flex-col gap-1 {{ badge_position_classes }}'>
+      {%- unless product.available -%}
+        {%- assign sold_out_label = 'products.product.sold_out' | t -%}
+        {% render 'badge', label: sold_out_label, variant: 'muted' %}
+      {%- endunless -%}
+      {%- if on_sale -%}
+        {%- assign sale_label = 'products.product.on_sale' | t -%}
+        {% render 'badge', label: sale_label, variant: 'sale', icon: 'tag' %}
+      {%- endif -%}
+    </div>
+
+    {%- if show_quick_add and product.available -%}
+      <div
+        class='absolute inset-x-2 bottom-2 z-10 translate-y-2 opacity-0 transition duration-200 group-hover:translate-y-0 group-hover:opacity-100 focus-within:translate-y-0 focus-within:opacity-100 max-md:translate-y-0 max-md:opacity-100'
+        x-data
+      >
+        {%- if has_one_variant -%}
+          {%- liquid
+            assign quick_add_label = 'products.product.add_to_cart' | t
+            assign add_expr = '$store.cart.addToCart(' | append: variant.id | append: ')'
+            assign processing_expr = '$store.cart.processingId === "' | append: variant.id | append: '"'
+            assign quick_add_aria = quick_add_label | append: ': ' | append: product.title | escape
+            assign quick_add_attr = 'aria-label="' | append: quick_add_aria | append: '"'
+          -%}
+          {% render 'button',
+            label: quick_add_label,
+            size: 'sm',
+            full: true,
+            click_expr: add_expr,
+            disabled_expr: processing_expr,
+            loading_expr: processing_expr,
+            attr: quick_add_attr
+          %}
+        {%- else -%}
+          {%- assign choose_label = 'products.product.choose_options' | t -%}
+          {% render 'button',
+            label: choose_label,
+            href: product.url,
+            size: 'sm',
+            full: true
+          %}
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if show_vendor and product.vendor != blank -%}
+    <p class='mb-1 text-xs text-fg-subtle'>{{ product.vendor }}</p>
+  {%- endif -%}
+
+  <h3 class='mb-1 text-sm font-medium md:text-base'>
+    <a
+      href='{{ product.url }}'
+      class='text-fg no-underline underline-offset-4 hover:underline'
+    >
+      {{ product.title }}
+    </a>
+  </h3>
+
+  {% render 'price', product: product, use_variant: true, show_from: true %}
+
+  {%- comment -%}
+    Swatches for the first option that has any — Shopify only fills `swatch` on
+    values whose option is set up as a colour/pattern in the admin.
+  {%- endcomment -%}
+  {%- for option in product.options_with_values -%}
+    {%- if option.values.first.swatch != blank -%}
+      <div class='mt-2 flex items-center gap-1.5'>
+        {%- for value in option.values limit: 5 -%}
+          <span
+            class='size-4 shrink-0 overflow-hidden rounded-full border border-border'
+            style='background: {{ value.swatch.color | default: 'transparent' }};'
+            title='{{ value | escape }}'
+          >
+            {%- if value.swatch.image -%}
+              {%- assign swatch_alt = value | escape -%}
+              {{
+                value.swatch.image
+                | image_url: width: 40
+                | image_tag: alt: swatch_alt, loading: 'lazy', class: 'size-full object-cover'
+              }}
+            {%- endif -%}
+          </span>
+        {%- endfor -%}
+        {%- if option.values.size > 5 -%}
+          <span class='text-xs text-fg-subtle'>+{{ option.values.size | minus: 5 }}</span>
+        {%- endif -%}
+      </div>
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+</div>

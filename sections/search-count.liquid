@@ -1,0 +1,12 @@
+{%- comment -%}
+  Just the result count. `src/elements/predictive-search.ts` fetches this section
+  from the search page to show the real total, which the predictive endpoint
+  doesn't return.
+{%- endcomment -%}
+{{- search.results_count -}}
+
+{% schema %}
+{
+  "name": "Search count"
+}
+{% endschema %}

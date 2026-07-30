@@ -23,7 +23,6 @@ whether the drawer is open → `$store.ui`. A slider only concerns itself → co
 | `$store.ui` | Drawers, menus, search panel, scroll state, promo bar |
 | `$store.cart` | Cart contents, in-flight flags, quantity changes, discount codes |
 | `$store.tiers` | Spend-more-save-more progress (reads the cart store) |
-| `$store.wishlist` | Saved handles, toast |
 | `$store.debug` | Focus logging, off by default |
 
 Stores don't reach into each other's state to write. `cart` announces

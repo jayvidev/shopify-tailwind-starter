@@ -1,0 +1,32 @@
+{% doc %}
+  Renders a labelled textarea.
+
+  @param {string} id - Unique id
+  @param {string} name - Field name
+  @param {string} [label] - Visible label
+  @param {string} [placeholder] - Placeholder text
+  @param {number} [rows] - Visible rows
+  @param {boolean} [required] - Marks the field as required
+  @param {string} [value] - Initial value
+
+  @example
+  {% render 'form-textarea', label: 'Mensaje', id: 'ContactForm-body', name: 'contact[body]', rows: 4 %}
+{% enddoc %}
+
+<div class='flex flex-col gap-2 w-full'>
+  {% if label %}
+    <label for='{{ id }}' class='text-fg-subtle text-xs md:text-base'>
+      {{ label }}
+    </label>
+  {% endif %}
+  <textarea
+    id='{{ id }}'
+    name='{{ name }}'
+    placeholder='{{ placeholder }}'
+    rows='{{ rows | default: 4 }}'
+    {% if required %}
+      required
+    {% endif %}
+    class='w-full px-3 py-1.5 rounded-input border text-sm md:text-base border-border-strong text-fg placeholder:text-fg-subtle focus:border-border-strong transition-colors bg-bg resize-none'
+  >{{ value }}</textarea>
+</div>

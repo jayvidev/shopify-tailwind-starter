@@ -38,7 +38,8 @@
       "label": "Pagination",
       "page": "Page {{ number }}",
       "next": "Next page",
-      "previous": "Previous page"
+      "previous": "Previous page",
+      "load_more": "Load more"
     },
     "search": {
       "search": "Search",
@@ -175,7 +176,7 @@
       "sold_out": "Sold out",
       "unavailable": "Unavailable",
       "vendor": "Vendor",
-      "value_unavailable": "{{ option_value }} - Unavailable",
+      "value_unavailable": "{{ option_value }} — unavailable",
       "variant_sold_out_or_unavailable": "Variant sold out or unavailable",
       "video_exit_message": "{{ title }} opens full screen video in same window.",
       "view_full_details": "View full details",
@@ -184,7 +185,8 @@
       "taxes_included": "Taxes included.",
       "duties_included": "Duties included.",
       "duties_and_taxes_included": "Duties and taxes included.",
-      "shipping_policy_html": "<a href=\"{{ link }}\">Shipping</a> calculated at checkout."
+      "shipping_policy_html": "<a href=\"{{ link }}\">Shipping</a> calculated at checkout.",
+      "value_sold_out": "{{ option_value }} — sold out"
     },
     "modal": {
       "label": "Media gallery"
@@ -319,7 +321,21 @@
       "login": {
         "title": "Have an account?",
         "paragraph_html": "<a href=\"{{ link }}\" class=\"link underlined-link\">Log in</a> to check out faster."
-      }
+      },
+      "tiers": {
+        "max_reached": "Top discount unlocked — {{ amount }} off",
+        "current": "{{ amount }} off unlocked.",
+        "next": "Spend {{ remaining }} more for {{ amount }} off.",
+        "first": "Spend {{ remaining }} more and get {{ amount }} off."
+      },
+      "discount_code": {
+        "label": "Discount code",
+        "placeholder": "Discount code",
+        "apply": "Apply",
+        "remove": "Remove discount"
+      },
+      "subtotal": "Subtotal",
+      "remove": "Remove"
     },
     "footer": {
       "payment": "Payment methods"

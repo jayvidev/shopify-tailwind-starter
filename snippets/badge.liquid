@@ -1,0 +1,31 @@
+{% doc %}
+  Renders a small pill badge, e.g. "Sale" or "Sold out".
+
+  @param {string} label - Badge text
+  @param {string} [variant] - 'sale', 'muted' or 'solid'. Defaults to 'solid'
+  @param {string} [icon] - Icon name rendered before the label
+  @param {string} [class] - Extra classes
+
+  @example
+  {% render 'badge', label: 'Sale', variant: 'sale' %}
+{% enddoc %}
+
+{%- liquid
+  case variant
+    when 'sale'
+      assign variant_classes = 'bg-sale text-bg'
+    when 'muted'
+      assign variant_classes = 'bg-surface text-fg'
+    else
+      assign variant_classes = 'bg-fg text-bg'
+  endcase
+-%}
+
+<span
+  class='inline-flex items-center gap-1 rounded-badge px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide {{ variant_classes }} {{ class }}'
+>
+  {%- if icon != blank -%}
+    {% render 'icon', icon: icon, class: 'size-3.5 shrink-0' %}
+  {%- endif -%}
+  {{ label }}
+</span>

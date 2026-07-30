@@ -1,119 +1,192 @@
-{% schema %}
-{
-  "name": "header",
-  "class": "section-header sticky top-0 z-20 shadow-md",
-  "tag": "header",
-  "settings": [
-    {
-      "type": "paragraph",
-      "content": "t:sections.header.settings.paragraph"
-    }
-  ]
-}
-{% endschema %}
+{%- liquid
+  assign menu = section.settings.menu
+  assign menu_type = section.settings.menu_type_desktop
+-%}
 
-{% if settings.show_promo_bar %}
-  {% render 'promo-bar' %}
-{% endif %}
-
-<div class='px-6 md:px-8 bg-indigo-900'>
-  <div class='container flex items-center text-white relative mx-auto'>
-    <nav
-      :class="$store.global.isMobileMenuVisible ? 'open' : 'closed'"
-      aria-label='Mobile Navigation Overlay'
-      class='block md:hidden'
-      style='transition: all 300ms;'
-      id='mobile-nav'
-      role='navigation'
-      x-cloak
-      x-data
-    >
+<div
+  class='header-container relative bg-bg{% if section.settings.show_line_separator %} border-b border-border{% endif %}'
+  x-data='{ hoveredItem: null }'
+  x-init="$watch('hoveredItem', (value) => ($store.ui.isMegaMenuVisible = !!value))"
+  @close-mega-menu.window='hoveredItem = null'
+  @mouseleave='hoveredItem = null'
+>
+  <div class='page flex h-16 items-center justify-between gap-4 md:h-20'>
+    {%- comment -%} Left: mobile menu toggle, desktop nav when the logo is centred {%- endcomment -%}
+    <div class='flex flex-1 items-center justify-start'>
       <button
-        id='mobile-nav-trigger'
         type='button'
-        class='block border-0 bg-transparent text-white appearance-none [&>span>svg]:h-auto [&>span>svg]:w-6.5 [&>span>svg]:fill-white'
-        @click='$store.global.toggleMobileMenu()'
-        :aria-expanded='$store.global.isMobileMenuVisible'
-        aria-label='Mobile Navigation Button'
-        aria-controls='mobile-menu-list'
-        x-data
+        class='-ms-2 cursor-pointer p-2 lg:hidden'
+        @click='$store.ui.toggleMobileMenu(); $store.ui.isPredictiveSearchVisible = false; $store.ui.isMinicartVisible = false; hoveredItem = null'
+        :aria-expanded="$store.ui.isMobileMenuVisible ? 'true' : 'false'"
+        aria-controls='mobile-menu'
+        aria-label='{{ 'sections.header.menu' | t }}'
       >
-        <span class='sr-only'>Menu</span>
-        <span aria-hidden='true' x-show='!$store.global.isMobileMenuVisible' class='text-white'>
-          {% render 'icon', icon: 'menu' %}
+        <span x-show='!$store.ui.isMobileMenuVisible'>
+          {% render 'icon', icon: 'menu', class: 'size-6' %}
         </span>
-        <span aria-hidden='true' x-show='$store.global.isMobileMenuVisible' class='text-white'>
-          {% render 'icon', icon: 'close' %}
+        <span x-show='$store.ui.isMobileMenuVisible' x-cloak>
+          {% render 'icon', icon: 'close', class: 'size-6' %}
         </span>
       </button>
-      {% render 'mobile-menu' %}
-    </nav>
 
-    <a
-      href='{{ routes.root_url }}'
-      class='header-logo ml-4 text-2xl uppercase text-white no-underline md:ml-0 md:text-[32px]'
-    >
-      Starter Dev
-    </a>
-
-    <div class='hidden md:block'>
-      {% render 'header-menu' %}
+      {%- if section.settings.logo_position == 'left' -%}
+        <a
+          href='{{ routes.root_url }}'
+          class='hidden shrink-0 items-center no-underline lg:flex'
+        >
+          {% render 'header-logo' %}
+        </a>
+      {%- endif -%}
     </div>
 
-    <div class='flex items-center space-x-3 self-center ml-auto'>
-      {% if settings.enable_modal %}
+    {%- comment -%}
+      The logo sits in the middle on mobile either way; on desktop the middle
+      slot holds whichever of logo/nav the setting didn't put on the left.
+    {%- endcomment -%}
+    <div class='flex shrink-0 items-center justify-center {% if section.settings.logo_position == 'left' %}lg:hidden{% endif %}'>
+      <a
+        href='{{ routes.root_url }}'
+        class='flex items-center no-underline'
+      >
+        {% render 'header-logo' %}
+      </a>
+    </div>
+
+    <div class='hidden flex-1 justify-center lg:flex'>
+      {% render 'header-menu', menu: menu, menu_type: menu_type %}
+    </div>
+
+    {%- comment -%} Right: search, account, cart {%- endcomment -%}
+    <div class='flex flex-1 items-center justify-end gap-1'>
+      {%- if settings.predictive_search_enabled -%}
         <button
           type='button'
-          class='fill-white p-2 text-white [&>svg]:h-7'
-          @click='$store.global.openModal()'
-          aria-label='Open Modal'
+          class='cursor-pointer p-2'
+          @click='$store.ui.isPredictiveSearchVisible = true; $store.ui.isMobileMenuVisible = false; $store.ui.isMinicartVisible = false; hoveredItem = null'
+          :aria-expanded="$store.ui.isPredictiveSearchVisible ? 'true' : 'false'"
+          aria-controls='predictive-search'
+          aria-label='{{ 'general.search.search' | t }}'
         >
-          {% render 'icon', icon: 'bubble-bottom' %}
+          {% render 'icon', icon: 'search', class: 'size-5 md:size-6' %}
         </button>
-      {% endif %}
-
-      {% if settings.enable_predictive_search %}
+      {%- else -%}
         <a
           href='{{ routes.search_url }}'
-          class='block fill-white p-2 text-white md:hidden [&>svg]:h-7'
+          class='p-2'
+          aria-label='{{ 'general.search.search' | t }}'
         >
-          {% render 'icon', icon: 'search' %}
+          {% render 'icon', icon: 'search', class: 'size-5 md:size-6' %}
         </a>
-        <button
-          type='button'
-          class='hidden fill-white p-2 text-white md:block [&>svg]:h-7'
-          @click='$store.global.isPredictiveSearchVisible = true'
-          :aria-expanded="$store.global.isPredictiveSearchVisible ? 'true' : 'false'"
-          aria-label='Search'
-          aria-controls='predictive-search'
+      {%- endif -%}
+
+      {%- if shop.customer_accounts_enabled and section.settings.show_account -%}
+        <a
+          href='{{ routes.account_url }}'
+          class='hidden p-2 md:block'
+          aria-label='{{ 'customer.log_in' | t }}'
         >
-          {% render 'icon', icon: 'search' %}
-        </button>
-      {% else %}
-        <a href='{{ routes.search_url }}' class='fill-white p-2 text-white [&>svg]:h-7'>
-          {% render 'icon', icon: 'search' %}
+          {% render 'icon', icon: 'user', class: 'size-5 md:size-6' %}
         </a>
-      {% endif %}
+      {%- endif -%}
 
-      {% if shop.customer_accounts_enabled %}
-        <a href='{{ routes.account_url }}' class='fill-white p-2 text-white [&>svg]:h-7'>
-          {% render 'icon', icon: 'user' %}
-        </a>
-      {% endif %}
-
-      <a
-        href='{{ routes.cart_url }}'
-        class='relative p-2 text-white [&>svg]:h-5.5 [&>svg]:w-auto'
-        x-cloak
+      <button
+        type='button'
+        class='relative -me-2 cursor-pointer p-2'
+        @click='$store.ui.isMinicartVisible = true; $store.ui.isMobileMenuVisible = false; $store.ui.isPredictiveSearchVisible = false; hoveredItem = null'
+        aria-label='{{ 'templates.cart.cart' | t }}'
+        aria-controls='minicart'
       >
-        {% render 'icon', icon: 'cart' %}
+        {% render 'icon', icon: 'cart', class: 'size-7 md:size-8' %}
         <span
           data-ajax-cart-bind='item_count'
-          class='absolute top-[58%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-xs text-cloud-burst-500'
+          class='cart-count-badge absolute inset-e-1 bottom-1.5 flex size-4 items-center justify-center rounded-full bg-fg text-[10px] font-semibold text-bg'
         >
           {{- cart.item_count -}}
         </span>
-      </a>
+      </button>
     </div>
   </div>
+
+  {% render 'mobile-menu', menu: menu %}
+
+  {%- if settings.predictive_search_enabled -%}
+    {% render 'predictive-search' %}
+    <script src='{{ 'predictive-search.js' | asset_url }}' defer='defer'></script>
+  {%- endif -%}
+
+  {% render 'minicart' %}
 </div>
+
+{% stylesheet %}
+  /* liquid-ajax-cart marks the document while the cart is empty. */
+  .js-ajax-cart-empty .cart-count-badge {
+    display: none;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header sticky top-0 z-100",
+  "tag": "header",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "default": "main-menu",
+      "label": "Menu"
+    },
+    {
+      "type": "select",
+      "id": "menu_type_desktop",
+      "default": "dropdown",
+      "options": [
+        {
+          "value": "dropdown",
+          "label": "Dropdown"
+        },
+        {
+          "value": "mega",
+          "label": "Mega menu"
+        }
+      ],
+      "label": "Desktop menu type",
+      "info": "Both are built from the nesting of the menu you selected — up to three levels."
+    },
+    {
+      "type": "select",
+      "id": "logo_position",
+      "default": "left",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "label": "Desktop logo position",
+      "info": "The logo image comes from Theme settings → Branding."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "default": true,
+      "label": "Show account link"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_line_separator",
+      "default": true,
+      "label": "Show separator line"
+    }
+  ],
+  "enabled_on": {
+    "groups": [
+      "header"
+    ]
+  }
+}
+{% endschema %}

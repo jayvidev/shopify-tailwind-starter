@@ -87,21 +87,23 @@ won't interpolate.
 `<style>` survives in exactly two snippets, both justified: `font-face.liquid`
 needs `asset_url`, and `head-css.liquid` must apply before first paint.
 
-## Section padding
+## Layout utilities
 
-Don't write per-section padding CSS. The `.section-padding` utility in
-`src/theme.css` does it, driven by custom properties:
+Three utilities in `src/theme.css` cover what almost every section needs. Use
+them instead of re-deciding the width and rhythm per section:
+
+| Utility | Gives you |
+|---|---|
+| `page` | Max width plus the horizontal gutter |
+| `section-spacing` | The vertical rhythm between sections |
+| `grid-gap` | Product-grid gutters, halved on mobile |
 
 ```liquid
-<div
-  class='section-padding …'
-  style='--section-padding-top: {{ section.settings.padding_top }}px;
-         --section-padding-bottom: {{ section.settings.padding_bottom }}px'
->
+<div class='page section-spacing'>
 ```
 
-Mobile is 75% of desktop, computed with `calc()`. Override the ramp per section
-with `--section-padding-scale-sm` / `-md` / `-lg`.
+Padding is not a per-section setting here. If a section needs to break the
+rhythm, write the exception in its markup and say why.
 
 ## Inline `<script>`
 
@@ -111,8 +113,8 @@ reason CSS and bundles can't cover:
 | Where | Why |
 |---|---|
 | `head-scripts.liquid` | Swaps `no-js` for `js` before first paint |
-| `main-search.liquid` | Redirect that must run before the bundle loads |
 | `liquid-ajax-cart.liquid` | Plugin configuration, not logic |
+| `layout/theme.liquid` | Fills `window.theme` from settings and locales |
 
 `<script type="application/json">` is fine and encouraged — that's data, not
 behaviour. JSON-LD blocks likewise.
@@ -122,5 +124,10 @@ emits a bare number and produces invalid JSON. Use `{{ media.id | append: '' | j
 
 ## Schemas
 
-All user-facing strings are `t:` keys — see `07-i18n.md`. Section `name` is
-capped at **25 characters**, and only the default locale is validated.
+**Editor labels are written inline, in English.** Storefront copy goes through
+`locales/` (see `07-i18n.md`); schema labels don't, because they'd mean a second
+translation file that only staff ever read. Section `name` is capped at
+**25 characters**.
+
+Settings cover content and behaviour. Colours, radii, shadows and type belong in
+`src/theme.css` — see `09-conventions.md`.

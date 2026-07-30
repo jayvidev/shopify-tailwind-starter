@@ -14,17 +14,16 @@ src/
   sections.ts           # Section Rendering API — see 05-sections-api.md
   product-media.ts      # parses the video/3D payload rendered by Liquid
   strings.ts            # t() over window.theme.strings
-  judgeme.ts            # store-specific, see 06
 
   alpine/
     index.ts            # single registration point for everything below
-    stores/             # shared state: ui · cart · discount-tiers · wishlist · debug
+    stores/             # shared state: ui · cart · discount-tiers · debug
     components/         # per-instance behaviour, one file per x-data name
     magic/              # $money, $amount
 
   elements/             # custom elements, bundled separately
   types/                # shopify.ts · alpine.ts · globals.d.ts · modules.d.ts
-  prodify/              # variant picker (inherited from the starter)
+  prodify/              # variant picker: owns the option selects
 ```
 
 ## Build

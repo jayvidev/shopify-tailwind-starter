@@ -1,0 +1,63 @@
+{% doc %}
+  Renders one filter value as a checkbox, with a swatch when the filter has one.
+
+  @param {string} name - Input name, from `value.param_name`
+  @param {string} value - Input value
+  @param {boolean} checked - Whether the value is active
+  @param {string} label - Visible label
+  @param {string} [color] - Swatch colour
+  @param {object} [swatch_image] - Swatch image
+  @param {number} [count] - Matching product count
+
+  @example
+  {% render 'filter-checkbox',
+    name: value.param_name,
+    value: value.value,
+    checked: value.active,
+    label: value.label,
+    count: value.count
+  %}
+{% enddoc %}
+
+<label class='flex cursor-pointer items-center justify-between gap-3'>
+  <span class='flex min-w-0 items-center gap-2.5'>
+    {%- if color != blank or swatch_image != blank -%}
+      <span
+        class='relative size-5 shrink-0 overflow-hidden rounded-full border border-border'
+        style='background-color: {{ color | default: 'transparent' }};'
+      >
+        {%- if swatch_image != blank -%}
+          {%- assign swatch_alt = label | escape -%}
+          {{
+            swatch_image
+            | image_url: width: 40
+            | image_tag: alt: swatch_alt, loading: 'lazy', class: 'size-full object-cover'
+          }}
+        {%- endif -%}
+      </span>
+    {%- endif -%}
+
+    <span class='truncate text-sm'>
+      {{ label }}
+      {%- if count != blank -%}
+        <span class='ms-1 text-xs text-fg-subtle'>({{ count }})</span>
+      {%- endif -%}
+    </span>
+  </span>
+
+  <span class='relative flex shrink-0 items-center justify-center'>
+    <input
+      type='checkbox'
+      name='{{ name }}'
+      value='{{ value }}'
+      {% if checked %}
+        checked
+      {% endif %}
+      class='peer size-5 cursor-pointer appearance-none rounded-input border border-border bg-bg transition-colors checked:bg-fg'
+    >
+    {%- comment -%} The tick sits on top of the input, which owns the border. {%- endcomment -%}
+    <span class='pointer-events-none absolute text-bg opacity-0 transition-opacity peer-checked:opacity-100'>
+      {% render 'icon', icon: 'check', class: 'size-3' %}
+    </span>
+  </span>
+</label>

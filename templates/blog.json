@@ -2,7 +2,7 @@
   "sections": {
     "main": {
       "type": "main-blog",
-      "settings": {}
+      "settings": { "posts_per_page": 9, "show_excerpt": true }
     }
   },
   "order": ["main"]

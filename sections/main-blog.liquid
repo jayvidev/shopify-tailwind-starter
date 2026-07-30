@@ -1,8 +1,33 @@
+<div class='page section-spacing'>
+  <h1 class='mb-8 text-2xl font-semibold md:text-3xl'>{{ blog.title }}</h1>
+
+  {%- paginate blog.articles by section.settings.posts_per_page -%}
+    <div class='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
+      {%- for article in blog.articles -%}
+        {% render 'article-card', article: article, show_excerpt: section.settings.show_excerpt %}
+      {%- endfor -%}
+    </div>
+
+    {% render 'pagination-navigation', paginate: paginate %}
+  {%- endpaginate -%}
+</div>
+
 {% schema %}
 {
-  "name": "Main Blog Section",
+  "name": "Blog posts",
   "class": "section-main-blog",
   "tag": "section",
-  "settings": []
+  "settings": [
+    {
+      "type": "range",
+      "id": "posts_per_page",
+      "min": 3,
+      "max": 24,
+      "step": 3,
+      "default": 9,
+      "label": "Posts per page"
+    },
+    { "type": "checkbox", "id": "show_excerpt", "default": true, "label": "Show excerpt" }
+  ]
 }
 {% endschema %}

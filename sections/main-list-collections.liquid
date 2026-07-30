@@ -1,32 +1,67 @@
-{% schema %}
-{
-  "name": "Main List Collections",
-  "class": "section-main-list-collections",
-  "tag": "section"
-}
-{% endschema %}
+{%- liquid
+  case section.settings.columns
+    when '2'
+      assign grid_classes = 'grid-cols-1 md:grid-cols-2'
+    when '4'
+      assign grid_classes = 'grid-cols-2 md:grid-cols-4'
+    else
+      assign grid_classes = 'grid-cols-2 md:grid-cols-3'
+  endcase
+-%}
 
-{% unless collection %}
-  {% assign collection = collections.all %}
-{% endunless %}
+<div class='page section-spacing'>
+  <h1 class='mb-8 text-2xl font-semibold md:text-3xl'>
+    {{ page_title }}
+  </h1>
 
-<div class='px-6 md:px-8 py-12'>
-  <div class='list-collections-inner container'>
-    <h1 class='mb-8 mx-auto max-w-max'>Collections</h1>
-    {% render 'collections-list' %}
-
-    <div class='grid-wrapper'>
-      {%- paginate collection.products by 12 -%}
-        <div class='product-grid grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4'>
-          {% for prod in collection.products %}
-            {% render 'product-grid-item', prod: prod %}
-          {% endfor %}
+  <div class='grid grid-gap {{ grid_classes }}'>
+    {%- for collection in collections -%}
+      {%- assign card_alt = collection.featured_image.alt | default: collection.title | escape -%}
+      <a href='{{ collection.url }}' class='group flex flex-col no-underline'>
+        <div class='mb-3 aspect-square overflow-hidden rounded-media bg-surface'>
+          {%- if collection.featured_image -%}
+            {{
+              collection.featured_image
+              | image_url: width: 1000
+              | image_tag:
+                alt: card_alt,
+                loading: 'lazy',
+                sizes: '(min-width: 768px) 33vw, 50vw',
+                widths: '300, 500, 700, 1000',
+                class: 'size-full object-cover transition-transform duration-500 group-hover:scale-105'
+            }}
+          {%- else -%}
+            {{ 'collection-1' | placeholder_svg_tag: 'size-full object-cover opacity-40' }}
+          {%- endif -%}
         </div>
-
-        <div class='mt-10 [&_.pagination]:mx-auto [&_.pagination]:flex [&_.pagination]:max-w-max [&_.pagination]:gap-2.5'>
-          {% render 'pagination-navigation', paginate: paginate %}
-        </div>
-      {% endpaginate %}
-    </div>
+        <h2 class='text-sm font-medium underline-offset-4 group-hover:underline md:text-base'>
+          {{ collection.title }}
+        </h2>
+        <p class='text-xs text-fg-subtle'>
+          {{ 'products.facets.product_count_simple' | t: count: collection.all_products_count }}
+        </p>
+      </a>
+    {%- endfor -%}
   </div>
 </div>
+
+{% schema %}
+{
+  "name": "Collections list",
+  "class": "section-main-list-collections",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "columns",
+      "default": "3",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ],
+      "label": "Desktop columns"
+    }
+  ]
+}
+{% endschema %}

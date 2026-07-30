@@ -1,0 +1,116 @@
+{% doc %}
+  Renders the fields of a customer address form. Rendered inside a
+  `{% form 'customer_address' %}`, which owns the submit.
+
+  @param {object} form - The address form object
+
+  @example
+  {% render 'address-fields', form: form %}
+{% enddoc %}
+
+{%- liquid
+  assign field_prefix = 'address-' | append: form.id
+  assign first_name_label = 'customer.addresses.first_name' | t
+  assign last_name_label = 'customer.addresses.last_name' | t
+  assign company_label = 'customer.addresses.company' | t
+  assign address1_label = 'customer.addresses.address1' | t
+  assign address2_label = 'customer.addresses.address2' | t
+  assign city_label = 'customer.addresses.city' | t
+  assign zip_label = 'customer.addresses.zip' | t
+  assign phone_label = 'customer.addresses.phone' | t
+  assign country_label = 'customer.addresses.country' | t
+  assign province_label = 'customer.addresses.province' | t
+-%}
+
+<div class='grid grid-cols-1 gap-4 md:grid-cols-2'>
+  {%- assign first_name_id = field_prefix | append: '-first-name' -%}
+  {%- assign last_name_id = field_prefix | append: '-last-name' -%}
+  {% render 'form-input',
+    id: first_name_id,
+    name: 'address[first_name]',
+    label: first_name_label,
+    value: form.first_name
+  %}
+  {% render 'form-input',
+    id: last_name_id,
+    name: 'address[last_name]',
+    label: last_name_label,
+    value: form.last_name
+  %}
+</div>
+
+{%- assign company_id = field_prefix | append: '-company' -%}
+{% render 'form-input',
+  id: company_id,
+  name: 'address[company]',
+  label: company_label,
+  value: form.company
+%}
+
+{%- assign address1_id = field_prefix | append: '-address1' -%}
+{%- assign address2_id = field_prefix | append: '-address2' -%}
+{% render 'form-input',
+  id: address1_id,
+  name: 'address[address1]',
+  label: address1_label,
+  value: form.address1
+%}
+{% render 'form-input',
+  id: address2_id,
+  name: 'address[address2]',
+  label: address2_label,
+  value: form.address2
+%}
+
+<div class='grid grid-cols-1 gap-4 md:grid-cols-2'>
+  {%- assign city_id = field_prefix | append: '-city' -%}
+  {%- assign zip_id = field_prefix | append: '-zip' -%}
+  {% render 'form-input', id: city_id, name: 'address[city]', label: city_label, value: form.city %}
+  {% render 'form-input', id: zip_id, name: 'address[zip]', label: zip_label, value: form.zip %}
+</div>
+
+{%- comment -%}
+  Country and province stay native selects: Shopify's own script wires the
+  province list to the chosen country through these ids.
+{%- endcomment -%}
+<div class='grid grid-cols-1 gap-4 md:grid-cols-2'>
+  <div class='flex w-full flex-col gap-2'>
+    <label for='{{ field_prefix }}-country' class='text-xs text-fg-subtle md:text-base'>
+      {{ country_label }}
+    </label>
+    <select
+      id='{{ field_prefix }}-country'
+      name='address[country]'
+      data-default='{{ form.country }}'
+      class='w-full rounded-input border border-border bg-bg px-3 py-1.5 text-sm md:text-base'
+    >
+      {{ country_option_tags }}
+    </select>
+  </div>
+
+  <div class='flex w-full flex-col gap-2' id='{{ field_prefix }}-province-container'>
+    <label for='{{ field_prefix }}-province' class='text-xs text-fg-subtle md:text-base'>
+      {{ province_label }}
+    </label>
+    <select
+      id='{{ field_prefix }}-province'
+      name='address[province]'
+      data-default='{{ form.province }}'
+      class='w-full rounded-input border border-border bg-bg px-3 py-1.5 text-sm md:text-base'
+    ></select>
+  </div>
+</div>
+
+{%- assign phone_id = field_prefix | append: '-phone' -%}
+{% render 'form-input',
+  id: phone_id,
+  name: 'address[phone]',
+  type: 'tel',
+  label: phone_label,
+  value: form.phone
+%}
+
+<label class='flex cursor-pointer items-center gap-2 text-sm'>
+  {{ form.set_as_default_checkbox }}
+  {{ 'customer.addresses.set_default' | t }}
+</label>

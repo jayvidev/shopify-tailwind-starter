@@ -2,7 +2,13 @@
   "sections": {
     "main": {
       "type": "main-collection",
-      "settings": {}
+      "settings": {
+        "show_banner": true,
+        "show_description": true,
+        "show_image": false,
+        "products_per_page": 16,
+        "columns": "3"
+      }
     }
   },
   "order": ["main"]

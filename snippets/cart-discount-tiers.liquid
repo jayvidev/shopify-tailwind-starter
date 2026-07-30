@@ -1,0 +1,106 @@
+{% doc %}
+  Renders the spend-more-save-more progress bar.
+
+  Thresholds come from Theme settings → Cart → Discount tiers and are read by
+  `src/alpine/stores/discount-tiers.ts`; this snippet only draws them. It hides
+  itself when no tiers are active, so it's safe to render unconditionally.
+
+  Tier amounts are plain numbers in the settings, not cents, so they're formatted
+  with `$amount` rather than `$money`.
+
+  @example
+  {% render 'cart-discount-tiers' %}
+{% enddoc %}
+
+<div
+  class='border-b border-border px-5 py-4'
+  x-data='
+    {
+      strings: {
+        maxReached: {{ 'sections.cart.tiers.max_reached' | t: amount: '%%amount%%' | json }},
+        current: {{ 'sections.cart.tiers.current' | t: amount: '%%amount%%' | json }},
+        next: {{ 'sections.cart.tiers.next' | t: remaining: '%%remaining%%', amount: '%%amount%%' | json }},
+        first: {{ 'sections.cart.tiers.first' | t: remaining: '%%remaining%%', amount: '%%amount%%' | json }}
+      },
+      fill(template, values) {
+        return Object.entries(values).reduce(
+          (text, [key, value]) => text.replaceAll(`%%${key}%%`, value),
+          template
+        )
+      }
+    }
+  '
+  x-show='$store.tiers.activeTiers.length > 0'
+  x-cloak
+>
+  <p class='mb-3 text-center text-xs font-medium'>
+    {%- comment -%} Every tier reached — nothing left to unlock. {%- endcomment -%}
+    <template x-if='$store.tiers.currentTier && !$store.tiers.nextTier'>
+      <span
+        class='text-success'
+        x-text='fill(strings.maxReached, { amount: $amount($store.tiers.currentTier.amount) })'
+      ></span>
+    </template>
+
+    {%- comment -%} Some discount earned, more still available. {%- endcomment -%}
+    <template x-if='$store.tiers.currentTier && $store.tiers.nextTier'>
+      <span>
+        <span
+          class='text-success'
+          x-text='fill(strings.current, { amount: $amount($store.tiers.currentTier.amount) })'
+        ></span>
+        <span
+          x-text='
+            " " +
+            fill(strings.next, {
+              remaining: $amount($store.tiers.tierRemaining),
+              amount: $amount($store.tiers.nextTier.amount)
+            })
+          '
+        ></span>
+      </span>
+    </template>
+
+    {%- comment -%} Nothing earned yet. {%- endcomment -%}
+    <template x-if='!$store.tiers.currentTier'>
+      <span
+        x-text='
+          fill(strings.first, {
+            remaining: $amount($store.tiers.tierRemaining),
+            amount: $amount($store.tiers.activeTiers[0]?.amount ?? 0)
+          })
+        '
+      ></span>
+    </template>
+  </p>
+
+  {%- comment -%}
+    One bar segment per tier, each filling on its own, so the gap between
+    thresholds stays readable however far apart the amounts are.
+  {%- endcomment -%}
+  <div class='mb-2 flex h-1.5 w-full gap-1.5'>
+    <template x-for='(segment, index) in $store.tiers.tierSegments' :key='index'>
+      <div class='relative h-full flex-1 overflow-hidden bg-surface'>
+        <div
+          class='h-full transition-all duration-500'
+          :class='segment.reached ? "bg-success" : "bg-fg"'
+          :style='{ width: segment.progress + "%" }'
+          style='width: 0%'
+        ></div>
+      </div>
+    </template>
+  </div>
+
+  <div class='flex gap-1.5'>
+    <template x-for='(segment, index) in $store.tiers.tierSegments' :key='index'>
+      <div class='flex-1 text-center'>
+        <span
+          class='block text-[10px] font-semibold transition-colors duration-300'
+          :class='segment.reached ? "text-success" : "text-fg"'
+          x-text='"-" + $amount(segment.amount)'
+        ></span>
+        <span class='block text-[10px] text-fg-subtle' x-text='$amount(segment.threshold)'></span>
+      </div>
+    </template>
+  </div>
+</div>

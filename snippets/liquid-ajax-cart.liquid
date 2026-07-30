@@ -1,3 +1,42 @@
+{% comment %}
+  Boots liquid-ajax-cart with the current cart, so the first render needs no
+  request. The `update` guard below stops the library from re-posting the cart
+  when the page is restored from the back/forward cache — that request races
+  with the restored DOM and can resurrect a removed line item.
+{% endcomment %}
+
 <script type='application/json' data-ajax-cart-initial-state>
   {{ cart | json }}
+</script>
+
+<script>
+  document.addEventListener(
+    'liquid-ajax-cart:init',
+    function () {
+      window.liquidAjaxCart.conf('updateOnWindowFocus', false)
+
+      var originalUpdate = window.liquidAjaxCart.update
+      window.liquidAjaxCart.update = function (body, options) {
+        if (window.themeBlockCartUpdate) return
+        return originalUpdate.call(this, body, options)
+      }
+    },
+    { once: true }
+  )
+
+  window.addEventListener(
+    'pageshow',
+    function (event) {
+      var isRestored =
+        event.persisted || performance.getEntriesByType('navigation')[0]?.type === 'back_forward'
+
+      if (!isRestored) return
+
+      window.themeBlockCartUpdate = true
+      setTimeout(function () {
+        window.themeBlockCartUpdate = false
+      }, 0)
+    },
+    true
+  )
 </script>

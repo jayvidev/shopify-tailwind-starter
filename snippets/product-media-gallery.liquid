@@ -1,0 +1,174 @@
+{% doc %}
+  Renders the product gallery: a main stage with thumbnails underneath.
+
+  Video and 3D players are not rendered upfront — their markup is stashed in a
+  JSON script tag and mounted on demand by `product-media-gallery.ts`, so a
+  product with ten videos still loads one image.
+
+  Must be rendered inside `[data-prodify-media-container]` so the component can
+  find the player slots.
+
+  @param {object} product - The product
+  @param {object} current_variant - The selected variant, used to pick the first slide
+
+  @example
+  {% render 'product-media-gallery', product: product, current_variant: current_variant %}
+{% enddoc %}
+
+{%- liquid
+  assign featured_media = current_variant.featured_media | default: product.featured_media
+  assign active_index = 0
+  for media in product.media
+    if media.id == featured_media.id
+      assign active_index = forloop.index0
+      break
+    endif
+  endfor
+-%}
+
+{%- comment -%} The media list Alpine works from: ids, sources and types. {%- endcomment -%}
+<script type='application/json' data-product-media-list>
+  [
+    {%- for media in product.media -%}
+      {
+        "id": {{ media.id }},
+        "src": {{ media.preview_image | image_url: width: 1600 | json }},
+        "srcset": {{ media.preview_image | image_url: width: 800 | json }},
+        "type": {{ media.media_type | json }}
+      }{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  ]
+</script>
+
+{%- comment -%}
+  Player markup, keyed by media id. `product-media.ts` parses this once and mounts
+  a player only when that slide is opened.
+{%- endcomment -%}
+<script type='application/json' data-product-media-html>
+  {
+    {%- assign player_media = product.media | where: 'media_type', 'video' -%}
+    {%- assign external_media = product.media | where: 'media_type', 'external_video' -%}
+    {%- assign model_media = product.media | where: 'media_type', 'model' -%}
+    {%- assign players = player_media | concat: external_media | concat: model_media -%}
+    {%- for media in players -%}
+      {%- capture player_html -%}
+        {%- case media.media_type -%}
+          {%- when 'video' -%}
+            {{ media | video_tag: image_size: '1600x', controls: true, preload: 'none' }}
+          {%- when 'external_video' -%}
+            {{ media | external_video_tag: loading: 'lazy' }}
+          {%- when 'model' -%}
+            {{ media | model_viewer_tag: image_size: '1600x', reveal: 'interaction' }}
+        {%- endcase -%}
+      {%- endcapture -%}
+      "{{ media.id }}": {{ player_html | json }}{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  }
+</script>
+
+<div
+  x-data='
+    productMediaGallery({
+      active: {{ active_index }},
+      mediaList: JSON.parse(document.querySelector("[data-product-media-list]").textContent)
+    })
+  '
+  @variant:changed.window='onVariantChanged($event.detail)'
+>
+  <div class='relative overflow-hidden rounded-media bg-surface'>
+    {%- for media in product.media -%}
+      {%- liquid
+        assign media_alt = media.alt | default: product.title | escape
+        if forloop.index0 == active_index
+          assign media_loading = 'eager'
+        else
+          assign media_loading = 'lazy'
+        endif
+      -%}
+      <div x-show='active === {{ forloop.index0 }}' class='relative'>
+        {{
+          media.preview_image
+          | image_url: width: 1600
+          | image_tag:
+            alt: media_alt,
+            loading: media_loading,
+            sizes: '(min-width: 768px) 50vw, 100vw',
+            widths: '400, 600, 800, 1200, 1600',
+            class: 'aspect-square w-full object-cover'
+        }}
+
+        {%- unless media.media_type == 'image' -%}
+          {%- comment -%}
+            Badge marking a slide that will mount a player when opened.
+          {%- endcomment -%}
+          <span class='pointer-events-none absolute inset-s-3 top-3 flex size-9 items-center justify-center rounded-full bg-bg/90 text-fg'>
+            {%- if media.media_type == 'model' -%}
+              {% render 'icon', icon: 'model', class: 'size-4' %}
+            {%- else -%}
+              {% render 'icon', icon: 'play', class: 'size-4' %}
+            {%- endif -%}
+          </span>
+        {%- endunless -%}
+      </div>
+    {%- endfor -%}
+
+    {%- comment -%} Slots the component mounts players into. {%- endcomment -%}
+    <div class='absolute inset-0 hidden bg-fg' data-video-viewer-container></div>
+    <div class='absolute inset-0 hidden bg-surface' data-model-viewer-container></div>
+  </div>
+
+  {%- if product.media.size > 1 -%}
+    <div class='relative mt-3'>
+      <div
+        class='flex gap-2 overflow-x-auto scroll-smooth'
+        x-ref='slider'
+        @scroll.passive='checkScroll()'
+      >
+        {%- for media in product.media -%}
+          {%- assign thumb_alt = media.alt | default: product.title | escape -%}
+          <button
+            type='button'
+            class='size-16 shrink-0 cursor-pointer overflow-hidden rounded-media border transition-colors md:size-20'
+            :class="active === {{ forloop.index0 }} ? 'border-fg' : 'border-border'"
+            @click='selectMedia({{ forloop.index0 }})'
+            :aria-current="active === {{ forloop.index0 }}"
+            aria-label='{{ thumb_alt }}'
+          >
+            {{
+              media.preview_image
+              | image_url: width: 200
+              | image_tag:
+                alt: thumb_alt,
+                loading: 'lazy',
+                widths: '100, 200',
+                sizes: '80px',
+                class: 'size-full object-cover'
+            }}
+          </button>
+        {%- endfor -%}
+      </div>
+
+      {%- comment -%} Arrows appear only when the strip actually overflows. {%- endcomment -%}
+      <button
+        type='button'
+        class='absolute inset-s-0 top-1/2 flex size-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-bg shadow-popup'
+        x-show='canPrev'
+        @click='scrollPrev()'
+        aria-label='{{ 'general.slider.previous_slide' | t }}'
+        x-cloak
+      >
+        {% render 'icon', icon: 'chevron-left', class: 'size-3' %}
+      </button>
+      <button
+        type='button'
+        class='absolute inset-e-0 top-1/2 flex size-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-bg shadow-popup'
+        x-show='canNext'
+        @click='scrollNext()'
+        aria-label='{{ 'general.slider.next_slide' | t }}'
+        x-cloak
+      >
+        {% render 'icon', icon: 'chevron-right', class: 'size-3' %}
+      </button>
+    </div>
+  {%- endif -%}
+</div>

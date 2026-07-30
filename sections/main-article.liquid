@@ -1,8 +1,144 @@
+<div class='page section-spacing'>
+  <article class='mx-auto max-w-3xl'>
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when 'featured_image' -%}
+          {%- if article.image -%}
+            {%- assign article_alt = article.image.alt | default: article.title | escape -%}
+            <div class='mb-6 overflow-hidden rounded-media bg-surface' {{ block.shopify_attributes }}>
+              {{
+                article.image
+                | image_url: width: 2000
+                | image_tag:
+                  alt: article_alt,
+                  loading: 'eager',
+                  sizes: '(min-width: 1024px) 48rem, 100vw',
+                  widths: '600, 900, 1200, 1600, 2000',
+                  class: 'w-full object-cover'
+              }}
+            </div>
+          {%- endif -%}
+
+        {%- when 'title' -%}
+          <header class='mb-6' {{ block.shopify_attributes }}>
+            <h1 class='mb-2 text-2xl font-semibold md:text-3xl'>{{ article.title }}</h1>
+            <p class='text-sm text-fg-subtle'>
+              {{ article.published_at | date: format: 'abbreviated_date' }}
+              {%- if block.settings.show_author and article.author != blank -%}
+                · {{ article.author }}
+              {%- endif -%}
+            </p>
+          </header>
+
+        {%- when 'content' -%}
+          <div class='prose' {{ block.shopify_attributes }}>{{ article.content }}</div>
+
+        {%- when 'share' -%}
+          <div class='mt-8' {{ block.shopify_attributes }}>
+            <a
+              href='{{ shop.url }}{{ article.url }}'
+              class='inline-flex items-center gap-2 text-sm no-underline'
+              target='_blank'
+              rel='noopener'
+            >
+              {% render 'icon', icon: 'share', class: 'size-4' %}
+              {{ block.settings.share_label | default: 'Share' }}
+            </a>
+          </div>
+      {%- endcase -%}
+    {%- endfor -%}
+
+    {%- if blog.comments_enabled? -%}
+      <section class='mt-12 border-t border-border pt-8'>
+        <h2 class='mb-4 text-lg font-semibold'>
+          {{ 'blogs.article.comments' | t: count: article.comments_count }}
+        </h2>
+
+        {%- if article.comments_count > 0 -%}
+          <ul class='mb-8 flex flex-col gap-6'>
+            {%- for comment in article.comments -%}
+              <li class='flex flex-col gap-1'>
+                <div class='prose'>{{ comment.content }}</div>
+                <p class='text-xs text-fg-subtle'>
+                  {{ comment.author }} · {{ comment.created_at | date: format: 'abbreviated_date' }}
+                </p>
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+
+        {%- form 'new_comment', article, class: 'flex flex-col gap-3' -%}
+          {%- if form.errors -%}
+            <p class='text-sm text-error'>{{ form.errors | default_errors }}</p>
+          {%- elsif form.posted_successfully? -%}
+            <p class='text-sm text-success'>{{ 'blogs.article.success' | t }}</p>
+          {%- endif -%}
+
+          <div class='grid grid-cols-1 gap-3 md:grid-cols-2'>
+            {%- assign author_label = 'blogs.article.name' | t -%}
+            {%- assign email_label = 'blogs.article.email' | t -%}
+            {% render 'form-input',
+              id: 'comment-author',
+              name: 'comment[author]',
+              label: author_label,
+              value: form.author,
+              required: true
+            %}
+            {% render 'form-input',
+              id: 'comment-email',
+              name: 'comment[email]',
+              type: 'email',
+              label: email_label,
+              value: form.email,
+              required: true
+            %}
+          </div>
+
+          {%- assign message_label = 'blogs.article.message' | t -%}
+          {% render 'form-textarea',
+            id: 'comment-body',
+            name: 'comment[body]',
+            label: message_label,
+            value: form.body,
+            rows: 4,
+            required: true
+          %}
+
+          {%- assign post_label = 'blogs.article.post' | t -%}
+          {% render 'button', label: post_label, type: 'submit', class: 'w-max' %}
+        {%- endform -%}
+      </section>
+    {%- endif -%}
+  </article>
+</div>
+
 {% schema %}
 {
-  "name": "Main Article Section",
-  "class": "section-main-carticle",
+  "name": "Blog post",
+  "class": "section-main-article",
   "tag": "section",
-  "settings": []
+  "blocks": [
+    { "type": "featured_image", "name": "Featured image", "limit": 1 },
+    {
+      "type": "title",
+      "name": "Title",
+      "limit": 1,
+      "settings": [{ "type": "checkbox", "id": "show_author", "default": false, "label": "Show author" }]
+    },
+    { "type": "content", "name": "Content", "limit": 1 },
+    {
+      "type": "share",
+      "name": "Share",
+      "limit": 1,
+      "settings": [{ "type": "text", "id": "share_label", "default": "Share", "label": "Label" }]
+    }
+  ],
+  "default": {
+    "blocks": [
+      { "type": "featured_image" },
+      { "type": "title" },
+      { "type": "content" }
+    ]
+  }
 }
 {% endschema %}

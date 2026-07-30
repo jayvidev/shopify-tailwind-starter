@@ -1,0 +1,46 @@
+{% doc %}
+  Renders a blog post card.
+
+  @param {object} article - The article
+  @param {boolean} [show_excerpt] - Show the excerpt under the title
+
+  @example
+  {% render 'article-card', article: article, show_excerpt: true %}
+{% enddoc %}
+
+{%- assign article_alt = article.image.alt | default: article.title | escape -%}
+
+<article class='group flex flex-col'>
+  <a href='{{ article.url }}' class='mb-3 block aspect-[3/2] overflow-hidden rounded-media bg-surface'>
+    {%- if article.image -%}
+      {{
+        article.image
+        | image_url: width: 1200
+        | image_tag:
+          alt: article_alt,
+          loading: 'lazy',
+          sizes: '(min-width: 768px) 33vw, 100vw',
+          widths: '300, 500, 700, 1000, 1200',
+          class: 'size-full object-cover transition-transform duration-500 group-hover:scale-105'
+      }}
+    {%- else -%}
+      {{ 'image' | placeholder_svg_tag: 'size-full object-cover opacity-40' }}
+    {%- endif -%}
+  </a>
+
+  <p class='mb-1 text-xs text-fg-subtle'>
+    {{ article.published_at | date: format: 'abbreviated_date' }}
+  </p>
+
+  <h2 class='mb-2 text-base font-medium'>
+    <a href='{{ article.url }}' class='text-fg no-underline underline-offset-4 hover:underline'>
+      {{ article.title }}
+    </a>
+  </h2>
+
+  {%- if show_excerpt and article.excerpt_or_content != blank -%}
+    <p class='text-sm text-fg-muted'>
+      {{ article.excerpt_or_content | strip_html | truncate: 140 }}
+    </p>
+  {%- endif -%}
+</article>

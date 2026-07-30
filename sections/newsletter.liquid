@@ -1,0 +1,57 @@
+<div class='section-spacing bg-surface'>
+  <div class='page mx-auto flex max-w-xl flex-col items-center gap-4 text-center'>
+    {%- if section.settings.heading != blank -%}
+      <h2 class='text-2xl font-semibold md:text-3xl'>{{ section.settings.heading }}</h2>
+    {%- endif -%}
+    {%- if section.settings.text != blank -%}
+      <div class='prose text-center'>{{ section.settings.text }}</div>
+    {%- endif -%}
+
+    {%- form 'customer', class: 'flex w-full flex-col gap-2' -%}
+      <input type='hidden' name='contact[tags]' value='newsletter'>
+
+      <div class='flex items-start gap-2'>
+        <div class='flex-1'>
+          <label class='sr-only' for='newsletter-email-{{ section.id }}'>
+            {{ 'newsletter.label' | t }}
+          </label>
+          <input
+            id='newsletter-email-{{ section.id }}'
+            type='email'
+            name='contact[email]'
+            value='{{ form.email }}'
+            autocomplete='email'
+            placeholder='{{ 'newsletter.label' | t }}'
+            required
+            class='h-11 w-full rounded-input border border-border bg-bg px-4 text-sm placeholder:text-fg-subtle'
+          >
+        </div>
+        {%- assign subscribe_label = 'newsletter.button_label' | t -%}
+        {% render 'button', label: subscribe_label, type: 'submit', class: 'h-11! py-0!' %}
+      </div>
+
+      {%- if form.errors -%}
+        <p class='text-xs text-error'>{{ form.errors.messages.email }}</p>
+      {%- elsif form.posted_successfully? -%}
+        <p class='text-xs text-success'>{{ 'newsletter.success' | t }}</p>
+      {%- endif -%}
+    {%- endform -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Newsletter",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "default": "Subscribe to our emails", "label": "Heading" },
+    {
+      "type": "richtext",
+      "id": "text",
+      "default": "<p>Be the first to know about new collections and offers.</p>",
+      "label": "Text"
+    }
+  ],
+  "presets": [{ "name": "Newsletter" }]
+}
+{% endschema %}

@@ -1,337 +1,391 @@
-{% schema %}
-{
-  "name": "Product Section",
-  "class": "section-main-product",
-  "tag": "section",
-  "settings": [
-    {
-      "type": "radio",
-      "id": "picker_type",
-      "label": "Variant Picker Type",
-      "options": [
-        {
-          "value": "radio",
-          "label": "Radio Buttons"
-        },
-        {
-          "value": "select",
-          "label": "Select Dropdowns"
-        }
-      ],
-      "default": "radio"
-    }
-  ],
-  "blocks": [
-    {
-      "type": "collapsable_row",
-      "name": "Collapsable Row",
-      "settings": [
-        {
-          "type": "text",
-          "id": "heading",
-          "label": "Heading"
-        },
-        {
-          "type": "richtext",
-          "id": "content",
-          "label": "Content"
-        }
-      ]
-    }
-  ]
-}
-{% endschema %}
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign variant_available = current_variant.available | default: false
 
-<div class='px-6 md:px-8 py-12'>
+  assign tracks_inventory = false
+  if current_variant.inventory_management != blank and current_variant.inventory_policy == 'deny'
+    assign tracks_inventory = true
+  endif
+
+  assign inventory_qty = current_variant.inventory_quantity | default: 0
+  assign low_stock = section.settings.low_stock_threshold
+
+  assign add_to_cart_label = 'products.product.add_to_cart' | t
+  assign sold_out_label = 'products.product.sold_out' | t
+-%}
+
+{%- comment -%}
+  Product page.
+
+  Three pieces of behaviour, all from `src/`:
+  - `data-prodify='select'` + the JSON scripts below drive variant switching
+    (`src/prodify/`), which fetches the variant's section markup and emits
+    `variant:changed`.
+  - `productInfo` owns quantity bounds and the add-to-cart button state, and
+    listens for those events.
+  - `productMediaGallery` swaps the gallery to the variant's image.
+{%- endcomment -%}
+
+<div class='page section-spacing'>
   <div
-    class='shopify-section-main-product-inner container mx-auto'
+    data-prodify='select'
     data-handle='{{ product.handle }}'
     data-id='{{ product.id }}'
     data-url='{{ product.url }}'
     data-section='{{ section.id }}'
-    data-prodify='{{ section.settings.picker_type }}'
   >
-    <script type='application/json' data-prodify-variants-json>
-      {{ product.variants | json }}
+    <script type='application/json' data-prodify-selected-variant>
+      {{ product.selected_variant | json }}
+    </script>
+    <script type='application/json' data-prodify-current-variant>
+      {{ current_variant | json }}
+    </script>
+    <script type='application/json' data-prodify-variant-stock>
+      {
+        "qty": {{ inventory_qty }},
+        "managedDeny": {{ tracks_inventory | json }}
+      }
     </script>
 
-    <a
-      class='absolute z-50 px-4 py-2 text-white bg-cloud-burst rounded-lg shadow-lg not-focus:sr-only'
-      href='#product-info-{{ section.id }}'
-    >
-      Skip to product info
-    </a>
-    <div class='md:flex md:gap-12 pdp-main relative'>
-      <div class='media flex-1 mb-8 md:mb-0' data-prodify-media-container>
-        <div class='image-wrapper relative overflow-hidden pt-[137%]'>
-          {% if product.selected_variant and product.selected_variant.image %}
-            {% assign media = product.selected_variant.image %}
-          {% else %}
-            {% assign media = product.featured_image %}
-          {% endif %}
-          <img
-            src='{{ media | image_url }}'
-            alt='{{ media.alt }}'
-            srcset='{{ media | image_url: width: 800 }} 800w, {{ media | image_url: width: 1000 }} 1000w, {{ media | image_url: width: 1426 }} 1426w'
-            sizes='(min-width: 768px) 55vw, 100vw'
-            height='{{ media.height }}'
-            width='{{ media.width }}'
-            class='absolute h-full w-full object-cover inset-0'
-            loading='eager'
-          >
-          <h1 class='text-4xl z-50 relative'>
-            {{ product.selected_or_first_available_variant.options }}
-          </h1>
-        </div>
-        <span class='absolute top-0 left-0 z-100 text-[10px]'>
-          {{ product.selected_or_first_available_variant.id }}
-        </span>
+    <div class='grid grid-cols-1 items-start gap-8 md:grid-cols-2 lg:gap-12'>
+      <div data-prodify-media-container class='md:sticky md:top-24'>
+        {% render 'product-media-gallery', product: product, current_variant: current_variant %}
       </div>
-      <div class='info flex-1' id='product-info-{{ section.id }}'>
-        <p class='caption tracking-wide text-[10px] leading-3 text-gray-500'>
-          {{ product.type | upcase }}
-        </p>
-        <h1 class='text-4xl leading-normal font-medium'>{{ product.title }}</h1>
-        <div class='flex items-center py-2' data-prodify-price-container>
-          <span class='sr-only'>Regular Price</span>
-          {% if product.selected_or_first_available_variant.compare_at_price %}
-            <span class='line-through'>
-              {{ product.selected_or_first_available_variant.compare_at_price | money }}
-            </span>
-          {% endif %}
-          <span>
-            {{ product.selected_or_first_available_variant.price | money }}
-          </span>
-        </div>
-        {% render 'product-variant-picker',
-          product: product,
-          product_form_id: 'product-form-id',
-          picker_type: section.settings.picker_type
-        %}
-        <div class='quantity-row'>
-          <label for='quantity-control-input'>Quantity</label>
-          <div class='quantity-control-container'>
-            <button type='button' data-prodify-quantity-decrement>
-              {% render 'icon', icon: 'minus' %}
-            </button>
-            <input
-              tabindex='-1'
-              type='number'
-              id='quantity-control-input'
-              value='1'
-              disabled=''
-              data-prodify-quantity-presentation
-            >
-            <button type='button' data-prodify-quantity-increment>
-              {% render 'icon', icon: 'plus' %}
-            </button>
-          </div>
-        </div>
 
-        <ajax-cart-product-form>
-          <form
-            action='{{ routes.cart_add_url }}'
-            id='product_form_id'
-            class='product-form'
-            novalidate='novalidate'
-            data-prodify-product-form
-          >
-            <input
-              type='hidden'
-              name='id'
-              value='{{ product.selected_or_first_available_variant.id }}'
-            >
-            <input
-              type='hidden'
-              name='quantity'
-              value='1'
-              data-prodify-quantity-hidden-input
-            >
-            <div class='mb-2.5'>
-              <button
-                type='submit'
-                name='add'
-                class='px-6 hover:bg-cloud-burst-400 bg-indigo-900 text-white w-full h-12 cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-black'
-                {% if product.selected_or_first_available_variant.available == false %}
-                  disabled
-                {% endif %}
+      <div
+        id='product-info-{{ section.id }}'
+        x-data='
+          productInfo({
+            variantId: {{ current_variant.id }},
+            available: {{ variant_available | json }},
+            inventoryQty: {{ inventory_qty }},
+            managedDeny: {{ tracks_inventory | json }},
+            minQty: {{ current_variant.quantity_rule.min | default: 1 }},
+            stepQty: {{ current_variant.quantity_rule.increment | default: 1 }},
+            ruleMax: {{ current_variant.quantity_rule.max | default: 0 }},
+            strings: {
+              soldOut: {{ sold_out_label | json }},
+              addToCart: {{ add_to_cart_label | json }}
+            }
+          })
+        '
+        @variant:changed.window='onVariantChanged($event.detail)'
+        @variant:unavailable.window='onVariantUnavailable()'
+        @variant:loading.window='loading = $event.detail.loading'
+        @liquid-ajax-cart:request-end.document='adding = false'
+      >
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'vendor' -%}
+              {%- if product.vendor != blank -%}
+                <p class='mb-1 text-sm text-fg-subtle' {{ block.shopify_attributes }}>
+                  {{ product.vendor }}
+                </p>
+              {%- endif -%}
+
+            {%- when 'title' -%}
+              <h1
+                id='product-anchor-{{ section.id }}'
+                class='mb-3 scroll-mt-28 text-2xl font-semibold md:text-3xl lg:text-4xl'
+                {{ block.shopify_attributes }}
               >
-                <span class='in-[[processing]]:hidden'>
-                  {%- if product.selected_or_first_available_variant.available -%}
-                    Add to cart
-                  {%- else -%}
-                    Sold out
+                {{ product.title }}
+              </h1>
+
+            {%- when 'price' -%}
+              <div class='mb-4' data-prodify-price-container {{ block.shopify_attributes }}>
+                {% render 'price',
+                  product: product,
+                  use_variant: true,
+                  price_class: 'text-xl md:text-2xl',
+                  compare_class: 'text-sm md:text-base'
+                %}
+
+                {%- if cart.taxes_included or shop.shipping_policy.body != blank -%}
+                  <p class='mt-1 text-xs text-fg-subtle'>
+                    {%- if shop.shipping_policy.body != blank -%}
+                      {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                    {%- endif -%}
+                  </p>
+                {%- endif -%}
+              </div>
+
+            {%- when 'inventory' -%}
+              <div class='mb-4' data-prodify-stock-info {{ block.shopify_attributes }}>
+                {%- if tracks_inventory and inventory_qty > 0 and inventory_qty <= low_stock -%}
+                  <p class='flex items-center gap-1.5 text-sm text-sale'>
+                    {% render 'icon', icon: 'warning', class: 'size-4 shrink-0' %}
+                    {{ 'products.product.inventory_low_stock_show_count' | t: quantity: inventory_qty }}
+                  </p>
+                {%- elsif variant_available -%}
+                  <p class='flex items-center gap-1.5 text-sm text-success'>
+                    {% render 'icon', icon: 'success', class: 'size-4 shrink-0' %}
+                    {{ 'products.product.inventory_in_stock' | t }}
+                  </p>
+                {%- else -%}
+                  <p class='text-sm text-fg-subtle'>
+                    {{ 'products.product.inventory_out_of_stock' | t }}
+                  </p>
+                {%- endif -%}
+              </div>
+
+            {%- when 'variant_picker' -%}
+              {%- unless product.has_only_default_variant -%}
+                <div
+                  class='mb-4 flex flex-col gap-3'
+                  {{ block.shopify_attributes }}
+                >
+                  {%- for option in product.options_with_values -%}
+                    {%- liquid
+                      assign option_id = 'Option-' | append: section.id | append: '-' | append: forloop.index0
+                      assign option_name = 'options[' | append: option.name | append: ']'
+                    -%}
+                    <div data-prodify-option-container>
+                      <label for='{{ option_id }}' class='mb-1 block text-sm text-fg-subtle'>
+                        {{ option.name }}
+                      </label>
+                      {% render 'form-select',
+                        id: option_id,
+                        name: option_name,
+                        selected_value: option.selected_value,
+                        options: option.values,
+                        current_option: option,
+                        position: forloop.index
+                      %}
+                    </div>
+                  {%- endfor -%}
+                </div>
+              {%- endunless -%}
+
+            {%- when 'quantity' -%}
+              <div class='mb-4' {{ block.shopify_attributes }}>
+                <label for='quantity-{{ section.id }}' class='mb-1 block text-sm text-fg-subtle'>
+                  {{ 'products.product.quantity.label' | t }}
+                </label>
+                <div
+                  class='inline-flex h-11 items-center rounded-input border border-border'
+                  :class="!available && 'opacity-60'"
+                >
+                  <button
+                    type='button'
+                    class='flex size-11 cursor-pointer items-center justify-center transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40'
+                    @click='decrement()'
+                    :disabled='!available || qty <= minQty'
+                    aria-label='{{ 'products.product.quantity.decrease' | t: product: product.title }}'
+                  >
+                    {% render 'icon', icon: 'minus', class: 'size-3' %}
+                  </button>
+                  <input
+                    id='quantity-{{ section.id }}'
+                    type='number'
+                    class='h-full w-12 appearance-none bg-transparent text-center text-sm font-medium [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
+                    x-model='qty'
+                    @change.stop
+                    @blur='validateQty()'
+                    @keydown.enter.prevent='$el.blur()'
+                    :disabled='!available'
+                    :min='minQty'
+                    :step='stepQty'
+                    aria-label='{{ 'products.product.quantity.input_label' | t: product: product.title }}'
+                  >
+                  <button
+                    type='button'
+                    class='flex size-11 cursor-pointer items-center justify-center transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40'
+                    @click='increment()'
+                    :disabled='!available || qty >= maxQty'
+                    aria-label='{{ 'products.product.quantity.increase' | t: product: product.title }}'
+                  >
+                    {% render 'icon', icon: 'plus', class: 'size-3' %}
+                  </button>
+                </div>
+
+                <p class='mt-1 text-xs text-fg-subtle' x-show='inCart > 0' x-cloak>
+                  <span x-text='inCart'></span>
+                  {{ 'products.product.quantity.in_cart_aria_label' | t: quantity: '' | strip }}
+                </p>
+              </div>
+
+            {%- when 'buy_buttons' -%}
+              <div class='flex flex-col gap-2.5' {{ block.shopify_attributes }}>
+                {%- comment -%}
+                  `<ajax-cart-product-form>` is liquid-ajax-cart's wrapper: it
+                  intercepts the submit and updates the cart sections in place.
+                {%- endcomment -%}
+                <ajax-cart-product-form>
+                  <form
+                    id='product-form-{{ section.id }}'
+                    action='{{ routes.cart_add_url }}'
+                    method='post'
+                    novalidate='novalidate'
+                    data-prodify-product-form
+                    @submit='adding = true'
+                  >
+                    <input type='hidden' name='id' :value='variantId'>
+                    <input type='hidden' name='quantity' :value='qty'>
+
+                    <button
+                      type='submit'
+                      name='add'
+                      class='flex w-full cursor-pointer items-center justify-center gap-2 rounded-button border border-fg bg-fg px-6 py-3.5 font-medium text-bg transition-colors hover:bg-transparent hover:text-fg disabled:cursor-not-allowed disabled:opacity-50'
+                      :disabled='btnDisabled'
+                    >
+                      <span x-show='adding' x-cloak>
+                        {% render 'icon', icon: 'spinner', class: 'size-4 animate-spin' %}
+                      </span>
+                      <span x-text='btnText'>
+                        {%- if variant_available -%}
+                          {{ add_to_cart_label }}
+                        {%- else -%}
+                          {{ sold_out_label }}
+                        {%- endif -%}
+                      </span>
+                    </button>
+
+                    <div data-ajax-cart-errors='form' class='mt-2 text-xs text-error'></div>
+                  </form>
+                </ajax-cart-product-form>
+
+                {%- if block.settings.show_dynamic_checkout -%}
+                  <div x-show='available' x-cloak>
+                    {%- assign buy_now_form_id = 'product-buy-now-' | append: section.id -%}
+                    {%- form 'product', product, id: buy_now_form_id, novalidate: 'novalidate' -%}
+                      <input type='hidden' name='id' :value='variantId'>
+                      <input type='hidden' name='quantity' :value='qty'>
+                      {{ form | payment_button }}
+                    {%- endform -%}
+                  </div>
+                {%- endif -%}
+              </div>
+
+            {%- when 'description' -%}
+              {%- if product.description != blank -%}
+                <div class='prose mt-6' {{ block.shopify_attributes }}>
+                  {{ product.description }}
+                </div>
+              {%- endif -%}
+
+            {%- when 'collapsible_row' -%}
+              <details class='mt-4 border-b border-border' {{ block.shopify_attributes }}>
+                <summary class='flex cursor-pointer items-center justify-between gap-2 py-3 text-sm font-medium'>
+                  {{ block.settings.heading | default: block.settings.title }}
+                  {% render 'icon', icon: 'chevron-down', class: 'size-3 shrink-0' %}
+                </summary>
+                <div class='prose pb-4'>
+                  {{ block.settings.content }}
+                  {%- if block.settings.page != blank -%}
+                    {{ pages[block.settings.page].content }}
                   {%- endif -%}
-                </span>
-                <span class='hidden in-[[processing]]:block in-[[processing]]:cursor-not-allowed'>
-                  Adding to cart...
-                </span>
-              </button>
-            </div>
-            <div data-ajax-cart-errors='form' class='text-red-500'>
-              <!-- Error messages appear here -->
-            </div>
+                </div>
+              </details>
 
-            {%- if product.selected_or_first_available_variant.available -%}
-              <button
-                type='button'
-                class='w-full h-12 px-6 text-white bg-indigo-900 flex items-center justify-center hover:after:border-offset-1'
-                onclick='onBuyNowClicked()'
-              >
-                Buy it now
-              </button>
-              <script>
-                const onBuyNowClicked = () => {
-                  window.location.href = `/cart/${window?.prodify?.currentVariant?.id}:1`
-                }
-              </script>
-            {%- endif -%}
+            {%- when 'share' -%}
+              <div class='mt-6' {{ block.shopify_attributes }}>
+                <a
+                  href='{{ shop.url }}{{ product.url }}'
+                  class='inline-flex items-center gap-2 text-sm text-fg no-underline'
+                  target='_blank'
+                  rel='noopener'
+                >
+                  {% render 'icon', icon: 'share', class: 'size-4' %}
+                  {{ block.settings.share_label | default: 'Share' }}
+                </a>
+              </div>
 
-            {{ form | payment_button }}
-          </form>
-        </ajax-cart-product-form>
-
-        <div class='description prose'>
-          {{ product.description }}
-        </div>
-        {% for block in section.blocks %}
-          <div class='collapsable-row border border-gray-500 my-4 p-4'>
-            <h2>{{ block.settings.heading }}</h2>
-            <div>{{ block.settings.content }}</div>
-          </div>
-        {% endfor %}
+            {%- when '@app' -%}
+              <div class='mt-4' {{ block.shopify_attributes }}>{% render block %}</div>
+          {%- endcase -%}
+        {%- endfor -%}
       </div>
     </div>
   </div>
 </div>
 
-<style>
-  .section-main-product .shopify-section-main-product-inner .info fieldset label {
-    display: inline-block;
-    padding: 10px 20px;
-    border-radius: 40px;
-    letter-spacing: 1px;
-    font-size: 14px;
-    cursor: pointer;
-  }
+{%- if section.settings.enable_sticky_add_to_cart -%}
+  {% render 'sticky-add-to-cart',
+    product: product,
+    current_variant: current_variant,
+    section_id: section.id,
+    add_to_cart_label: add_to_cart_label,
+    sold_out_label: sold_out_label
+  %}
+{%- endif -%}
 
-  body:not(.using-mouse)
-    .section-main-product
-    .shopify-section-main-product-inner
-    .info
-    fieldset
-    input:focus
-    + label {
-    outline: #08f auto 2px;
+{% schema %}
+{
+  "name": "Product",
+  "class": "section-main-product",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_sticky_add_to_cart",
+      "default": true,
+      "label": "Show sticky add to cart",
+      "info": "Appears once the add-to-cart button scrolls out of view."
+    },
+    {
+      "type": "range",
+      "id": "low_stock_threshold",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 5,
+      "label": "Low stock threshold",
+      "info": "Show a low-stock warning at or below this quantity."
+    }
+  ],
+  "blocks": [
+    { "type": "@app" },
+    { "type": "vendor", "name": "Vendor", "limit": 1 },
+    { "type": "title", "name": "Title", "limit": 1 },
+    { "type": "price", "name": "Price", "limit": 1 },
+    { "type": "inventory", "name": "Inventory status", "limit": 1 },
+    { "type": "variant_picker", "name": "Variant picker", "limit": 1 },
+    { "type": "quantity", "name": "Quantity selector", "limit": 1 },
+    {
+      "type": "buy_buttons",
+      "name": "Buy buttons",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_dynamic_checkout",
+          "default": true,
+          "label": "Show dynamic checkout buttons",
+          "info": "Shop Pay, PayPal and the rest, depending on the store's payment methods."
+        }
+      ]
+    },
+    { "type": "description", "name": "Description", "limit": 1 },
+    {
+      "type": "collapsible_row",
+      "name": "Collapsible row",
+      "settings": [
+        { "type": "text", "id": "heading", "default": "Collapsible row", "label": "Heading" },
+        { "type": "richtext", "id": "content", "label": "Content" },
+        { "type": "page", "id": "page", "label": "Content from page" }
+      ]
+    },
+    {
+      "type": "share",
+      "name": "Share",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "share_label", "default": "Share", "label": "Label" }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      { "type": "vendor" },
+      { "type": "title" },
+      { "type": "price" },
+      { "type": "inventory" },
+      { "type": "variant_picker" },
+      { "type": "quantity" },
+      { "type": "buy_buttons" },
+      { "type": "description" }
+    ]
   }
-
-  .section-main-product
-    .shopify-section-main-product-inner
-    .info
-    fieldset
-    label[data-unavailable='true'],
-  .section-main-product .shopify-section-main-product-inner .info fieldset input[disabled] + label {
-    background-color: rgb(241 245 249);
-    color: lightgray;
-  }
-
-  .section-main-product .shopify-section-main-product-inner .info .quantity-row label {
-    display: block;
-    font-size: 13px;
-    letter-spacing: 0.4px;
-    line-height: 19.5px;
-    color: rgba(26, 27, 24, 0.75);
-    margin-bottom: 4px;
-  }
-
-  .section-main-product
-    .shopify-section-main-product-inner
-    .info
-    .quantity-row
-    .quantity-control-container {
-    display: flex;
-    align-items: center;
-    border: 1px solid rgba(26, 27, 24, 0.55);
-    max-width: max-content;
-    color: rgba(26, 27, 24, 0.75);
-    font-family: Arial;
-    font-size: 14px;
-  }
-
-  .section-main-product
-    .shopify-section-main-product-inner
-    .info
-    .quantity-row
-    .quantity-control-container
-    button {
-    width: 45px;
-    height: 45px;
-    appearance: none;
-    -webkit-appearance: none;
-    background: transparent;
-    border: none;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-  }
-
-  .section-main-product
-    .shopify-section-main-product-inner
-    .info
-    .quantity-row
-    .quantity-control-container
-    button
-    svg {
-    width: 10px;
-  }
-
-  .section-main-product
-    .shopify-section-main-product-inner
-    .info
-    .quantity-row
-    .quantity-control-container
-    input {
-    appearance: none;
-    -webkit-appearance: none;
-    border: none;
-    pointer-events: none;
-    width: 48px;
-    text-align: center;
-    padding: 0;
-  }
-
-  .section-main-product
-    .shopify-section-main-product-inner
-    .info
-    .quantity-row
-    .quantity-control-container
-    input[type='number']::-webkit-inner-spin-button,
-  .section-main-product
-    .shopify-section-main-product-inner
-    .info
-    .quantity-row
-    .quantity-control-container
-    input[type='number']::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-
-  .section-main-product .shopify-section-main-product-inner .info form {
-    margin: 25px auto;
-  }
-
-  .section-main-product .shopify-section-main-product-inner .info .description {
-    font-size: 16px;
-    line-height: 28.8px;
-  }
-
-  .section-main-product .shopify-section-main-product-inner .info .description em {
-    font-style: italic;
-  }
-
-  .section-main-product .shopify-section-main-product-inner .info .description a {
-    color: rgba(68, 89, 88, 0.85);
-  }
-</style>
+}
+{% endschema %}

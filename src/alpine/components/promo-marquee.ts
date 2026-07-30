@@ -2,6 +2,8 @@ import { debounce } from '@/helpers'
 import { defineData } from '@/types/alpine'
 
 const MAX_COPIES = 20
+/** Pixels per second, when the section doesn't say. */
+const DEFAULT_SPEED = 60
 
 export default {
   name: 'promoMarquee',
@@ -34,7 +36,23 @@ export default {
             copies++
           }
         })
+
+        this.setDuration(track)
       })
+    },
+
+    /**
+     * The animation always travels half the track, so a fixed duration would
+     * scroll faster on pages with more copy. Deriving it from the distance keeps
+     * the speed identical everywhere.
+     */
+    setDuration(track: HTMLElement) {
+      const pixelsPerSecond = parseFloat(track.dataset.promoMarqueeSpeed || '') || DEFAULT_SPEED
+      const distance = track.scrollWidth / 2
+
+      if (!distance) return
+
+      track.style.animationDuration = `${distance / pixelsPerSecond}s`
     },
   })),
 }

@@ -1,0 +1,67 @@
+<div class='page section-spacing'>
+  <div class='mx-auto max-w-3xl'>
+    {%- if section.settings.heading != blank -%}
+      <h2 class='mb-6 text-center text-2xl font-semibold md:text-3xl'>
+        {{ section.settings.heading }}
+      </h2>
+    {%- endif -%}
+
+    {%- comment -%}
+      One open row at a time, tracked here rather than with <details> so the
+      collapse can animate.
+    {%- endcomment -%}
+    <div x-data='{ openRow: null }' class='flex flex-col'>
+      {%- for block in section.blocks -%}
+        <div class='border-b border-border' {{ block.shopify_attributes }}>
+          <button
+            type='button'
+            class='flex w-full cursor-pointer items-center justify-between gap-4 py-4 text-start'
+            @click='openRow = openRow === {{ forloop.index }} ? null : {{ forloop.index }}'
+            :aria-expanded="openRow === {{ forloop.index }} ? 'true' : 'false'"
+          >
+            <span class='text-base font-medium'>{{ block.settings.heading }}</span>
+            <span
+              class='shrink-0 transition-transform duration-300'
+              :class="openRow === {{ forloop.index }} && 'rotate-180'"
+            >
+              {% render 'icon', icon: 'chevron-down', class: 'size-3' %}
+            </span>
+          </button>
+
+          <div class='overflow-hidden' x-show='openRow === {{ forloop.index }}' x-collapse>
+            <div class='prose pb-4'>
+              {{ block.settings.content }}
+              {%- if block.settings.page != blank -%}
+                {{ pages[block.settings.page].content }}
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collapsible content",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "default": "Frequently asked questions", "label": "Heading" }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "name": "Row",
+      "settings": [
+        { "type": "text", "id": "heading", "default": "Question", "label": "Heading" },
+        { "type": "richtext", "id": "content", "label": "Content" },
+        { "type": "page", "id": "page", "label": "Content from page" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Collapsible content", "blocks": [{ "type": "row" }, { "type": "row" }, { "type": "row" }] }
+  ]
+}
+{% endschema %}

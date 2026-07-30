@@ -1,0 +1,169 @@
+{% doc %}
+  Renders the filter form — one collapsible group per filter, list values as
+  checkboxes and price ranges as a pair of inputs.
+
+  Rendered twice per page (desktop sidebar and mobile drawer) with different ids;
+  `src/alpine/components/collection.ts` replaces both after each request, which is
+  why every group carries `data-filter-group`.
+
+  @param {object} filters - `collection.filters` or `search.filters`
+  @param {string} form_id - Id for the <form>, must match FILTER_CONTAINERS in collection.ts
+  @param {string} id_prefix - Prefix for input ids, so the two copies don't collide
+
+  @example
+  {% render 'product-filters-form',
+    filters: collection.filters,
+    form_id: 'CollectionFiltersForm',
+    id_prefix: 'Filter'
+  %}
+{% enddoc %}
+
+<form id='{{ form_id }}' @change='updateFilters($event)'>
+  {%- for filter in filters -%}
+    {%- liquid
+      # Hide values that would return nothing, but keep active ones so they can
+      # be switched off.
+      assign visible_values = 0
+      for value in filter.values
+        if value.count > 0 or value.active
+          assign visible_values = visible_values | plus: 1
+        endif
+      endfor
+      if filter.type == 'price_range'
+        assign visible_values = 1
+      endif
+
+      assign has_price_value = false
+      if filter.min_value.value != blank or filter.max_value.value != blank
+        assign has_price_value = true
+      endif
+    -%}
+
+    {%- if visible_values > 0 -%}
+      <div
+        class='border-b border-border py-3 last:border-b-0'
+        data-filter-group
+        x-data='{ expanded: true }'
+      >
+        <button
+          type='button'
+          class='flex w-full cursor-pointer items-center justify-between gap-2 text-start'
+          @click='expanded = !expanded'
+          :aria-expanded="expanded ? 'true' : 'false'"
+        >
+          <span class='text-sm font-semibold'>
+            {{ filter.label }}
+            {%- if filter.active_values.size > 0 -%}
+              <span class='ms-1 font-normal text-fg-subtle'>
+                ({{ filter.active_values.size }})
+              </span>
+            {%- endif -%}
+          </span>
+          <span class='transition-transform duration-300' :class="expanded && 'rotate-180'">
+            {% render 'icon', icon: 'chevron-down', class: 'size-3' %}
+          </span>
+        </button>
+
+        <div class='overflow-hidden' x-show='expanded' x-collapse>
+          {%- case filter.type -%}
+            {%- when 'list', 'boolean' -%}
+              <div class='mt-3 flex max-h-56 flex-col gap-2.5 overflow-y-auto'>
+                {%- for value in filter.values -%}
+                  {%- if value.count > 0 or value.active -%}
+                    {% render 'filter-checkbox',
+                      name: value.param_name,
+                      value: value.value,
+                      checked: value.active,
+                      label: value.label,
+                      color: value.swatch.color,
+                      swatch_image: value.swatch.image,
+                      count: value.count
+                    %}
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+
+              {%- if filter.active_values.size > 0 -%}
+                {%- assign clear_label = 'products.facets.clear' | t -%}
+                {% render 'button',
+                  label: clear_label,
+                  type: 'button',
+                  variant: 'outline',
+                  size: 'sm',
+                  full: true,
+                  click_expr: 'clearListFilter($event)',
+                  class: 'mt-3 py-1.5'
+                %}
+              {%- endif -%}
+
+            {%- when 'price_range' -%}
+              <div class='mt-3 flex flex-col gap-3'>
+                {%- comment -%}
+                  `@change.stop` keeps the form-level handler from firing on every
+                  keystroke; the component debounces these itself.
+                {%- endcomment -%}
+                <div class='flex items-center gap-2' @change.stop @input='handlePriceInput($event)'>
+                  {%- liquid
+                    assign price_min = ''
+                    if filter.min_value.value
+                      assign price_min = filter.min_value.value | divided_by: 100.0
+                    endif
+                    assign price_max = ''
+                    if filter.max_value.value
+                      assign price_max = filter.max_value.value | divided_by: 100.0
+                    endif
+                    assign price_min_id = id_prefix | append: '-price-gte'
+                    assign price_max_id = id_prefix | append: '-price-lte'
+                    assign price_min_label = 'products.facets.from' | t
+                    assign price_max_label = 'products.facets.to' | t
+                  -%}
+
+                  <div class='flex-1'>
+                    {% render 'form-input',
+                      type: 'text',
+                      name: filter.min_value.param_name,
+                      id: price_min_id,
+                      value: price_min,
+                      placeholder: price_min_label,
+                      inputmode: 'decimal',
+                      size: 'sm'
+                    %}
+                  </div>
+                  <span class='text-fg-subtle'>–</span>
+                  <div class='flex-1'>
+                    {% render 'form-input',
+                      type: 'text',
+                      name: filter.max_value.param_name,
+                      id: price_max_id,
+                      value: price_max,
+                      placeholder: price_max_label,
+                      inputmode: 'decimal',
+                      size: 'sm'
+                    %}
+                  </div>
+                </div>
+
+                {%- assign range_max_price = filter.range_max | money -%}
+                <p class='text-xs text-fg-subtle'>
+                  {{ 'products.facets.max_price' | t: price: range_max_price }}
+                </p>
+
+                {%- if has_price_value -%}
+                  {%- assign clear_price_label = 'products.facets.clear' | t -%}
+                  {% render 'button',
+                    label: clear_price_label,
+                    type: 'button',
+                    variant: 'outline',
+                    size: 'sm',
+                    full: true,
+                    click_expr: 'clearPriceFilter($event)',
+                    class: 'py-1.5'
+                  %}
+                {%- endif -%}
+              </div>
+          {%- endcase -%}
+        </div>
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
+</form>

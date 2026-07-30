@@ -1,0 +1,81 @@
+{% doc %}
+  Renders the discount code field plus the codes already on the cart.
+
+  Applying and removing go through `$store.cart`, which checks the resulting cart
+  for the code — Shopify accepts the request even when the code doesn't apply, so
+  a 200 alone means nothing.
+
+  @example
+  {% render 'cart-discount-form' %}
+{% enddoc %}
+
+<div class='mb-4 flex flex-col gap-2 border-b border-border pb-4'>
+  {%- if cart.cart_level_discount_applications.size > 0 -%}
+    <ul class='flex flex-col gap-1'>
+      {%- for discount in cart.cart_level_discount_applications -%}
+        <li class='flex items-center justify-between gap-2 text-xs'>
+          <span class='flex min-w-0 items-center gap-1.5'>
+            {% render 'icon', icon: 'tag', class: 'size-3.5 shrink-0' %}
+            <span class='truncate'>{{ discount.title }}</span>
+
+            {%- if discount.type == 'discount_code' -%}
+              <button
+                type='button'
+                class='flex size-4 shrink-0 cursor-pointer items-center justify-center transition-opacity hover:opacity-70 disabled:opacity-50'
+                @click='$store.cart.removeDiscount()'
+                :disabled='$store.cart.isCartLoading || $store.cart.isDiscountProcessing'
+                aria-label='{{ 'sections.cart.discount_code.remove' | t }}'
+              >
+                <span x-show='!$store.cart.isDiscountProcessing'>
+                  {% render 'icon', icon: 'close', class: 'size-3' %}
+                </span>
+                <span x-show='$store.cart.isDiscountProcessing' x-cloak>
+                  {% render 'icon', icon: 'spinner', class: 'size-3 animate-spin' %}
+                </span>
+              </button>
+            {%- endif -%}
+          </span>
+
+          <span class='shrink-0 font-medium text-success'>
+            -{{ discount.total_allocated_amount | money }}
+          </span>
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+
+  <div class='flex items-start gap-2' x-data>
+    <div class='flex-1'>
+      <label class='sr-only' for='minicart-discount-code'>
+        {{ 'sections.cart.discount_code.label' | t }}
+      </label>
+      <input
+        id='minicart-discount-code'
+        type='text'
+        autocomplete='off'
+        class='h-10 w-full rounded-input border border-border bg-bg px-3 text-sm placeholder:text-fg-subtle'
+        placeholder='{{ 'sections.cart.discount_code.placeholder' | t }}'
+        x-model='$store.cart.discountCode'
+        @keydown.enter.prevent='$store.cart.applyDiscount($store.cart.discountCode)'
+        :disabled='$store.cart.isDiscountProcessing'
+      >
+      <p
+        class='mt-1 text-xs text-error'
+        x-show='$store.cart.discountError'
+        x-text='$store.cart.discountError'
+        x-cloak
+      ></p>
+    </div>
+
+    {%- assign apply_label = 'sections.cart.discount_code.apply' | t -%}
+    {% render 'button',
+      label: apply_label,
+      variant: 'outline',
+      size: 'sm',
+      click_expr: '$store.cart.applyDiscount($store.cart.discountCode)',
+      disabled_expr: '$store.cart.isDiscountProcessing || !$store.cart.discountCode',
+      loading_expr: '$store.cart.isDiscountProcessing',
+      class: 'h-10! py-0!'
+    %}
+  </div>
+</div>

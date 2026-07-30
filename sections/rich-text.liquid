@@ -1,0 +1,65 @@
+<div class='page section-spacing'>
+  <div class='mx-auto flex max-w-3xl flex-col items-center gap-4 text-center'>
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when 'heading' -%}
+          <h2 class='text-2xl font-semibold md:text-3xl' {{ block.shopify_attributes }}>
+            {{ block.settings.heading }}
+          </h2>
+        {%- when 'text' -%}
+          <div class='prose text-center' {{ block.shopify_attributes }}>
+            {{ block.settings.text }}
+          </div>
+        {%- when 'button' -%}
+          {%- if block.settings.label != blank -%}
+            <div {{ block.shopify_attributes }}>
+              {% render 'button', label: block.settings.label, href: block.settings.link %}
+            </div>
+          {%- endif -%}
+      {%- endcase -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Rich text",
+  "tag": "section",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "limit": 1,
+      "settings": [
+        { "type": "inline_richtext", "id": "heading", "default": "Talk about your brand", "label": "Heading" }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>Share information about your brand with your customers.</p>",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "label", "default": "Learn more", "label": "Label" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Rich text", "blocks": [{ "type": "heading" }, { "type": "text" }, { "type": "button" }] }
+  ]
+}
+{% endschema %}

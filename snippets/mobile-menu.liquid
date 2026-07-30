@@ -1,19 +1,130 @@
-<ul
-  id='mobile-menu-list'
-  class='mobile-menu-list z-20 p-7.5 bg-indigo-900 w-screen -left-6 absolute top-full'
-  x-show='$store.global.isMobileMenuVisible'
-  role='menu'
+{% doc %}
+  Renders the mobile navigation drawer from a linklist. Items with children
+  expand in place, up to three levels.
+
+  @param {string} menu - Handle of the linklist to render
+
+  @example
+  {% render 'mobile-menu', menu: section.settings.menu %}
+{% enddoc %}
+
+<div
+  id='mobile-menu'
+  class='absolute inset-x-0 top-full z-120 max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-border bg-bg text-fg lg:hidden'
+  x-data='{ openItem: null, openChild: null }'
+  x-show='$store.ui.isMobileMenuVisible'
+  x-trap.noscroll.inert='$store.ui.isMobileMenuVisible'
+  x-transition:enter='transition ease-out duration-200'
+  x-transition:enter-start='opacity-0 -translate-y-2'
+  x-transition:enter-end='opacity-100 translate-y-0'
+  x-transition:leave='transition ease-in duration-150'
+  x-transition:leave-start='opacity-100 translate-y-0'
+  x-transition:leave-end='opacity-0 -translate-y-2'
+  role='dialog'
+  aria-modal='true'
+  aria-label='{{ 'sections.header.menu' | t }}'
+  x-cloak
 >
-  {% for link in linklists['main-menu'].links %}
-    <li class='mobile-menu-item' role='presentation'>
-      <a
-        href='{{ link.url }}'
-        role='menuitem'
-        class='mb-2.5 block text-[26px] font-bold tracking-[1.2px] text-white no-underline'
-      >
-        {{- link.title -}}
-      </a>
-    </li>
-  {% endfor %}
-  <li></li>
-</ul>
+  <nav class='page flex flex-col py-2'>
+    {%- for link in linklists[menu].links -%}
+      {%- liquid
+        assign link_key = link.handle | default: forloop.index
+        assign is_active = false
+        if link.active or link.child_active
+          assign is_active = true
+        endif
+      -%}
+
+      <div class='border-b border-border last:border-b-0'>
+        <div class='flex items-center justify-between gap-2'>
+          <a
+            href='{{ link.url }}'
+            class='flex-1 py-3 text-base text-fg no-underline {% if is_active %}font-semibold{% endif %}'
+            {% if link.active %}
+              aria-current='page'
+            {% endif %}
+          >
+            {{ link.title | escape }}
+          </a>
+
+          {%- if link.links != blank -%}
+            <button
+              type='button'
+              class='cursor-pointer p-2 transition-transform duration-300'
+              :class="openItem === '{{ link_key }}' && 'rotate-180'"
+              @click="openItem = openItem === '{{ link_key }}' ? null : '{{ link_key }}'"
+              :aria-expanded="openItem === '{{ link_key }}' ? 'true' : 'false'"
+              aria-label='{{ link.title | escape }}'
+            >
+              {% render 'icon', icon: 'chevron-down', class: 'size-3' %}
+            </button>
+          {%- endif -%}
+        </div>
+
+        {%- if link.links != blank -%}
+          <div
+            class='overflow-hidden'
+            x-show="openItem === '{{ link_key }}'"
+            x-collapse
+          >
+            <ul class='flex flex-col gap-1 pb-4 ps-3'>
+              {%- for childlink in link.links -%}
+                {%- assign child_key = link_key | append: '-' | append: forloop.index -%}
+                <li>
+                  <div class='flex items-center justify-between gap-2'>
+                    <a
+                      href='{{ childlink.url }}'
+                      class='flex-1 py-1.5 text-sm text-fg-muted no-underline'
+                      {% if childlink.current %}
+                        aria-current='page'
+                      {% endif %}
+                    >
+                      {{ childlink.title | escape }}
+                    </a>
+
+                    {%- if childlink.links != blank -%}
+                      <button
+                        type='button'
+                        class='cursor-pointer p-2 transition-transform duration-300'
+                        :class="openChild === '{{ child_key }}' && 'rotate-180'"
+                        @click="openChild = openChild === '{{ child_key }}' ? null : '{{ child_key }}'"
+                        :aria-expanded="openChild === '{{ child_key }}' ? 'true' : 'false'"
+                        aria-label='{{ childlink.title | escape }}'
+                      >
+                        {% render 'icon', icon: 'chevron-down', class: 'size-2.5' %}
+                      </button>
+                    {%- endif -%}
+                  </div>
+
+                  {%- if childlink.links != blank -%}
+                    <div
+                      class='overflow-hidden'
+                      x-show="openChild === '{{ child_key }}'"
+                      x-collapse
+                    >
+                      <ul class='flex flex-col gap-1 py-1 ps-3'>
+                        {%- for grandchildlink in childlink.links -%}
+                          <li>
+                            <a
+                              href='{{ grandchildlink.url }}'
+                              class='block py-1 text-sm text-fg-subtle no-underline'
+                              {% if grandchildlink.current %}
+                                aria-current='page'
+                              {% endif %}
+                            >
+                              {{ grandchildlink.title | escape }}
+                            </a>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    </div>
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </nav>
+</div>

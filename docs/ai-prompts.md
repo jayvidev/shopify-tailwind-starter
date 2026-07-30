@@ -27,9 +27,9 @@ placeholders.
 
 > Create the section `sections/<name>.liquid` following `docs/04-liquid.md`:
 > markup, then `{% stylesheet %}`, then `{% schema %}` last. Use the
-> `.section-padding` utility with `--section-padding-top/-bottom` instead of
-> writing padding CSS. Every schema string must be a `t:` key, added to both
-> `locales/es.schema.json` and `locales/en.default.schema.json` (English there).
+> `page` and `section-spacing` utilities instead of
+> writing padding CSS. Schema labels are plain English strings, not `t:` keys;
+> storefront copy goes through `locales/en.default.json` and `locales/es.json`.
 > Section `name` must be 25 characters or fewer. Finish with
 > `pnpm shopify theme check`.
 

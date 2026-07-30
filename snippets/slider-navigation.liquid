@@ -1,0 +1,45 @@
+{% doc %}
+  Renders the arrows and dots for a slider. Must sit inside an element with
+  `x-data='slider'` — the state lives there (`src/alpine/components/slider.ts`).
+
+  @param {boolean} [show_dots] - Render the dot indicators
+  @param {string} [class] - Extra classes on the arrow buttons
+
+  @example
+  {% render 'slider-navigation', show_dots: true %}
+{% enddoc %}
+
+<button
+  type='button'
+  class='absolute inset-s-0 top-1/2 z-10 flex size-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-border bg-bg shadow-popup transition-opacity disabled:opacity-0 {{ class }}'
+  @click='scrollLeft()'
+  :disabled='!canScrollLeft'
+  aria-label='{{ 'general.slider.previous_slide' | t }}'
+>
+  {% render 'icon', icon: 'chevron-left', class: 'size-3' %}
+</button>
+
+<button
+  type='button'
+  class='absolute inset-e-0 top-1/2 z-10 flex size-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-border bg-bg shadow-popup transition-opacity disabled:opacity-0 {{ class }}'
+  @click='scrollRight()'
+  :disabled='!canScrollRight'
+  aria-label='{{ 'general.slider.next_slide' | t }}'
+>
+  {% render 'icon', icon: 'chevron-right', class: 'size-3' %}
+</button>
+
+{%- if show_dots -%}
+  <div class='mt-4 flex items-center justify-center gap-2' x-show='numDots > 1' x-cloak>
+    <template x-for='(point, index) in snapPoints' :key='index'>
+      <button
+        type='button'
+        class='size-2 cursor-pointer rounded-full transition-colors'
+        :class="activeIndex === index ? 'bg-fg' : 'bg-border'"
+        @click='scrollToIndex(index)'
+        :aria-current='activeIndex === index'
+        :aria-label='`{{ 'sections.slideshow.slide' | t }} ${index + 1}`'
+      ></button>
+    </template>
+  </div>
+{%- endif -%}

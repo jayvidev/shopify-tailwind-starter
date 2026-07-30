@@ -1,113 +1,93 @@
-{% schema %}
-{
-  "name": "Search Section",
-  "class": "section-main-search",
-  "tag": "section",
-  "settings": []
-}
-{% endschema %}
+{%- comment -%}
+  Search results page. Reuses the collection filter/grid snippet, so filtering,
+  sorting and load-more behave exactly as they do on a collection.
+{%- endcomment -%}
 
-{% comment %}
-  Docs on the Shopify search object
-  https://shopify.dev/api/liquid/objects/search#search-results
-{% endcomment %}
+<div
+  class='page section-spacing'
+  x-data='collection({ sectionId: "{{ section.id }}" })'
+  @click='handleLinkClick($event)'
+>
+  <div class='mb-8 flex flex-col items-center gap-4 text-center'>
+    <h1 class='text-3xl font-semibold md:text-4xl'>
+      {%- if search.performed -%}
+        {{ 'templates.search.search_for' | t: terms: search.terms }}
+      {%- else -%}
+        {{ 'templates.search.title' | t }}
+      {%- endif -%}
+    </h1>
 
-<div class='px-6 md:px-8 py-12'>
-  <div class='search-inner mx-auto container'>
-    {% if search.performed %}
-      <h1>Search Results</h1>
-    {% else %}
-      <h1>Search</h1>
-    {% endif %}
-
-    <form action='{{ routes.search_url }}' class='flex my-8 space-x-2'>
-      <input
-        type='text'
-        placeholder='Search'
-        name='q'
-        value='{{ search.terms | escape }}'
-        class='starter-input'
-      >
-      <!-- <input type="hidden" name="type" value="product" /> -->
-      <input type='submit' value='Search' class='pill-button'>
+    <form
+      action='{{ routes.search_url }}'
+      method='get'
+      role='search'
+      class='flex w-full max-w-lg items-center gap-2'
+    >
+      <div class='flex-1'>
+        <label class='sr-only' for='search-page-input'>{{ 'general.search.search' | t }}</label>
+        <input
+          id='search-page-input'
+          type='search'
+          name='q'
+          value='{{ search.terms | escape }}'
+          placeholder='{{ 'general.search.search' | t }}'
+          class='h-11 w-full rounded-input border border-border bg-bg px-4 text-sm placeholder:text-fg-subtle'
+        >
+      </div>
+      <input type='hidden' name='options[prefix]' value='last'>
+      {%- assign search_label = 'general.search.search' | t -%}
+      {% render 'button', label: search_label, type: 'submit', class: 'h-11! py-0!' %}
     </form>
 
-    {% if search.performed %}
-      {% if search.results.size > 0 %}
-        {%- paginate search.results by 12 -%}
-          <div class='product-grid grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4'>
-            {% for item in search.results %}
-              {% case item.object_type %}
-                {% when 'product' %}
-                  {% render 'product-grid-item', prod: item %}
-                {% when 'article' %}
-                  <div class='article-grid-item'>
-                    <div class='article-grid-item-inner'>
-                      {% if item.image %}
-                        <img
-                          src='{{ item.image | image_url: width: 410 }}'
-                          srcset='{{ item.image | image_url: width: 205 }} 1x, {{ item.image | image_url: width: 410 }} 2x'
-                          loading='lazy'
-                          width='{{ item.image.width }}'
-                          height='{{ item.image.height }}'
-                          alt='{{ item.image.alt }}'
-                        >
-                      {% endif %}
-                      <div class='content'>
-                        <a href='{{ item.url }}'>
-                          <h3 class='h3 dark'>{{ item.title }}</h3>
-                        </a>
-                        <p class='article-excerpt'>
-                          {{ item.excerpt_or_content | truncate: 100 }}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                {% when 'page' %}
-                  <div class='page-grid-item'>
-                    <div
-                      class='page-grid-item-inner'
-                      style='padding-top: 141%; position: relative;'
-                    >
-                      {% if item.featured_image %}
-                        <img
-                          src='{{ item.featured_image | image_url: width: 410 }}'
-                          srcset='{{ item.featured_image | image_url: width: 205 }} 1x, {{ item.featured_image | image_url: width: 410 }} 2x'
-                          loading='lazy'
-                          width='{{ item.featured_image.width }}'
-                          height='{{ item.featured_image.height }}'
-                          alt='{{ item.featured_image.alt }}'
-                          class='absolute object-contain inset-0'
-                        >
-                      {% else %}
-                        <img
-                          src='{{ 'no-image-found.jpg' | asset_url }}'
-                          loading='lazy'
-                          width='205'
-                          height='auto'
-                          alt='no-image-found'
-                          class='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'
-                        >
-                      {% endif %}
-                      <div class='content'>
-                        <a href='{{ item.url }}'>
-                          <h3 class='h3 dark'>
-                            {{ item.title }}
-                          </h3>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                {% else %}
-                  This item cannot be displayed.
-              {% endcase %}
-            {% endfor %}
-          </div>
-          {% render 'pagination-navigation', paginate: paginate %}
-        {% endpaginate %}
-      {% else %}
-        There are no results
-      {% endif %}
-    {% endif %}
+    {%- if search.performed -%}
+      <p class='text-sm text-fg-subtle'>
+        {{ 'templates.search.results_with_count' | t: count: search.results_count }}
+      </p>
+    {%- endif -%}
   </div>
+
+  {%- if search.performed -%}
+    {%- paginate search.results by section.settings.products_per_page -%}
+      {% render 'product-grid-filters',
+        products: search.results,
+        filters: search.filters,
+        paginate: paginate,
+        sort_options: search.sort_options,
+        sort_selected: search.sort_by,
+        results_url: routes.search_url,
+        form_id_prefix: 'Search',
+        columns: section.settings.columns
+      %}
+    {%- endpaginate -%}
+  {%- endif -%}
 </div>
+
+{% schema %}
+{
+  "name": "Search results",
+  "class": "section-main-search",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 16,
+      "label": "Results per page"
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "default": "3",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ],
+      "label": "Desktop columns"
+    }
+  ]
+}
+{% endschema %}

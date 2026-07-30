@@ -5,8 +5,7 @@
 /*
   Design tokens live here, not in the theme settings. Colours, type and shape
   are decisions the theme makes; the settings only cover content and behaviour.
-  Values below are Dawn's base palette — change them once and the whole theme
-  follows.
+  Change a value here and the whole theme follows.
 */
 @theme {
   --color-fg: #121212;
@@ -28,7 +27,7 @@
   --font-body: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
   --font-heading: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
 
-  /* Shape. Dawn's defaults are square; bump these for a softer theme. */
+  /* Shape. Square by default; raise these for a softer theme. */
   --radius-button: 0px;
   --radius-input: 0px;
   --radius-card: 0px;
@@ -71,6 +70,52 @@
   [x-cloak] {
     display: none !important;
   }
+
+  /*
+    One focus style for the whole theme, keyed to the palette — otherwise each
+    browser paints its own ring (blue in Chrome, rounded regardless of the
+    element's radius).
+  */
+  :focus-visible {
+    outline: 2px solid var(--color-fg);
+    outline-offset: 2px;
+  }
+
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /*
+    Fields get the outline *inside* their own box instead: an offset ring gets
+    clipped by scrolling filter panels and drawers, and 2px outside a 1px border
+    reads as a doubled edge.
+  */
+  .field-focus,
+  input:not([type='checkbox'], [type='radio'], [type='button'], [type='submit']),
+  textarea,
+  select {
+    border-radius: var(--radius-input);
+    outline: 1px solid transparent;
+    outline-offset: -1px;
+    transition:
+      outline-color 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+
+  /*
+    The halo is what stays visible on fields whose border is already dark, where
+    recolouring the outline alone would show nothing. Raised, because panels
+    rendered below would paint over its bottom edge.
+  */
+  .field-focus:focus-within,
+  input:not([type='checkbox'], [type='radio'], [type='button'], [type='submit']):focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    position: relative;
+    z-index: 20;
+    outline-color: var(--color-fg);
+    box-shadow: 0 0 0 3px --alpha(var(--color-fg) / 15%);
+  }
 }
 
 /* Page container: max width plus the horizontal gutter. */
@@ -111,10 +156,6 @@
     --tw-prose-hr: var(--color-border);
     --tw-prose-quotes: var(--color-fg);
     --tw-prose-quote-borders: var(--color-border);
-
-    &:where(a:hover) {
-      --tw-prose-links: var(--color-accent);
-    }
 
     &:where(iframe) {
       width: 100%;

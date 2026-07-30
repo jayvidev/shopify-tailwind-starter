@@ -1,0 +1,292 @@
+{% doc %}
+  Renders the filter sidebar, the product grid and the load-more control. Shared
+  by the collection and search templates.
+
+  Filtering, sorting and load-more all go through `?section_id=` requests handled
+  by `src/alpine/components/collection.ts`, so the page never reloads. The ids
+  below are part of that contract — the component looks for `#ProductGridContainer`,
+  `#ProductGrid`, `#LoadMoreContainer`, `#ProductCount`, and the filter form ids.
+
+  @param {object} products - `collection.products`, or `search.results` filtered to products
+  @param {object} filters - `collection.filters` or `search.filters`
+  @param {object} paginate - The `paginate` object of the enclosing tag
+  @param {object} sort_options - `collection.sort_options` or `search.sort_options`
+  @param {string} sort_selected - `collection.sort_by` or `search.sort_by`
+  @param {string} results_url - URL that clears every filter
+  @param {string} [form_id_prefix] - 'Collection' or 'Search'. Defaults to 'Collection'
+  @param {string} [columns] - Desktop columns: '2', '3' or '4'. Defaults to '3'
+
+  @example
+  {% render 'product-grid-filters',
+    products: collection.products,
+    filters: collection.filters,
+    paginate: paginate,
+    sort_options: collection.sort_options,
+    sort_selected: collection.sort_by,
+    results_url: collection.url
+  %}
+{% enddoc %}
+
+{%- liquid
+  assign form_id_prefix = form_id_prefix | default: 'Collection'
+  assign form_desktop_id = form_id_prefix | append: 'FiltersForm'
+  assign form_mobile_id = form_id_prefix | append: 'FiltersFormMobile'
+  # Comes from a select, so it arrives as a string.
+  assign columns = columns | default: '3'
+
+  case columns
+    when '2'
+      assign grid_classes = 'grid-cols-2'
+    when '4'
+      assign grid_classes = 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+    else
+      assign grid_classes = 'grid-cols-2 md:grid-cols-3'
+  endcase
+
+  assign total_items = paginate.items
+  assign total_visible = paginate.current_offset | plus: products.size
+  if total_visible > total_items
+    assign total_visible = total_items
+  endif
+
+  assign has_filters = false
+  if filters.size > 0
+    assign has_filters = true
+  endif
+
+  assign has_active_filters = false
+  for filter in filters
+    if filter.active_values.size > 0
+      assign has_active_filters = true
+      break
+    endif
+    if filter.type == 'price_range' and filter.min_value.value != blank
+      assign has_active_filters = true
+      break
+    endif
+    if filter.type == 'price_range' and filter.max_value.value != blank
+      assign has_active_filters = true
+      break
+    endif
+  endfor
+
+  assign sort_label = 'products.facets.sort_by_label' | t
+  assign filter_label = 'products.facets.filter_button' | t
+-%}
+
+{%- comment -%}
+  The sort control dispatches `sort:select` rather than submitting, so the
+  component owns every URL change in one place.
+{%- endcomment -%}
+{%- capture sort_handler -%}
+  const value = $event.target.value
+  if (!value) return
+  const url = new URL(window.location.href)
+  url.searchParams.set('sort_by', value)
+  url.searchParams.delete('page')
+  window.dispatchEvent(new CustomEvent('sort:select', { detail: { url: url.toString() } }))
+{%- endcapture -%}
+
+{%- if has_filters -%}
+  {%- comment -%} Mobile: sticky bar that opens the filter drawer. {%- endcomment -%}
+  <div
+    id='MobileStickyFilterBar'
+    class='sticky top-16 z-50 mb-2 flex items-center justify-between gap-3 bg-bg py-2.5 md:top-20 lg:hidden'
+  >
+    {% render 'button',
+      label: filter_label,
+      type: 'button',
+      variant: 'outline',
+      size: 'sm',
+      icon: 'filter',
+      click_expr: '$store.ui.isFilterOpen = true',
+      class: 'py-1.5'
+    %}
+
+    {%- if sort_options.size > 0 -%}
+      <div class='min-w-40 shrink-0' @change.stop='{{ sort_handler | escape }}'>
+        {% render 'form-select',
+          id: 'sort-by-mobile',
+          name: 'sort_by',
+          selected_value: sort_selected,
+          option_objects: sort_options,
+          size: 'sm',
+          placeholder: sort_label
+        %}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} Mobile: the drawer itself. {%- endcomment -%}
+  <div
+    class='fixed inset-0 z-1000 lg:hidden'
+    x-show='$store.ui.isFilterOpen'
+    x-trap.noscroll.inert='$store.ui.isFilterOpen'
+    @keydown.escape.window='$store.ui.isFilterOpen = false'
+    role='dialog'
+    aria-modal='true'
+    aria-label='{{ 'products.facets.filter_and_sort' | t }}'
+    x-cloak
+  >
+    <div
+      class='absolute inset-0 bg-fg/50'
+      x-show='$store.ui.isFilterOpen'
+      x-transition:enter='transition ease-out duration-300'
+      x-transition:enter-start='opacity-0'
+      x-transition:enter-end='opacity-100'
+      x-transition:leave='transition ease-in duration-200'
+      x-transition:leave-start='opacity-100'
+      x-transition:leave-end='opacity-0'
+      @click='$store.ui.isFilterOpen = false'
+    ></div>
+
+    <div
+      class='absolute inset-y-0 inset-s-0 flex w-[min(20rem,90vw)] flex-col bg-bg shadow-drawer'
+      x-show='$store.ui.isFilterOpen'
+      x-transition:enter='transition duration-300 ease-out'
+      x-transition:enter-start='-translate-x-full'
+      x-transition:enter-end='translate-x-0'
+      x-transition:leave='transition duration-200 ease-in'
+      x-transition:leave-start='translate-x-0'
+      x-transition:leave-end='-translate-x-full'
+    >
+      <div class='flex shrink-0 items-center justify-between border-b border-border px-4 py-4'>
+        <h2 class='font-medium'>{{ 'products.facets.filter_button' | t }}</h2>
+        <button
+          type='button'
+          class='-me-2 cursor-pointer p-2 text-fg-subtle transition-colors hover:text-fg'
+          @click='$store.ui.isFilterOpen = false'
+          aria-label='{{ 'accessibility.close' | t }}'
+        >
+          {% render 'icon', icon: 'close', class: 'size-5' %}
+        </button>
+      </div>
+
+      <div class='flex-1 overflow-y-auto px-4 py-2'>
+        {% render 'product-filters-form',
+          filters: filters,
+          form_id: form_mobile_id,
+          id_prefix: 'filter-mobile'
+        %}
+      </div>
+
+      {%- if has_active_filters -%}
+        <div class='shrink-0 border-t border-border p-4'>
+          {%- assign clear_all_label = 'products.facets.clear_all' | t -%}
+          {% render 'button',
+            label: clear_all_label,
+            href: results_url,
+            variant: 'outline',
+            full: true,
+            class: 'clear-filters'
+          %}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}
+
+<div class='grid grid-cols-1 gap-8 {% if has_filters %}lg:grid-cols-[16rem_1fr]{% endif %}'>
+  {%- if has_filters -%}
+    <aside class='hidden lg:block'>
+      <div class='sticky top-24'>
+        <div class='mb-3 flex items-center justify-between gap-2'>
+          <h2 class='text-sm font-semibold'>{{ 'products.facets.filter_button' | t }}</h2>
+          {%- if has_active_filters -%}
+            <a
+              href='{{ results_url }}'
+              class='clear-filters text-xs text-fg-subtle underline transition-colors hover:text-fg'
+            >
+              {{ 'products.facets.clear_all' | t }}
+            </a>
+          {%- endif -%}
+        </div>
+
+        {% render 'product-filters-form',
+          filters: filters,
+          form_id: form_desktop_id,
+          id_prefix: 'filter'
+        %}
+      </div>
+    </aside>
+  {%- endif -%}
+
+  <div
+    id='ProductGridContainer'
+    class='transition-opacity duration-300'
+    :class="loading && 'pointer-events-none opacity-50'"
+  >
+    <div class='mb-4 hidden items-center justify-between gap-4 lg:flex'>
+      <span id='ProductCount' class='text-sm text-fg-subtle'>
+        {%- comment -%}
+          The component keeps these two counts in sync as pages are appended.
+        {%- endcomment -%}
+        <span class='js-visible-count'>{{ total_visible }}</span>
+        /
+        <span class='js-total-count'>{{ total_items }}</span>
+        {{ 'templates.search.products' | t | downcase }}
+      </span>
+
+      {%- if sort_options.size > 0 -%}
+        <div class='min-w-48' @change.stop='{{ sort_handler | escape }}'>
+          {% render 'form-select',
+            id: 'sort-by-desktop',
+            name: 'sort_by',
+            selected_value: sort_selected,
+            option_objects: sort_options,
+            size: 'sm',
+            placeholder: sort_label
+          %}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if products.size > 0 -%}
+      <div id='ProductGrid' class='grid grid-gap {{ grid_classes }}'>
+        {%- for product in products -%}
+          {%- if forloop.index <= 4 -%}
+            {%- assign card_loading = 'eager' -%}
+          {%- else -%}
+            {%- assign card_loading = 'lazy' -%}
+          {%- endif -%}
+          {% render 'product-card', product: product, image_loading: card_loading %}
+        {%- endfor -%}
+      </div>
+
+      {%- if paginate.next -%}
+        <div id='LoadMoreContainer' class='mt-12 flex flex-col items-center gap-4'>
+          <span class='text-sm text-fg-subtle'>
+            <span class='js-visible-count'>{{ total_visible }}</span>
+            /
+            <span class='js-total-count'>{{ total_items }}</span>
+          </span>
+          {%- liquid
+            assign load_more_label = 'general.pagination.load_more' | t
+            assign next_url_attr = 'data-next-url="' | append: paginate.next.url | append: '"'
+          -%}
+          {% render 'button',
+            label: load_more_label,
+            type: 'button',
+            variant: 'outline',
+            click_expr: 'loadMore($event)',
+            disabled_expr: 'loading',
+            loading_expr: 'loading',
+            attr: next_url_attr
+          %}
+        </div>
+      {%- endif -%}
+    {%- else -%}
+      <div class='py-20 text-center'>
+        <p class='text-fg-subtle'>{{ 'sections.collection_template.empty' | t }}</p>
+        {%- if has_active_filters -%}
+          <a
+            href='{{ results_url }}'
+            class='clear-filters mt-4 inline-block font-medium text-fg underline'
+          >
+            {{ 'products.facets.clear_all' | t }}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>

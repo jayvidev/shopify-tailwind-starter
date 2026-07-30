@@ -1,15 +1,62 @@
 {
   "sections": {
-    "main": {
-      "type": "main-index",
+    "image-banner": {
+      "type": "image-banner",
+      "blocks": {
+        "heading": { "type": "heading", "settings": { "heading": "Your headline here" } },
+        "text": {
+          "type": "text",
+          "settings": { "text": "<p>Say what makes the shop worth a look.</p>" }
+        },
+        "button": { "type": "button", "settings": { "label": "Shop all" } }
+      },
+      "block_order": ["heading", "text", "button"],
+      "settings": { "height": "medium", "content_position": "middle-center", "overlay_opacity": 20 }
+    },
+    "featured-collection": {
+      "type": "featured-collection",
+      "settings": { "heading": "Featured collection", "products_to_show": 8, "columns": "4" }
+    },
+    "collection-list": {
+      "type": "collection-list",
+      "blocks": {
+        "one": { "type": "collection", "settings": {} },
+        "two": { "type": "collection", "settings": {} },
+        "three": { "type": "collection", "settings": {} }
+      },
+      "block_order": ["one", "two", "three"],
+      "settings": { "heading": "Shop by category", "columns": "3" }
+    },
+    "multicolumn": {
+      "type": "multicolumn",
+      "blocks": {
+        "one": { "type": "column", "settings": { "heading": "Free shipping" } },
+        "two": { "type": "column", "settings": { "heading": "Easy returns" } },
+        "three": { "type": "column", "settings": { "heading": "Secure checkout" } }
+      },
+      "block_order": ["one", "two", "three"],
+      "settings": { "heading": "Why shop with us", "columns": "3" }
+    },
+    "rich-text": {
+      "type": "rich-text",
+      "blocks": {
+        "heading": { "type": "heading", "settings": { "heading": "Talk about your brand" } },
+        "text": {
+          "type": "text",
+          "settings": { "text": "<p>Share what the shop is about and why it exists.</p>" }
+        }
+      },
+      "block_order": ["heading", "text"],
       "settings": {}
     },
-    "featured-product-grid": {
-      "type": "featured-product-grid",
-      "settings": {
-        "featured_collection": "homepage-collection"
-      }
-    }
+    "newsletter": { "type": "newsletter", "settings": {} }
   },
-  "order": ["main", "featured-product-grid"]
+  "order": [
+    "image-banner",
+    "featured-collection",
+    "collection-list",
+    "multicolumn",
+    "rich-text",
+    "newsletter"
+  ]
 }

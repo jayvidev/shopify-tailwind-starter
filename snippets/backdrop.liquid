@@ -1,0 +1,32 @@
+{% doc %}
+  Renders the shared dimmed backdrop behind drawers and menus.
+
+  @param {string} show_condition - Alpine expression that toggles visibility
+  @param {string} click_action - Alpine expression run on click
+  @param {string} [mouseenter_action] - Alpine expression run on mouseenter
+  @param {string} [top_class] - Top offset. Defaults to 'top-0'
+  @param {string} [z_class] - z-index. Defaults to 'z-90'
+
+  @example
+  {% render 'backdrop',
+    show_condition: '$store.ui.isMinicartVisible',
+    click_action: '$store.ui.isMinicartVisible = false'
+  %}
+{% enddoc %}
+
+<div
+  class='fixed inset-0 {{ top_class | default: "top-0" }} {{ z_class | default: "z-90" }} bg-fg/50'
+  x-show='{{ show_condition }}'
+  x-transition:enter='transition ease-out duration-300'
+  x-transition:enter-start='opacity-0'
+  x-transition:enter-end='opacity-100'
+  x-transition:leave='transition ease-in duration-200'
+  x-transition:leave-start='opacity-100'
+  x-transition:leave-end='opacity-0'
+  @click='{{ click_action }}'
+  {% if mouseenter_action %}
+    @mouseenter='{{ mouseenter_action }}'
+  {% endif %}
+  aria-hidden='true'
+  x-cloak
+></div>

@@ -1,0 +1,266 @@
+{% doc %}
+  Renders the cart drawer.
+
+  Wrapped in `data-ajax-cart-section`, so liquid-ajax-cart re-renders this markup
+  after every cart request — the Liquid here is always in sync with the server,
+  and the `$store.cart` state only drives loading and error UI.
+
+  @example
+  {% render 'minicart' %}
+{% enddoc %}
+
+{%- liquid
+  assign has_tiers = false
+  if settings.discount_tiers_count > 0
+    assign has_tiers = true
+  endif
+-%}
+
+<div
+  id='minicart'
+  class='fixed inset-y-0 inset-e-0 z-120 flex w-full max-w-100 flex-col border-s border-border bg-bg shadow-drawer'
+  data-ajax-cart-section
+  x-show='$store.ui.isMinicartVisible'
+  x-trap.noscroll.inert='$store.ui.isMinicartVisible'
+  x-transition:enter='transition duration-300 ease-out'
+  x-transition:enter-start='translate-x-full'
+  x-transition:enter-end='translate-x-0'
+  x-transition:leave='transition duration-200 ease-in'
+  x-transition:leave-start='translate-x-0'
+  x-transition:leave-end='translate-x-full'
+  @keydown.escape.window='$store.ui.isMinicartVisible = false'
+  role='dialog'
+  aria-modal='true'
+  aria-label='{{ 'sections.cart.title' | t }}'
+  x-cloak
+>
+  <div class='flex items-center justify-between border-b border-border px-5 py-4'>
+    <h2 class='text-lg font-medium'>
+      {{ 'sections.cart.title' | t }}
+      <span class='text-fg-subtle' data-ajax-cart-bind='item_count'>{{ cart.item_count }}</span>
+    </h2>
+    <button
+      type='button'
+      class='-me-2 cursor-pointer p-2 transition-opacity hover:opacity-70'
+      @click='$store.ui.isMinicartVisible = false'
+      aria-label='{{ 'accessibility.close' | t }}'
+    >
+      {% render 'icon', icon: 'close', class: 'size-5' %}
+    </button>
+  </div>
+
+  {%- if cart.item_count == 0 -%}
+    <div class='flex flex-1 flex-col items-center justify-center gap-6 px-6 text-center'>
+      {% render 'icon', icon: 'cart-empty', class: 'size-20 text-fg-subtle' %}
+      <p class='text-base font-medium'>{{ 'sections.cart.empty' | t }}</p>
+      {%- assign continue_label = 'general.continue_shopping' | t -%}
+      {% render 'button', label: continue_label, href: routes.all_products_collection_url %}
+    </div>
+  {%- else -%}
+    <div class='flex-1 overflow-y-auto' data-ajax-cart-section-scroll>
+      {%- if has_tiers -%}
+        {% render 'cart-discount-tiers' %}
+      {%- endif -%}
+
+      <ul class='flex flex-col gap-5 px-5 py-5'>
+        {%- for line_item in cart.items -%}
+          {%- liquid
+            assign line_image = line_item.variant.featured_media.preview_image | default: line_item.image
+            assign line_image_alt = line_item.title | escape
+
+            # Only cap the stepper when Shopify actually refuses oversells.
+            assign at_stock_max = false
+            assign tracks_inventory = false
+            if line_item.variant.inventory_management != blank and line_item.variant.inventory_policy == 'deny'
+              assign tracks_inventory = true
+            endif
+            if tracks_inventory and line_item.quantity >= line_item.variant.inventory_quantity
+              assign at_stock_max = true
+            endif
+
+            assign quantity_down = line_item.quantity | minus: 1
+            assign quantity_up = line_item.quantity | plus: 1
+          -%}
+
+          <li class='flex gap-3'>
+            <a
+              href='{{ line_item.url }}'
+              class='block size-20 shrink-0 overflow-hidden rounded-media bg-surface'
+            >
+              {%- if line_image -%}
+                {{
+                  line_image
+                  | image_url: width: 200
+                  | image_tag:
+                    alt: line_image_alt,
+                    loading: 'lazy',
+                    widths: '100, 200',
+                    sizes: '80px',
+                    class: 'size-full object-cover'
+                }}
+              {%- endif -%}
+            </a>
+
+            <div class='flex min-w-0 flex-1 flex-col'>
+              <div class='flex items-start justify-between gap-3'>
+                <div class='min-w-0'>
+                  <a
+                    href='{{ line_item.url }}'
+                    class='block truncate text-sm font-medium text-fg no-underline'
+                  >
+                    {{ line_item.product.title }}
+                  </a>
+
+                  {%- unless line_item.product.has_only_default_variant -%}
+                    <p class='mt-0.5 text-xs text-fg-subtle'>
+                      {%- for option in line_item.options_with_values -%}
+                        {{ option.value }}
+                        {%- unless forloop.last %} / {% endunless -%}
+                      {%- endfor -%}
+                    </p>
+                  {%- endunless -%}
+
+                  {%- for discount in line_item.line_level_discount_allocations -%}
+                    <p class='mt-0.5 flex items-center gap-1 text-xs text-success'>
+                      {% render 'icon', icon: 'discount', class: 'size-3 shrink-0' %}
+                      {{ discount.discount_application.title }}
+                      (-{{ discount.amount | money }})
+                    </p>
+                  {%- endfor -%}
+                </div>
+
+                <div class='flex shrink-0 flex-col items-end'>
+                  <span class='text-sm font-medium'>{{ line_item.final_line_price | money }}</span>
+                  {%- if line_item.original_line_price > line_item.final_line_price -%}
+                    <s class='mt-0.5 text-xs text-fg-subtle'>
+                      {{ line_item.original_line_price | money }}
+                    </s>
+                  {%- endif -%}
+                </div>
+              </div>
+
+              <div class='mt-2 flex items-center justify-between'>
+                <div class='flex items-center border border-border'>
+                  <button
+                    type='button'
+                    class='flex size-8 cursor-pointer items-center justify-center transition-colors hover:bg-surface disabled:opacity-40'
+                    @click='$store.cart.updateQuantity("{{ line_item.key }}", {{ quantity_down }})'
+                    :disabled='$store.cart.isCartLoading'
+                    aria-label='{{ 'products.product.quantity.decrease' | t: product: line_item.title }}'
+                  >
+                    {% render 'icon', icon: 'minus', class: 'size-3' %}
+                  </button>
+
+                  <span class='relative flex h-8 w-9 items-center justify-center text-sm font-medium'>
+                    <span
+                      class='absolute inset-0 flex items-center justify-center'
+                      x-show='$store.cart.processingId === "{{ line_item.key }}"'
+                      x-cloak
+                    >
+                      {% render 'icon', icon: 'spinner', class: 'size-3.5 animate-spin text-fg-subtle' %}
+                    </span>
+                    <span x-show='$store.cart.processingId !== "{{ line_item.key }}"'>
+                      {{- line_item.quantity -}}
+                    </span>
+                  </span>
+
+                  <button
+                    type='button'
+                    class='flex size-8 cursor-pointer items-center justify-center transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40'
+                    @click='$store.cart.updateQuantity("{{ line_item.key }}", {{ quantity_up }})'
+                    :disabled='$store.cart.isCartLoading || {{ at_stock_max }}'
+                    {% if at_stock_max %}
+                      title='{{ 'javascript.max_in_cart' | t }}'
+                    {% endif %}
+                    aria-label='{{ 'products.product.quantity.increase' | t: product: line_item.title }}'
+                  >
+                    {% render 'icon', icon: 'plus', class: 'size-3' %}
+                  </button>
+                </div>
+
+                <button
+                  type='button'
+                  class='cursor-pointer p-1 text-fg-subtle transition-colors hover:text-error disabled:opacity-40'
+                  @click='$store.cart.removeItem("{{ line_item.key }}")'
+                  :disabled='$store.cart.isCartLoading'
+                  aria-label='{{ 'sections.cart.remove_title' | t: title: line_item.title }}'
+                >
+                  {% render 'icon', icon: 'remove', class: 'size-4' %}
+                </button>
+              </div>
+            </div>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+
+    <div class='border-t border-border px-5 py-4'>
+      {%- if settings.show_cart_discount_field -%}
+        {% render 'cart-discount-form' %}
+      {%- endif -%}
+
+      {%- if settings.show_cart_note -%}
+        <details class='mb-4 border-b border-border pb-3'>
+          <summary class='cursor-pointer text-sm font-medium'>
+            {{ 'sections.cart.note' | t }}
+          </summary>
+          <textarea
+            name='note'
+            form='minicart-form'
+            rows='3'
+            class='mt-2 w-full resize-none rounded-input border border-border bg-bg px-3 py-2 text-sm'
+          >{{ cart.note }}</textarea>
+        </details>
+      {%- endif -%}
+
+      <div class='mb-1 flex items-baseline justify-between'>
+        <span class='text-sm font-medium'>{{ 'sections.cart.estimated_total' | t }}</span>
+        <span class='text-base font-semibold' data-ajax-cart-bind='total_price|money'>
+          {{- cart.total_price | money -}}
+        </span>
+      </div>
+
+      <p class='mb-4 text-xs text-fg-subtle'>
+        {%- if cart.taxes_included and shop.shipping_policy.body != blank -%}
+          {{
+            'sections.cart.taxes_included_shipping_at_checkout_with_policy_html'
+            | t: link: shop.shipping_policy.url
+          }}
+        {%- elsif cart.taxes_included -%}
+          {{ 'sections.cart.taxes_included_shipping_at_checkout_without_policy' | t }}
+        {%- elsif shop.shipping_policy.body != blank -%}
+          {{
+            'sections.cart.taxes_at_checkout_shipping_at_checkout_with_policy_html'
+            | t: link: shop.shipping_policy.url
+          }}
+        {%- else -%}
+          {{ 'sections.cart.taxes_at_checkout_shipping_at_checkout_without_policy' | t }}
+        {%- endif -%}
+      </p>
+
+      <form
+        id='minicart-form'
+        action='{{ routes.cart_url }}'
+        method='post'
+        class='flex flex-col gap-2'
+      >
+        {%- assign checkout_label = 'sections.cart.checkout' | t -%}
+        {% render 'button',
+          label: checkout_label,
+          type: 'submit',
+          full: true,
+          attr: 'name="checkout"',
+          loading_expr: '$store.cart.isCartLoading',
+          disabled_expr: '$store.cart.isCartLoading'
+        %}
+        {%- assign view_cart_label = 'templates.cart.cart' | t -%}
+        {% render 'button',
+          label: view_cart_label,
+          href: routes.cart_url,
+          variant: 'outline',
+          full: true
+        %}
+      </form>
+    </div>
+  {%- endif -%}
+</div>

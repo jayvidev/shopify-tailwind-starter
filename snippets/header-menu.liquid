@@ -1,20 +1,84 @@
-<ul class='header-menu flex items-center p-4 max-[576px]:hidden'>
-  {% for link in linklists['main-menu'].links %}
-    <li>
+{% doc %}
+  Renders the desktop navigation from a linklist. Items with children open a
+  panel on hover — a narrow dropdown or a full-width mega menu, depending on
+  `menu_type`. Three levels of nesting are supported.
+
+  Expects to be rendered inside the header's `x-data`, which owns `hoveredItem`.
+
+  @param {string} menu - Handle of the linklist to render
+  @param {string} [menu_type] - 'dropdown' or 'mega'. Defaults to 'dropdown'
+
+  @example
+  {% render 'header-menu', menu: section.settings.menu, menu_type: 'mega' %}
+{% enddoc %}
+
+{%- assign menu_type = menu_type | default: 'dropdown' -%}
+
+<ul class='header-menu flex items-center gap-1'>
+  {%- for link in linklists[menu].links -%}
+    {%- liquid
+      assign link_handle = link.handle | default: forloop.index
+      assign has_children = false
+      if link.links != blank
+        assign has_children = true
+      endif
+
+      assign is_active = false
+      if link.active or link.child_active
+        assign is_active = true
+      endif
+    -%}
+
+    <li
+      class='{% if menu_type == 'dropdown' and has_children %}relative{% endif %}'
+      {% if has_children %}
+        @mouseenter="hoveredItem = '{{ link_handle }}'; $store.ui.isMinicartVisible = false; $store.ui.isPredictiveSearchVisible = false"
+      {% else %}
+        @mouseenter='hoveredItem = null'
+      {% endif %}
+    >
       <a
         href='{{ link.url }}'
-        class='mr-4 cursor-pointer text-base text-white no-underline{% if link.active %} underline{% endif %}'
+        class='flex items-center gap-1.5 px-3 py-2 text-sm text-fg no-underline underline-offset-4 hover:underline'
+        {% if has_children %}
+          :aria-expanded="hoveredItem === '{{ link_handle }}' ? 'true' : 'false'"
+        {% endif %}
+        {% if link.active %}
+          aria-current='page'
+        {% endif %}
       >
-        {{ link.title | escape }}
+        {%- comment -%}
+          The bold copy is duplicated invisibly so the item doesn't shift width
+          when it becomes active.
+        {%- endcomment -%}
+        <span class='grid'>
+          <span class='col-start-1 row-start-1 {% if is_active %}font-semibold{% else %}font-normal{% endif %}'>
+            {{ link.title | escape }}
+          </span>
+          <span
+            class='invisible col-start-1 row-start-1 font-semibold'
+            aria-hidden='true'
+          >
+            {{ link.title | escape }}
+          </span>
+          <span
+            class='col-start-1 row-start-1 mt-6 h-px w-full {% if is_active %}bg-current{% else %}bg-transparent{% endif %}'
+          ></span>
+        </span>
+
+        {%- if has_children -%}
+          <span
+            class='inline-block transition-transform duration-300'
+            :class="{ 'rotate-180': hoveredItem === '{{ link_handle }}' }"
+          >
+            {% render 'icon', icon: 'chevron-down', class: 'size-2.5' %}
+          </span>
+        {%- endif -%}
       </a>
+
+      {%- if has_children -%}
+        {% render 'header-menu-panel', link: link, link_handle: link_handle, menu_type: menu_type %}
+      {%- endif -%}
     </li>
-  {% endfor %}
-  <button
-    type='button'
-    x-data
-    @click='$store.global.isMinicartVisible = true'
-    class='mr-4 cursor-pointer border-0 bg-transparent text-base text-white appearance-none'
-  >
-    Minicart
-  </button>
+  {%- endfor -%}
 </ul>
