@@ -119,6 +119,7 @@
         {%- if has_one_variant -%}
           {%- liquid
             assign quick_add_label = 'products.product.add_to_cart' | t
+            assign quick_adding_label = 'products.product.adding' | t
             assign add_expr = '$store.cart.addToCart(' | append: variant.id | append: ')'
             assign processing_expr = '$store.cart.processingId === "' | append: variant.id | append: '"'
             assign quick_add_aria = quick_add_label | append: ': ' | append: product.title | escape
@@ -131,6 +132,7 @@
             click_expr: add_expr,
             disabled_expr: processing_expr,
             loading_expr: processing_expr,
+            loading_label: quick_adding_label,
             attr: quick_add_attr
           %}
         {%- else -%}

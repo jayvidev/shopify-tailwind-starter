@@ -90,7 +90,7 @@
                       x-show='$store.cart.processingId === "{{ line_item.key }}"'
                       x-cloak
                     >
-                      {% render 'icon', icon: 'spinner', class: 'size-3.5 animate-spin text-fg-subtle' %}
+                      {% render 'icon', icon: 'spinner', class: 'spinner size-3.5 text-fg-subtle' %}
                     </span>
                     <span x-show='$store.cart.processingId !== "{{ line_item.key }}"'>
                       {{- line_item.quantity -}}

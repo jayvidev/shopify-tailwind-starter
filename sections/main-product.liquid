@@ -12,6 +12,7 @@
 
   assign add_to_cart_label = 'products.product.add_to_cart' | t
   assign sold_out_label = 'products.product.sold_out' | t
+  assign adding_label = 'products.product.adding' | t
 -%}
 
 {%- comment -%}
@@ -112,21 +113,22 @@
 
             {%- when 'inventory' -%}
               <div class='mb-4' data-prodify-stock-info {{ block.shopify_attributes }}>
-                {%- if tracks_inventory and inventory_qty > 0 and inventory_qty <= low_stock -%}
-                  <p class='flex items-center gap-1.5 text-sm text-sale'>
-                    {% render 'icon', icon: 'warning', class: 'size-4 shrink-0' %}
-                    {{ 'products.product.inventory_low_stock_show_count' | t: quantity: inventory_qty }}
-                  </p>
-                {%- elsif variant_available -%}
-                  <p class='flex items-center gap-1.5 text-sm text-success'>
-                    {% render 'icon', icon: 'success', class: 'size-4 shrink-0' %}
-                    {{ 'products.product.inventory_in_stock' | t }}
-                  </p>
-                {%- else -%}
-                  <p class='text-sm text-fg-subtle'>
-                    {{ 'products.product.inventory_out_of_stock' | t }}
-                  </p>
-                {%- endif -%}
+                {%- liquid
+                  if tracks_inventory and inventory_qty > 0 and inventory_qty <= low_stock
+                    assign inventory_text = 'products.product.inventory_low_stock_show_count' | t: quantity: inventory_qty
+                    assign inventory_dot = 'bg-sale'
+                  elsif variant_available
+                    assign inventory_text = 'products.product.inventory_in_stock' | t
+                    assign inventory_dot = 'bg-success'
+                  else
+                    assign inventory_text = 'products.product.inventory_out_of_stock' | t
+                    assign inventory_dot = 'bg-border'
+                  endif
+                -%}
+                <p class='flex items-center gap-2 text-sm'>
+                  <span class='size-2 shrink-0 rounded-full {{ inventory_dot }}'></span>
+                  {{ inventory_text }}
+                </p>
               </div>
 
             {%- when 'variant_picker' -%}
@@ -163,12 +165,12 @@
                   {{ 'products.product.quantity.label' | t }}
                 </label>
                 <div
-                  class='inline-flex h-11 items-center rounded-input border border-border'
+                  class='inline-flex h-10 items-center rounded-input border border-border'
                   :class="!available && 'opacity-60'"
                 >
                   <button
                     type='button'
-                    class='flex size-11 cursor-pointer items-center justify-center transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40'
+                    class='flex size-10 cursor-pointer items-center justify-center transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40'
                     @click='decrement()'
                     :disabled='!available || qty <= minQty'
                     aria-label='{{ 'products.product.quantity.decrease' | t: product: product.title }}'
@@ -190,7 +192,7 @@
                   >
                   <button
                     type='button'
-                    class='flex size-11 cursor-pointer items-center justify-center transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40'
+                    class='flex size-10 cursor-pointer items-center justify-center transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40'
                     @click='increment()'
                     :disabled='!available || qty >= maxQty'
                     aria-label='{{ 'products.product.quantity.increase' | t: product: product.title }}'
@@ -223,23 +225,26 @@
                     <input type='hidden' name='id' :value='variantId'>
                     <input type='hidden' name='quantity' :value='qty'>
 
-                    <button
-                      type='submit'
-                      name='add'
-                      class='flex w-full cursor-pointer items-center justify-center gap-2 rounded-button border border-fg bg-fg px-6 py-3.5 font-medium text-bg transition-colors hover:bg-transparent hover:text-fg disabled:cursor-not-allowed disabled:opacity-50'
-                      :disabled='btnDisabled'
-                    >
-                      <span x-show='adding' x-cloak>
-                        {% render 'icon', icon: 'spinner', class: 'size-4 animate-spin' %}
-                      </span>
-                      <span x-text='btnText'>
-                        {%- if variant_available -%}
-                          {{ add_to_cart_label }}
-                        {%- else -%}
-                          {{ sold_out_label }}
-                        {%- endif -%}
-                      </span>
-                    </button>
+                    {%- comment -%}
+                      Outline, because the dynamic checkout button below is the
+                      primary action. `btnText` covers sold out and max-in-cart.
+                    {%- endcomment -%}
+                    {%- if variant_available -%}
+                      {%- assign add_button_label = add_to_cart_label -%}
+                    {%- else -%}
+                      {%- assign add_button_label = sold_out_label -%}
+                    {%- endif -%}
+                    {% render 'button',
+                      label: add_button_label,
+                      label_expr: 'btnText',
+                      loading_expr: 'adding',
+                      loading_label: adding_label,
+                      disabled_expr: 'btnDisabled',
+                      variant: 'outline',
+                      full: true,
+                      class: 'h-12! py-0!',
+                      attr: 'name="add"'
+                    %}
 
                     <div data-ajax-cart-errors='form' class='mt-2 text-xs text-error'></div>
                   </form>
@@ -259,10 +264,7 @@
 
             {%- when 'description' -%}
               {%- if product.description != blank -%}
-                <div
-                  class='prose mt-8 border-t border-border pt-6'
-                  {{ block.shopify_attributes }}
-                >
+                <div class='rte mt-6 text-start text-sm md:text-base' {{ block.shopify_attributes }}>
                   {{ product.description }}
                 </div>
               {%- endif -%}
@@ -273,7 +275,7 @@
                   {{ block.settings.heading | default: block.settings.title }}
                   {% render 'icon', icon: 'chevron-down', class: 'size-3 shrink-0' %}
                 </summary>
-                <div class='prose pb-4'>
+                <div class='rte pb-4 text-start text-sm'>
                   {{ block.settings.content }}
                   {%- if block.settings.page != blank -%}
                     {{ pages[block.settings.page].content }}
@@ -309,9 +311,42 @@
     current_variant: current_variant,
     section_id: section.id,
     add_to_cart_label: add_to_cart_label,
-    sold_out_label: sold_out_label
+    sold_out_label: sold_out_label,
+    adding_label: adding_label
   %}
 {%- endif -%}
+
+{% stylesheet %}
+  /*
+    The dynamic checkout button is Shopify's markup, so it can't take our classes
+    — match the solid button here instead.
+  */
+  .shopify-payment-button__button--unbranded {
+    background-color: var(--color-fg) !important;
+    color: var(--color-bg);
+    border: 1px solid var(--color-fg);
+    border-radius: var(--radius-button);
+    padding: 0 2rem;
+    min-height: 3rem;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0.025em;
+    transition: opacity 0.2s ease;
+  }
+
+  .shopify-payment-button__button--unbranded:hover:not([disabled]) {
+    opacity: 0.9;
+  }
+
+  .shopify-payment-button__more-options {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
@@ -433,9 +468,6 @@
       },
       {
         "type": "price"
-      },
-      {
-        "type": "inventory"
       },
       {
         "type": "variant_picker"

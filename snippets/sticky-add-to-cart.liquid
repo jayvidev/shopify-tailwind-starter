@@ -8,6 +8,7 @@
   @param {string} section_id - Id of the product section, used to find the form and anchor
   @param {string} add_to_cart_label - Add-to-cart copy
   @param {string} sold_out_label - Sold-out copy
+  @param {string} adding_label - Copy shown while the add request is in flight
 
   @example
   {% render 'sticky-add-to-cart',
@@ -15,7 +16,8 @@
     current_variant: current_variant,
     section_id: section.id,
     add_to_cart_label: add_to_cart_label,
-    sold_out_label: sold_out_label
+    sold_out_label: sold_out_label,
+    adding_label: adding_label
   %}
 {% enddoc %}
 
@@ -122,17 +124,15 @@
           <input type='hidden' name='id' :value='variantId'>
           <input type='hidden' name='quantity' :value='qty'>
 
-          <button
-            type='submit'
-            name='add'
-            class='flex cursor-pointer items-center justify-center gap-2 rounded-button border border-fg bg-fg px-5 py-2.5 text-sm font-medium text-bg transition-colors hover:bg-transparent hover:text-fg disabled:cursor-not-allowed disabled:opacity-50'
-            :disabled='btnDisabled'
-          >
-            <span x-show='adding' x-cloak>
-              {% render 'icon', icon: 'spinner', class: 'size-4 animate-spin' %}
-            </span>
-            <span x-text='btnText'>{{ add_to_cart_label }}</span>
-          </button>
+          {% render 'button',
+            label: add_to_cart_label,
+            label_expr: 'btnText',
+            loading_expr: 'adding',
+            loading_label: adding_label,
+            disabled_expr: 'btnDisabled',
+            attr: 'name="add"',
+            class: 'h-11! py-0!'
+          %}
         </form>
       </ajax-cart-product-form>
     </div>

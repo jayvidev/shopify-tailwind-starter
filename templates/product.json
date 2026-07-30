@@ -20,10 +20,6 @@
           "type": "price",
           "settings": {}
         },
-        "inventory": {
-          "type": "inventory",
-          "settings": {}
-        },
         "variant_picker": {
           "type": "variant_picker",
           "settings": {}
@@ -46,7 +42,6 @@
       "block_order": [
         "title",
         "price",
-        "inventory",
         "variant_picker",
         "quantity",
         "buy_buttons",

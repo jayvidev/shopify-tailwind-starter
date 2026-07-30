@@ -13,6 +13,9 @@
   @param {string} [class] - Extra classes. `size` owns the padding, so override it
   @param {string} [attr] - Raw attributes appended to the tag
   @param {string} [loading_expr] - Alpine expression that toggles the spinner
+  @param {string} [loading_label] - Label shown while loading. Defaults to `label`
+  @param {string} [label_expr] - Alpine expression for a label that changes at runtime.
+    `label` stays as the server-rendered fallback
   @param {string} [click_expr] - Alpine expression bound to @click
   @param {string} [disabled_expr] - Alpine expression bound to :disabled
 
@@ -34,16 +37,17 @@
       assign size_classes = 'px-6 py-3 text-sm'
   endcase
 
+  # Hover only fades the whole button — colours never swap.
   case variant
     when 'outline'
-      assign variant_classes = 'bg-transparent text-fg border border-fg hover:bg-fg hover:text-bg'
+      assign variant_classes = 'bg-transparent text-fg border border-fg hover:opacity-70'
     when 'ghost'
-      assign variant_classes = 'bg-transparent text-fg border border-transparent hover:bg-surface'
+      assign variant_classes = 'bg-transparent text-fg border border-transparent hover:opacity-70'
     else
-      assign variant_classes = 'bg-fg text-bg border border-fg hover:bg-transparent hover:text-fg'
+      assign variant_classes = 'bg-fg text-bg border border-fg hover:opacity-90'
   endcase
 
-  assign base_classes = 'inline-flex items-center justify-center gap-2 rounded-button font-medium tracking-wide cursor-pointer transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg disabled:cursor-not-allowed disabled:opacity-50'
+  assign base_classes = 'inline-flex items-center justify-center gap-2 rounded-button font-medium tracking-wide cursor-pointer transition duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg disabled:cursor-not-allowed disabled:opacity-50'
 
   if full
     assign base_classes = base_classes | append: ' w-full'
@@ -52,16 +56,52 @@
   assign icon_classes = icon_class | default: 'size-4' | append: ' shrink-0'
 %}
 
+{%- liquid
+  # The label can be static, driven by an expression, or swapped while loading.
+  if label_expr != blank
+    assign idle_label_expr = label_expr
+  else
+    assign idle_label_expr = label | json
+  endif
+
+  if loading_expr != blank
+    assign loading_text = loading_label | default: label | json
+    capture label_binding
+      echo loading_expr
+      echo ' ? '
+      echo loading_text
+      echo ' : '
+      echo idle_label_expr
+    endcapture
+  elsif label_expr != blank
+    assign label_binding = label_expr
+  endif
+-%}
+
 {%- capture button_content -%}
   {%- if loading_expr != blank -%}
     <span x-show='{{ loading_expr }}' x-cloak>
-      {%- render 'icon', icon: 'spinner', class: 'size-4 animate-spin' -%}
+      {%- render 'icon', icon: 'spinner', class: 'spinner size-4' -%}
     </span>
   {%- endif -%}
+
   {%- if icon != blank -%}
-    {% render 'icon', icon: icon, class: icon_classes %}
+    {%- if loading_expr != blank -%}
+      <span x-show='!({{ loading_expr }})'>
+        {% render 'icon', icon: icon, class: icon_classes %}
+      </span>
+    {%- else -%}
+      {% render 'icon', icon: icon, class: icon_classes %}
+    {%- endif -%}
   {%- endif -%}
-  <span>{{ label }}</span>
+
+  <span
+    {% if label_binding != blank %}
+      x-text='{{ label_binding }}'
+    {% endif %}
+  >
+    {{- label -}}
+  </span>
 {%- endcapture -%}
 
 {% if href != blank %}

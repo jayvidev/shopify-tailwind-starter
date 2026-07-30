@@ -118,6 +118,42 @@
   }
 }
 
+/*
+  The spinner is a single circle, so rotating it alone shows nothing — the arc is
+  drawn by animating the dash offset while the whole thing turns.
+*/
+@utility spinner {
+  animation: spinner-rotate 1.4s linear infinite;
+
+  & circle {
+    stroke: currentColor;
+    stroke-dasharray: 280;
+    stroke-dashoffset: 0;
+    transform-origin: center;
+    animation: spinner-dash 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(270deg);
+  }
+}
+
+@keyframes spinner-dash {
+  0% {
+    stroke-dashoffset: 280;
+  }
+  50% {
+    stroke-dashoffset: 75;
+    transform: rotate(135deg);
+  }
+  100% {
+    stroke-dashoffset: 280;
+    transform: rotate(450deg);
+  }
+}
+
 /* Page container: max width plus the horizontal gutter. */
 @utility page {
   width: 100%;
@@ -136,6 +172,50 @@
 
   @variant md {
     padding-block: --spacing(16);
+  }
+}
+
+@utility rte {
+  > * + * {
+    margin-top: 1em;
+  }
+
+  & :where(h1, h2, h3, h4, h5, h6) {
+    font-weight: 600;
+  }
+
+  & :where(ul, ol) {
+    padding-inline-start: 1.5em;
+    list-style: revert;
+  }
+
+  & :where(li + li) {
+    margin-top: 0.25em;
+  }
+
+  & :where(a) {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  & :where(img, iframe, video) {
+    max-width: 100%;
+  }
+
+  & :where(iframe) {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+
+  & :where(table) {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  & :where(th, td) {
+    border: 1px solid var(--color-border);
+    padding: 0.5em 0.75em;
+    text-align: start;
   }
 }
 

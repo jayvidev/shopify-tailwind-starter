@@ -196,7 +196,8 @@
       "taxes_included": "Impuestos incluidos.",
       "duties_included": "Aranceles incluidos.",
       "duties_and_taxes_included": "Aranceles e impuestos incluidos.",
-      "value_sold_out": "{{ option_value }} — agotado"
+      "value_sold_out": "{{ option_value }} — agotado",
+      "adding": "Añadiendo"
     },
     "modal": {
       "label": "Galería multimedia"

@@ -195,7 +195,8 @@
       "duties_included": "Duties included.",
       "duties_and_taxes_included": "Duties and taxes included.",
       "shipping_policy_html": "<a href=\"{{ link }}\">Shipping</a> calculated at checkout.",
-      "value_sold_out": "{{ option_value }} — sold out"
+      "value_sold_out": "{{ option_value }} — sold out",
+      "adding": "Adding"
     },
     "modal": {
       "label": "Media gallery"
