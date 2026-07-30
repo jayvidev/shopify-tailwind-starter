@@ -12,32 +12,13 @@
   x-data='collection({ sectionId: "{{ section.id }}" })'
   @click='handleLinkClick($event)'
 >
-  {%- if section.settings.show_banner -%}
-    <div class='mb-8 flex flex-col items-center gap-3 text-center'>
-      <h1 class='text-3xl font-semibold md:text-4xl lg:text-5xl'>{{ collection.title }}</h1>
+  <div class='mb-8 flex flex-col items-center gap-3 text-center'>
+    <h1 class='text-3xl font-semibold md:text-4xl lg:text-5xl'>{{ collection.title }}</h1>
 
-      {%- if section.settings.show_description and collection.description != blank -%}
-        <div class='prose max-w-3xl text-center'>{{ collection.description }}</div>
-      {%- endif -%}
-
-      {%- if section.settings.show_image and collection.image -%}
-        {%- assign banner_alt = collection.image.alt | default: collection.title | escape -%}
-        <div class='mt-4 w-full overflow-hidden rounded-media'>
-          {{
-            collection.image
-            | image_url: width: 2400
-            | image_tag:
-              alt: banner_alt,
-              loading: 'eager',
-              fetchpriority: 'high',
-              sizes: '100vw',
-              widths: '600, 900, 1200, 1600, 2000, 2400',
-              class: 'h-48 w-full object-cover md:h-72'
-          }}
-        </div>
-      {%- endif -%}
-    </div>
-  {%- endif -%}
+    {%- if collection.description != blank -%}
+      <div class='prose max-w-3xl text-center'>{{ collection.description }}</div>
+    {%- endif -%}
+  </div>
 
   {%- paginate collection.products by section.settings.products_per_page -%}
     {% render 'product-grid-filters',
@@ -47,8 +28,7 @@
       sort_options: collection.sort_options,
       sort_selected: collection.sort_by,
       results_url: collection.url,
-      form_id_prefix: 'Collection',
-      columns: section.settings.columns
+      form_id_prefix: 'Collection'
     %}
   {%- endpaginate -%}
 </div>
@@ -60,24 +40,6 @@
   "tag": "section",
   "settings": [
     {
-      "type": "checkbox",
-      "id": "show_banner",
-      "default": true,
-      "label": "Show collection title"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_description",
-      "default": true,
-      "label": "Show collection description"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_image",
-      "default": false,
-      "label": "Show collection image"
-    },
-    {
       "type": "range",
       "id": "products_per_page",
       "min": 8,
@@ -85,17 +47,6 @@
       "step": 4,
       "default": 16,
       "label": "Products per page"
-    },
-    {
-      "type": "select",
-      "id": "columns",
-      "default": "3",
-      "options": [
-        { "value": "2", "label": "2" },
-        { "value": "3", "label": "3" },
-        { "value": "4", "label": "4" }
-      ],
-      "label": "Desktop columns"
     }
   ]
 }

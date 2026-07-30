@@ -259,7 +259,10 @@
 
             {%- when 'description' -%}
               {%- if product.description != blank -%}
-                <div class='prose mt-6' {{ block.shopify_attributes }}>
+                <div
+                  class='prose mt-8 border-t border-border pt-6'
+                  {{ block.shopify_attributes }}
+                >
                   {{ product.description }}
                 </div>
               {%- endif -%}
@@ -335,13 +338,39 @@
     }
   ],
   "blocks": [
-    { "type": "@app" },
-    { "type": "vendor", "name": "Vendor", "limit": 1 },
-    { "type": "title", "name": "Title", "limit": 1 },
-    { "type": "price", "name": "Price", "limit": 1 },
-    { "type": "inventory", "name": "Inventory status", "limit": 1 },
-    { "type": "variant_picker", "name": "Variant picker", "limit": 1 },
-    { "type": "quantity", "name": "Quantity selector", "limit": 1 },
+    {
+      "type": "@app"
+    },
+    {
+      "type": "vendor",
+      "name": "Vendor",
+      "limit": 1
+    },
+    {
+      "type": "title",
+      "name": "Title",
+      "limit": 1
+    },
+    {
+      "type": "price",
+      "name": "Price",
+      "limit": 1
+    },
+    {
+      "type": "inventory",
+      "name": "Inventory status",
+      "limit": 1
+    },
+    {
+      "type": "variant_picker",
+      "name": "Variant picker",
+      "limit": 1
+    },
+    {
+      "type": "quantity",
+      "name": "Quantity selector",
+      "limit": 1
+    },
     {
       "type": "buy_buttons",
       "name": "Buy buttons",
@@ -356,14 +385,31 @@
         }
       ]
     },
-    { "type": "description", "name": "Description", "limit": 1 },
+    {
+      "type": "description",
+      "name": "Description",
+      "limit": 1
+    },
     {
       "type": "collapsible_row",
       "name": "Collapsible row",
       "settings": [
-        { "type": "text", "id": "heading", "default": "Collapsible row", "label": "Heading" },
-        { "type": "richtext", "id": "content", "label": "Content" },
-        { "type": "page", "id": "page", "label": "Content from page" }
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "Collapsible row",
+          "label": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Content"
+        },
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Content from page"
+        }
       ]
     },
     {
@@ -371,20 +417,38 @@
       "name": "Share",
       "limit": 1,
       "settings": [
-        { "type": "text", "id": "share_label", "default": "Share", "label": "Label" }
+        {
+          "type": "text",
+          "id": "share_label",
+          "default": "Share",
+          "label": "Label"
+        }
       ]
     }
   ],
   "default": {
     "blocks": [
-      { "type": "vendor" },
-      { "type": "title" },
-      { "type": "price" },
-      { "type": "inventory" },
-      { "type": "variant_picker" },
-      { "type": "quantity" },
-      { "type": "buy_buttons" },
-      { "type": "description" }
+      {
+        "type": "title"
+      },
+      {
+        "type": "price"
+      },
+      {
+        "type": "inventory"
+      },
+      {
+        "type": "variant_picker"
+      },
+      {
+        "type": "quantity"
+      },
+      {
+        "type": "buy_buttons"
+      },
+      {
+        "type": "description"
+      }
     ]
   }
 }

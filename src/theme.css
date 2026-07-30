@@ -143,24 +143,23 @@
   max-width: none;
   font-size: 0.875rem;
 
+  --tw-prose-body: var(--color-fg-muted);
+  --tw-prose-headings: var(--color-fg);
+  --tw-prose-links: var(--color-fg);
+  --tw-prose-bold: var(--color-fg);
+  --tw-prose-bullets: var(--color-border);
+  --tw-prose-hr: var(--color-border);
+  --tw-prose-quotes: var(--color-fg);
+  --tw-prose-quote-borders: var(--color-border);
+
   @variant md {
     font-size: 1rem;
   }
 
-  :where(:not(.not-prose, .not-prose *)) {
-    --tw-prose-body: var(--color-fg-muted);
-    --tw-prose-headings: var(--color-fg);
-    --tw-prose-links: var(--color-fg);
-    --tw-prose-bold: var(--color-fg);
-    --tw-prose-bullets: var(--color-border);
-    --tw-prose-hr: var(--color-border);
-    --tw-prose-quotes: var(--color-fg);
-    --tw-prose-quote-borders: var(--color-border);
-
-    &:where(iframe) {
-      width: 100%;
-      height: 100%;
-      aspect-ratio: 16 / 9;
-    }
+  /* Embeds pasted into a description come without sizing of their own. */
+  :where(iframe:not(.not-prose *)) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
   }
 }

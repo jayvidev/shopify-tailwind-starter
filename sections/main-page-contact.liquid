@@ -25,6 +25,7 @@
           id: 'contact-name',
           name: 'contact[name]',
           label: name_label,
+          placeholder: name_label,
           value: form.name
         %}
         {% render 'form-input',
@@ -32,6 +33,7 @@
           name: 'contact[email]',
           type: 'email',
           label: email_label,
+          placeholder: email_label,
           value: form.email,
           required: true
         %}
@@ -42,7 +44,8 @@
         id: 'contact-phone',
         name: 'contact[phone]',
         type: 'tel',
-        label: phone_label
+        label: phone_label,
+        placeholder: phone_label
       %}
 
       {%- assign comment_label = 'templates.contact.form.comment' | t -%}
@@ -50,6 +53,7 @@
         id: 'contact-body',
         name: 'contact[body]',
         label: comment_label,
+        placeholder: comment_label,
         value: form.body,
         rows: 5,
         required: true

@@ -4,7 +4,7 @@
 -%}
 
 <div
-  class='header-container relative bg-bg{% if section.settings.show_line_separator %} border-b border-border{% endif %}'
+  class='header-container relative border-b border-border bg-bg'
   x-data='{ hoveredItem: null }'
   x-init="$watch('hoveredItem', (value) => ($store.ui.isMegaMenuVisible = !!value))"
   @close-mega-menu.window='hoveredItem = null'
@@ -15,7 +15,7 @@
     <div class='flex flex-1 items-center justify-start'>
       <button
         type='button'
-        class='-ms-2 cursor-pointer p-2 lg:hidden'
+        class='-ms-3 flex size-11 cursor-pointer items-center justify-center lg:hidden'
         @click='$store.ui.toggleMobileMenu(); $store.ui.isPredictiveSearchVisible = false; $store.ui.isMinicartVisible = false; hoveredItem = null'
         :aria-expanded="$store.ui.isMobileMenuVisible ? 'true' : 'false'"
         aria-controls='mobile-menu'
@@ -29,21 +29,16 @@
         </span>
       </button>
 
-      {%- if section.settings.logo_position == 'left' -%}
-        <a
-          href='{{ routes.root_url }}'
-          class='hidden shrink-0 items-center no-underline lg:flex'
-        >
-          {% render 'header-logo' %}
-        </a>
-      {%- endif -%}
+      <a
+        href='{{ routes.root_url }}'
+        class='hidden shrink-0 items-center no-underline lg:flex'
+      >
+        {% render 'header-logo' %}
+      </a>
     </div>
 
-    {%- comment -%}
-      The logo sits in the middle on mobile either way; on desktop the middle
-      slot holds whichever of logo/nav the setting didn't put on the left.
-    {%- endcomment -%}
-    <div class='flex shrink-0 items-center justify-center {% if section.settings.logo_position == 'left' %}lg:hidden{% endif %}'>
+    {%- comment -%} The logo moves to the middle on mobile, where there's no nav. {%- endcomment -%}
+    <div class='flex shrink-0 items-center justify-center lg:hidden'>
       <a
         href='{{ routes.root_url }}'
         class='flex items-center no-underline'
@@ -57,11 +52,11 @@
     </div>
 
     {%- comment -%} Right: search, account, cart {%- endcomment -%}
-    <div class='flex flex-1 items-center justify-end gap-1'>
+    <div class='flex flex-1 items-center justify-end'>
       {%- if settings.predictive_search_enabled -%}
         <button
           type='button'
-          class='cursor-pointer p-2'
+          class='flex size-11 cursor-pointer items-center justify-center'
           @click='$store.ui.isPredictiveSearchVisible = true; $store.ui.isMobileMenuVisible = false; $store.ui.isMinicartVisible = false; hoveredItem = null'
           :aria-expanded="$store.ui.isPredictiveSearchVisible ? 'true' : 'false'"
           aria-controls='predictive-search'
@@ -72,7 +67,7 @@
       {%- else -%}
         <a
           href='{{ routes.search_url }}'
-          class='p-2'
+          class='flex size-11 items-center justify-center'
           aria-label='{{ 'general.search.search' | t }}'
         >
           {% render 'icon', icon: 'search', class: 'size-5' %}
@@ -82,7 +77,7 @@
       {%- if shop.customer_accounts_enabled and section.settings.show_account -%}
         <a
           href='{{ routes.account_url }}'
-          class='hidden p-2 md:block'
+          class='hidden size-11 items-center justify-center md:flex'
           aria-label='{{ 'customer.log_in' | t }}'
         >
           {% render 'icon', icon: 'user', class: 'size-5' %}
@@ -91,17 +86,45 @@
 
       <button
         type='button'
-        class='relative -me-2 cursor-pointer p-2'
+        class='relative -me-3 flex size-11 cursor-pointer items-center justify-center'
         @click='$store.ui.isMinicartVisible = true; $store.ui.isMobileMenuVisible = false; $store.ui.isPredictiveSearchVisible = false; hoveredItem = null'
         aria-label='{{ 'templates.cart.cart' | t }}'
         aria-controls='minicart'
       >
-        {% render 'icon', icon: 'cart', class: 'size-11' %}
+        {%- comment -%}
+          Two icons, one shown at a time: the closed bag once there's something in
+          the cart. `$store.cart` is populated from the initial cart state, and the
+          Liquid value covers the frame before Alpine starts.
+        {%- endcomment -%}
+        {%- liquid
+          assign cart_has_items = false
+          if cart.item_count > 0
+            assign cart_has_items = true
+          endif
+        -%}
         <span
-          data-ajax-cart-bind='item_count'
-          class='cart-count-badge absolute inset-e-2.5 bottom-2.5 flex size-4 items-center justify-center rounded-full bg-fg text-[10px] font-semibold text-bg'
+          x-data='{
+            get hasItems() {
+              return $store.cart.cart
+                ? $store.cart.cart.item_count > 0
+                : {{ cart_has_items | json }}
+            }
+          }'
         >
-          {{- cart.item_count -}}
+          <span x-show='!hasItems' {% if cart_has_items %}x-cloak{% endif %}>
+            {% render 'icon', icon: 'cart-empty', class: 'size-11' %}
+          </span>
+          <span x-show='hasItems' {% unless cart_has_items %}x-cloak{% endunless %}>
+            {% render 'icon', icon: 'cart', class: 'size-11' %}
+          </span>
+
+          {%- comment -%} Same offsets as Dawn: 17px bubble, 8px up, 22px in. {%- endcomment -%}
+          <span
+            data-ajax-cart-bind='item_count'
+            class='cart-count-badge absolute bottom-2 inset-s-5.5 flex size-[1.0625rem] items-center justify-center rounded-full bg-fg text-[0.5625rem] font-semibold text-bg'
+          >
+            {{- cart.item_count -}}
+          </span>
         </span>
       </button>
     </div>
@@ -114,7 +137,6 @@
     <script src='{{ 'predictive-search.js' | asset_url }}' defer='defer'></script>
   {%- endif -%}
 
-  {% render 'minicart' %}
 </div>
 
 {% stylesheet %}
@@ -154,33 +176,10 @@
       "info": "Both are built from the nesting of the menu you selected — up to three levels."
     },
     {
-      "type": "select",
-      "id": "logo_position",
-      "default": "left",
-      "options": [
-        {
-          "value": "left",
-          "label": "Left"
-        },
-        {
-          "value": "center",
-          "label": "Center"
-        }
-      ],
-      "label": "Desktop logo position",
-      "info": "The logo image comes from Theme settings → Branding."
-    },
-    {
       "type": "checkbox",
       "id": "show_account",
       "default": true,
       "label": "Show account link"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_line_separator",
-      "default": true,
-      "label": "Show separator line"
     }
   ],
   "enabled_on": {

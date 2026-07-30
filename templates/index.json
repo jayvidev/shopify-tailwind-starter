@@ -40,12 +40,7 @@
         "button"
       ],
       "settings": {
-        "image": "shopify://shop_images/banner.jpg",
-        "height": "medium",
-        "content_position": "middle-center",
-        "overlay_opacity": 20,
-        "text_color": "#ffffff",
-        "image_behavior": "fixed"
+        "image": "shopify://shop_images/banner.jpg"
       }
     },
     "featured-collection": {
@@ -55,7 +50,6 @@
         "description": "",
         "collection": "frontpage",
         "products_to_show": 8,
-        "columns": "4",
         "show_view_all": true
       }
     },
@@ -87,9 +81,7 @@
         "three"
       ],
       "settings": {
-        "heading": "Shop by category",
-        "columns": "3",
-        "show_product_count": false
+        "heading": "Shop by category"
       }
     },
     "multicolumn": {
@@ -129,9 +121,7 @@
         "three"
       ],
       "settings": {
-        "heading": "Why shop with us",
-        "columns": "3",
-        "image_shape": "landscape"
+        "heading": "Why shop with us"
       }
     },
     "rich-text": {

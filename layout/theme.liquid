@@ -92,11 +92,29 @@
 
     {% sections 'footer-group' %}
 
+    {%- comment -%}
+      Two backdrops, because they sit on different sides of the header. The menus
+      and the search panel hang off the header, so their backdrop goes *under* it;
+      the cart drawer covers the page, header included, so its backdrop goes above.
+
+      The drawer is rendered here rather than inside the header for the same
+      reason: the header is a `z-100` stacking context, and anything inside it can
+      never paint above a backdrop that covers the header.
+    {%- endcomment -%}
     {% render 'backdrop',
-      show_condition: '$store.ui.isMinicartVisible || $store.ui.isMegaMenuVisible || $store.ui.isMobileMenuVisible || $store.ui.isPredictiveSearchVisible',
-      click_action: '$store.ui.isMinicartVisible = false; $store.ui.isMobileMenuVisible = false; $store.ui.isPredictiveSearchVisible = false; $dispatch("close-mega-menu")',
-      mouseenter_action: '$dispatch("close-mega-menu")'
+      show_condition: '$store.ui.isMegaMenuVisible || $store.ui.isMobileMenuVisible || $store.ui.isPredictiveSearchVisible',
+      click_action: '$store.ui.isMobileMenuVisible = false; $store.ui.isPredictiveSearchVisible = false; $dispatch("close-mega-menu")',
+      mouseenter_action: '$dispatch("close-mega-menu")',
+      z_class: 'z-90'
     %}
+
+    {% render 'backdrop',
+      show_condition: '$store.ui.isMinicartVisible',
+      click_action: '$store.ui.isMinicartVisible = false',
+      z_class: 'z-110'
+    %}
+
+    {% render 'minicart' %}
 
     {% render 'liquid-ajax-cart' %}
 

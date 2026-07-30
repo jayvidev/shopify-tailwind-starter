@@ -1,21 +1,10 @@
-{%- liquid
-  case section.settings.columns
-    when '2'
-      assign grid_classes = 'grid-cols-1 md:grid-cols-2'
-    when '4'
-      assign grid_classes = 'grid-cols-2 md:grid-cols-4'
-    else
-      assign grid_classes = 'grid-cols-2 md:grid-cols-3'
-  endcase
--%}
-
 <div class='page section-spacing'>
   {%- if section.settings.heading != blank -%}
     <h2 class='mb-6 text-2xl font-semibold md:text-3xl'>{{ section.settings.heading }}</h2>
   {%- endif -%}
 
   {%- if section.blocks.size > 0 -%}
-    <div class='grid grid-gap {{ grid_classes }}'>
+    <div class='grid grid-gap grid-cols-2 md:grid-cols-3'>
       {%- for block in section.blocks -%}
         {%- liquid
           # A `collection` setting hands back the collection itself, not its handle.
@@ -50,7 +39,7 @@
           <h3 class='text-sm font-medium text-fg underline-offset-4 group-hover:underline md:text-base'>
             {{ block_title }}
           </h3>
-          {%- if section.settings.show_product_count and block_collection.title != blank -%}
+          {%- if block_collection.title != blank -%}
             <p class='text-xs text-fg-subtle'>
               {{ 'products.facets.product_count_simple' | t: count: block_collection.all_products_count }}
             </p>
@@ -66,34 +55,46 @@
   "name": "Collection list",
   "tag": "section",
   "settings": [
-    { "type": "text", "id": "heading", "default": "Collections", "label": "Heading" },
     {
-      "type": "select",
-      "id": "columns",
-      "default": "3",
-      "options": [
-        { "value": "2", "label": "2" },
-        { "value": "3", "label": "3" },
-        { "value": "4", "label": "4" }
-      ],
-      "label": "Desktop columns"
-    },
-    { "type": "checkbox", "id": "show_product_count", "default": false, "label": "Show product count" }
+      "type": "text",
+      "id": "heading",
+      "default": "Collections",
+      "label": "Heading"
+    }
   ],
   "blocks": [
     {
       "type": "collection",
       "name": "Collection",
       "settings": [
-        { "type": "collection", "id": "collection", "label": "Collection" },
-        { "type": "image_picker", "id": "image", "label": "Image", "info": "Defaults to the collection image." }
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "Defaults to the collection image."
+        }
       ]
     }
   ],
   "presets": [
     {
       "name": "Collection list",
-      "blocks": [{ "type": "collection" }, { "type": "collection" }, { "type": "collection" }]
+      "blocks": [
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        }
+      ]
     }
   ]
 }

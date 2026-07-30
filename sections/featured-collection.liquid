@@ -4,16 +4,6 @@
   assign featured_collection = section.settings.collection
   assign products_to_show = section.settings.products_to_show
 
-  case section.settings.columns
-    when '2'
-      assign grid_classes = 'grid-cols-2'
-    when '5'
-      assign grid_classes = 'grid-cols-2 md:grid-cols-3 lg:grid-cols-5'
-    when '4'
-      assign grid_classes = 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-    else
-      assign grid_classes = 'grid-cols-2 md:grid-cols-3'
-  endcase
 -%}
 
 <div class='page section-spacing'>
@@ -39,7 +29,7 @@
   </div>
 
   {%- if featured_collection.products.size > 0 -%}
-    <div class='grid grid-gap {{ grid_classes }}'>
+    <div class='grid grid-gap grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
       {%- for product in featured_collection.products limit: products_to_show -%}
         {% render 'product-card', product: product %}
       {%- endfor -%}
@@ -49,7 +39,7 @@
       Placeholders until a collection is picked, so the section is visible in the
       editor instead of looking broken.
     {%- endcomment -%}
-    <div class='grid grid-gap {{ grid_classes }}'>
+    <div class='grid grid-gap grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
       {%- for i in (1..products_to_show) -%}
         <div class='flex flex-col'>
           <div class='mb-3 aspect-square overflow-hidden rounded-media bg-surface'>
@@ -68,9 +58,22 @@
   "name": "Featured collection",
   "tag": "section",
   "settings": [
-    { "type": "text", "id": "heading", "default": "Featured collection", "label": "Heading" },
-    { "type": "richtext", "id": "description", "label": "Description" },
-    { "type": "collection", "id": "collection", "label": "Collection" },
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "Featured collection",
+      "label": "Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
     {
       "type": "range",
       "id": "products_to_show",
@@ -81,19 +84,16 @@
       "label": "Products to show"
     },
     {
-      "type": "select",
-      "id": "columns",
-      "default": "4",
-      "options": [
-        { "value": "2", "label": "2" },
-        { "value": "3", "label": "3" },
-        { "value": "4", "label": "4" },
-        { "value": "5", "label": "5" }
-      ],
-      "label": "Desktop columns"
-    },
-    { "type": "checkbox", "id": "show_view_all", "default": true, "label": "Show \"View all\"" }
+      "type": "checkbox",
+      "id": "show_view_all",
+      "default": true,
+      "label": "Show \"View all\""
+    }
   ],
-  "presets": [{ "name": "Featured collection" }]
+  "presets": [
+    {
+      "name": "Featured collection"
+    }
+  ]
 }
 {% endschema %}

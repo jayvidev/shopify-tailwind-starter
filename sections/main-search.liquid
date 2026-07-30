@@ -55,8 +55,7 @@
         sort_options: search.sort_options,
         sort_selected: search.sort_by,
         results_url: routes.search_url,
-        form_id_prefix: 'Search',
-        columns: section.settings.columns
+        form_id_prefix: 'Search'
       %}
     {%- endpaginate -%}
   {%- endif -%}
@@ -76,17 +75,6 @@
       "step": 4,
       "default": 16,
       "label": "Results per page"
-    },
-    {
-      "type": "select",
-      "id": "columns",
-      "default": "3",
-      "options": [
-        { "value": "2", "label": "2" },
-        { "value": "3", "label": "3" },
-        { "value": "4", "label": "4" }
-      ],
-      "label": "Desktop columns"
     }
   ]
 }

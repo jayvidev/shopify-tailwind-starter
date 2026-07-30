@@ -1,20 +1,9 @@
-{%- liquid
-  case section.settings.columns
-    when '2'
-      assign grid_classes = 'grid-cols-1 md:grid-cols-2'
-    when '4'
-      assign grid_classes = 'grid-cols-2 md:grid-cols-4'
-    else
-      assign grid_classes = 'grid-cols-2 md:grid-cols-3'
-  endcase
--%}
-
 <div class='page section-spacing'>
   <h1 class='mb-8 text-2xl font-semibold md:text-3xl'>
     {{ page_title }}
   </h1>
 
-  <div class='grid grid-gap {{ grid_classes }}'>
+  <div class='grid grid-gap grid-cols-2 md:grid-cols-3'>
     {%- for collection in collections -%}
       {%- assign card_alt = collection.featured_image.alt | default: collection.title | escape -%}
       <a href='{{ collection.url }}' class='group flex flex-col no-underline'>
@@ -50,18 +39,6 @@
   "name": "Collections list",
   "class": "section-main-list-collections",
   "tag": "section",
-  "settings": [
-    {
-      "type": "select",
-      "id": "columns",
-      "default": "3",
-      "options": [
-        { "value": "2", "label": "2" },
-        { "value": "3", "label": "3" },
-        { "value": "4", "label": "4" }
-      ],
-      "label": "Desktop columns"
-    }
-  ]
+  "settings": []
 }
 {% endschema %}

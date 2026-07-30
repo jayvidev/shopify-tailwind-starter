@@ -12,17 +12,38 @@
     "main": {
       "type": "main-product",
       "blocks": {
-        "vendor": { "type": "vendor", "settings": {} },
-        "title": { "type": "title", "settings": {} },
-        "price": { "type": "price", "settings": {} },
-        "inventory": { "type": "inventory", "settings": {} },
-        "variant_picker": { "type": "variant_picker", "settings": {} },
-        "quantity": { "type": "quantity", "settings": {} },
-        "buy_buttons": { "type": "buy_buttons", "settings": { "show_dynamic_checkout": true } },
-        "description": { "type": "description", "settings": {} }
+        "title": {
+          "type": "title",
+          "settings": {}
+        },
+        "price": {
+          "type": "price",
+          "settings": {}
+        },
+        "inventory": {
+          "type": "inventory",
+          "settings": {}
+        },
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": {}
+        },
+        "quantity": {
+          "type": "quantity",
+          "settings": {}
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {}
+        }
       },
       "block_order": [
-        "vendor",
         "title",
         "price",
         "inventory",
@@ -31,12 +52,21 @@
         "buy_buttons",
         "description"
       ],
-      "settings": { "enable_sticky_add_to_cart": true, "low_stock_threshold": 5 }
+      "settings": {
+        "enable_sticky_add_to_cart": true,
+        "low_stock_threshold": 5
+      }
     },
     "recommendations": {
       "type": "product-recommendations",
-      "settings": { "heading": "You may also like", "products_to_show": 6 }
+      "settings": {
+        "heading": "You may also like",
+        "products_to_show": 6
+      }
     }
   },
-  "order": ["main", "recommendations"]
+  "order": [
+    "main",
+    "recommendations"
+  ]
 }
