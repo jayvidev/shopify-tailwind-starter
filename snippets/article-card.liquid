@@ -11,7 +11,7 @@
 {%- assign article_alt = article.image.alt | default: article.title | escape -%}
 
 <article class='group flex flex-col'>
-  <a href='{{ article.url }}' class='mb-3 block aspect-[3/2] overflow-hidden rounded-media bg-surface'>
+  <a href='{{ article.url }}' class='mb-3 block aspect-3/2 overflow-hidden rounded-media bg-surface'>
     {%- if article.image -%}
       {{
         article.image

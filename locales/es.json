@@ -88,7 +88,7 @@
       "new_window": "Se abre en una nueva ventana.",
       "external": "Se abre el sitio web externo."
     },
-    "loading": "Cargando...",
+    "loading": "Cargando",
     "skip_to_product_info": "Ir directamente a la información del producto",
     "total_reviews": "reseñas totales",
     "star_reviews_info": "{{ rating_value }} de {{ rating_max }} estrellas",

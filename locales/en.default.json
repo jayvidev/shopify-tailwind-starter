@@ -89,7 +89,7 @@
       "new_window": "Opens in a new window.",
       "external": "Opens external website."
     },
-    "loading": "Loading...",
+    "loading": "Loading",
     "total_reviews": "total reviews",
     "star_reviews_info": "{{ rating_value }} out of {{ rating_max }} stars",
     "collapsible_content_title": "Collapsible content",
