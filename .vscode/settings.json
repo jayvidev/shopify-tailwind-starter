@@ -33,5 +33,6 @@
   },
   "prettier.requireConfig": true,
   "shopifyLiquid.formattingEnabled": true,
-  "shopifyLiquid.themeCheckEnabled": true
+  "shopifyLiquid.themeCheckEnabled": true,
+  "css.lint.unknownAtRules": "ignore"
 }
