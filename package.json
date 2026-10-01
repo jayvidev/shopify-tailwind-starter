@@ -15,12 +15,6 @@
     "zip": "zip -r theme.zip assets config layout locales sections snippets templates shopify.theme.toml -x \"*.DS_Store*\"",
     "package": "pnpm build && pnpm zip"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "protobufjs"
-    ]
-  },
   "devDependencies": {
     "@alpinejs/collapse": "^3.15.3",
     "@alpinejs/focus": "^3.15.3",
